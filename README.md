@@ -37,3 +37,8 @@ Hervé peut relancer la recherche avec « Actualiser les infos » dans la fiche 
 
 Dans un avis, on peut coller l'adresse d'un GIF (lien giphy.com ou image en https), sans configuration.
 Pour activer la recherche de GIF dans l'app, créez une clé gratuite sur https://developers.giphy.com et collez-la dans `giphyKey` (config.js).
+
+## Mot de passe oublié
+
+Sur l'écran de connexion, « Mot de passe oublié ? » envoie un e-mail avec un lien. Pour que ce lien ramène sur le site, dans Supabase :
+Authentication > URL Configuration : mettre l'adresse du site dans « Site URL » et l'ajouter dans « Redirect URLs ».

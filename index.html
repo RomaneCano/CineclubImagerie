@@ -140,6 +140,19 @@ nav button{padding:9px 16px}
 .fside{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.flist{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}.flist .frow:last-child{border:0}
 .mg{margin-bottom:12px}.mh{display:flex;gap:12px;align-items:center;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left;margin-bottom:14px}.mh b{flex:1;text-transform:capitalize;font:600 18px Fraunces}.mh i{font-style:normal;color:var(--mut);font-size:22px}
 .ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.ctl select{width:auto}
+.mi{display:flex;align-items:center;gap:12px}.mi .ico{font-size:22px;width:30px;text-align:center;flex:none}.mi-out{margin-top:6px;border-top:1px solid var(--line);border-radius:0 0 10px 10px;padding-top:14px;font-weight:600;color:var(--bad)}.mi-out .ico{font-size:26px}
+.rk{animation:rise .45s ease both;animation-delay:calc(var(--i)*40ms)}@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+.mbar{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-top:6px;max-width:220px}.mbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));animation:fill .8s ease forwards;animation-delay:calc(var(--i,0)*40ms + .2s)}@keyframes fill{to{width:var(--w)}}
+.rkl .frow:nth-child(n){--i:0}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.cf{position:absolute;top:-16px;left:var(--x);width:8px;height:14px;background:var(--c);opacity:.95;animation:fall var(--d) linear var(--w) 1 forwards}@keyframes fall{to{transform:translateY(620px) rotate(560deg);opacity:0}}
+.podium{display:flex;gap:12px;align-items:flex-end;justify-content:center;height:340px;margin:38px 0 18px;position:relative}.pcol{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;width:31%;max-width:170px;text-align:center;gap:2px}
+.pav{font-size:36px;opacity:0;animation:pop .5s ease forwards;animation-delay:calc(var(--dl,0s) + .8s);position:relative}.p1 .pav{animation-delay:1.4s}.p2 .pav{animation-delay:1.1s}.p3 .pav{animation-delay:.8s}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.crown{position:absolute;top:-30px;left:50%;margin-left:-14px;font-size:26px;animation:bob 1.6s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-6px)}}
+.pbar{width:100%;border-radius:12px 12px 0 0;display:grid;place-items:start center;padding-top:10px;font-size:32px;height:0;animation:grow .9s cubic-bezier(.2,.9,.3,1) forwards;animation-delay:var(--dl)}@keyframes grow{to{height:var(--h)}}
+.p1 .pbar{background:linear-gradient(#ffe066,#ff9d1f)}.p2 .pbar{background:linear-gradient(#e6e8ee,#9aa0ad)}.p3 .pbar{background:linear-gradient(#e0a370,#a8622d)}
+@media(prefers-reduced-motion:reduce){.pbar{height:var(--h)!important}.pav{opacity:1!important}.mbar i{width:var(--w)!important}.cf{display:none}.rk{opacity:1!important}}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}.tile{display:grid;gap:4px;justify-items:start;text-align:left;padding:14px;border-radius:var(--r);background:var(--panel);border:1px solid var(--line);transition:.15s}.tile:hover{border-color:var(--acc);transform:translateY(-2px)}.tile.on{border-color:var(--ok)}.tile .tem{font-size:30px}.tile b{font-size:16px}
 </style>
 </head>
 <body>
@@ -305,6 +318,7 @@ function badgeFams(id,xp,lvl){
    ['Communauté','❤️','Coup de cœur',[3,10,25,60,150],likesRecv,k=>`Recevez ${k} likes sur vos avis`],
    ['Communauté','🤝','Généreux·se',[5,25,100,300],S.ratings.filter(r=>(r.likes||[]).includes(id)).length,k=>`Likez ${k} avis de vos collègues`],
    ['Communauté','🌟','Avis star',[3,6,10],Math.max(0,...rs.map(r=>(r.likes||[]).length)),k=>`Un même avis qui reçoit ${k} likes`],
+   ['Communauté','🏅','Reviewer du mois',[1,3,6,12],monthsWithActivity().filter(k=>k<monthKey(Date.now())).filter(k=>{const m=monthScores(k)[0];return m&&m.id===id}).length,k=>`Terminez première du podium mensuel ${k} fois`],
    ['Communauté','🥇','Lauréat·e',[1,3,10,25],rs.filter(r=>r.trophy).length,k=>`Recevez ${plur(k,'trophée')} du juge Hervé`],
    ['Communauté','🧭','Même longueur d’onde',[5,20,50,120],rs.filter(r=>{const d=dh(r);return d&&Math.abs(d.stars-r.stars)<=2}).length,k=>`Notez ${plur(k,'film')} à une étoile près d’Hervé`],
    ['Communauté','😈','Contrariant·e',[1,5,15,40],rs.filter(r=>{const d=dh(r);return d&&Math.abs(d.stars-r.stars)>=6}).length,k=>`Donnez ${plur(k,'note')} qui s’écarte d’au moins 3 étoiles de celle d’Hervé`],
@@ -346,17 +360,18 @@ function verdictRow(fid,mine){return`<div class="vd">${Object.entries(VERDICTS).
 
 /* écrans */
 let menuOpen=false;
-const NAVTIP={home:'Les films proposés par Hervé',dash:'Notes, participation et animation de l’équipe',team:'Classement, palmes et défis du mois',roulette:'Tirer un film au hasard quand on manque d’idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
-function header(){const s=stats(S.meId),nav=[['home','Séances']];if(isDir())nav.push(['dash','Tableau de bord']);nav.push(['team','Équipe']);if(isDir())nav.push(['roulette','Roulette']);nav.push(['profile','Mon profil']);nav.push(['guide','Guide']);
+const NAVTIP={home:'Les films proposés par Hervé',dash:'Notes, participation et statistiques de chaque film',animer:'Lancer un défi du mois ou un duel entre deux films',team:'Classement, palmes et défis du mois',palmares:'Les mieux notés, les plus détestés, les plus commentés et les reviewers du mois',roulette:'Tirer un film au hasard quand on manque d’idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
+function header(){const s=stats(S.meId),nav=[['home','Séances']];if(isDir())nav.push(['dash','Tableau de bord']);if(isDir())nav.push(['animer','Animer']);nav.push(['team','Équipe']);nav.push(['palmares','Palmarès']);if(isDir())nav.push(['roulette','Roulette']);nav.push(['profile','Mon profil']);nav.push(['guide','Guide']);
   return`<header><div class="logo">Ciné-Club <b>Imagerie</b></div><nav>${nav.map(([k,l])=>`<button class="${view===k?'on':''}" data-act="nav" data-id="${k}" data-tip="${e(NAVTIP[k])}">${l}</button>`).join('')}</nav>
   <div class="sp"></div>
   <div class="mewrap"><button class="me" data-act="menu" aria-haspopup="true" aria-expanded="${menuOpen}" data-tip="Mon profil et mes réglages"><span class="av">${emojiOf(S.meId)}</span><div style="line-height:1.15;text-align:left"><div style="font-size:13px;font-weight:600">${e(nameOf(S.meId).split(' ')[0])}${s.streak?` 🔥${s.streak}`:''}</div><div class="xp"><i style="width:${s.pct}%"></i></div></div><span class="dim" aria-hidden="true">▾</span></button>${menuOpen?profileMenu(s):''}</div></header>`}
 function profileMenu(s){return`<div class="menu" role="menu"><div class="row" style="gap:12px;margin-bottom:12px"><span class="av" style="width:48px;height:48px;font-size:26px">${emojiOf(S.meId)}</span><div style="min-width:0"><b>${e(nameOf(S.meId))}</b><div class="dim" style="font-size:13px">${s.name}</div></div></div>
   <div class="xp" style="width:100%;height:8px"><i style="width:${s.pct}%"></i></div><div class="dim" style="font-size:12px;margin:6px 0 12px">${s.xp} XP${s.next?` · encore ${s.next[0]-s.xp} pour devenir ${s.next[1]}`:' · niveau maximum'}${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''} d’affilée`:''}</div>
-  <button class="mi" role="menuitem" data-act="nav" data-id="profile">👤 Mon profil</button><button class="mi" role="menuitem" data-act="nav" data-id="badges">🏅 Mes badges</button><button class="mi" role="menuitem" data-act="nav" data-id="guide">📖 Guide</button><button class="mi" role="menuitem" data-act="mute">${muted?'🔇 Activer le son':'🔊 Couper le son'}</button><button class="mi" role="menuitem" data-act="logout">⎋ Se déconnecter</button></div>`}
+  <button class="mi" role="menuitem" data-act="nav" data-id="profile"><span class="ico">👤</span>Mon profil</button><button class="mi" role="menuitem" data-act="nav" data-id="badges"><span class="ico">🏅</span>Mes badges</button><button class="mi" role="menuitem" data-act="nav" data-id="palmares"><span class="ico">🏆</span>Palmarès et podium</button><button class="mi" role="menuitem" data-act="nav" data-id="guide"><span class="ico">📖</span>Guide</button><button class="mi" role="menuitem" data-act="mute"><span class="ico">${muted?'🔇':'🔊'}</span>${muted?'Activer le son':'Couper le son'}</button><button class="mi mi-out" role="menuitem" data-act="logout"><span class="ico">🚪</span>Se déconnecter</button></div>`}
 function banners(films){
   let h='';
   if(!S.cfg.directorId)h+=`<div class="banner"><span><b>Hervé n’a pas encore créé son compte.</b> Il doit s’inscrire avec le code réservé au directeur. Les séances démarreront ensuite.</span></div>`;
+  if(isDir()&&films.length&&!S.chals.some(c=>c.month===monthKey(Date.now())))h+=`<div class="banner"><span>⛳ <b>Aucun défi ce mois-ci.</b> Un clic suffit pour en lancer un.</span><button class="btn" data-act="nav" data-id="animer">Lancer un défi</button></div>`;
   const tvf=films.filter(f=>f.tvAt&&f.tvAt>Date.now()-2*3600e3&&f.tvAt<Date.now()+36*3600e3).sort((a,b)=>a.tvAt-b.tvAt)[0];
   if(tvf)h+=`<div class="banner"><span>📺 <b>${e(tvWhen(tvf.tvAt))}${tvf.tvCh?' sur '+e(tvf.tvCh):''}</b> : ${e(tvf.title)}</span><button class="btn" data-act="open" data-id="${tvf.id}">Voir le film</button></div>`;
   const lf=films.find(f=>f.id===liveFilm());
@@ -414,6 +429,63 @@ function filmsSection(liveF,genres){
    ${isDir()?'':`<button class="chip ${filter==='todo'?'on':''}" data-act="filter" data-id="todo" data-tip="Les films que vous n’avez pas encore notés">À noter (${liveF.filter(f=>!rOf(f.id,S.meId)).length})</button><button class="chip ${filter==='done'?'on':''}" data-act="filter" data-id="done" data-tip="Les films que vous avez déjà notés">Déjà notés</button><button class="chip ${filter==='watch'?'on':''}" data-act="filter" data-id="watch" data-tip="Les films de votre liste « À voir plus tard »">🔖 Ma liste</button>`}
    ${genres.map(g=>`<button class="chip ${filter==='g:'+g?'on':''}" data-act="filter" data-id="g:${e(g)}">${e(g)}</button>`).join('')}</div>
    <div class="ctl"><label class="dim" for="hsort">Trier</label><select id="hsort">${Object.entries(sorts).map(([k,v])=>`<option value="${k}" ${homeSort===k?'selected':''}>${v[0]}</option>`).join('')}</select>${decs.length>1?`<label class="dim" for="hdec">Époque</label><select id="hdec"><option value="">Toutes</option>${decs.map(d=>`<option value="${d}" ${String(decSel)===String(d)?'selected':''}>Années ${d}</option>`).join('')}</select>`:''}<span style="flex:1"></span><button class="chip ${homeView==='grid'?'on':''}" data-act="hview" data-id="grid" data-tip="Affichage en affiches">▦ Affiches</button><button class="chip ${homeView==='list'?'on':''}" data-act="hview" data-id="list" data-tip="Affichage en liste compacte, pratique avec beaucoup de films">☰ Liste</button></div>${body}`}
+
+/* palmarès, reviewers du mois et podium */
+let pmTab='best',pmMonth=null,pmLimit=20,podium=null;
+const MED=['🥇','🥈','🥉'];
+function monthsWithActivity(){return[...new Set(S.ratings.map(r=>monthKey(r.ts)))].sort().reverse()}
+const monthLabel=k=>{const [y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})};
+function monthScores(key){const m={};
+  S.ratings.filter(r=>monthKey(r.ts)===key&&r.userId!==S.cfg.directorId).forEach(r=>{const o=m[r.userId]||(m[r.userId]={id:r.userId,score:0,ratings:0,texts:0,likes:0,trophies:0});
+    o.ratings++;o.score+=1;if(r.text){o.texts++;o.score+=3}if(r.shot)o.score+=1;if(r.gif)o.score+=1;const l=(r.likes||[]).length;o.likes+=l;o.score+=2*l;if(r.trophy){o.trophies++;o.score+=5}});
+  return Object.values(m).sort((a,b)=>b.score-a.score||b.texts-a.texts||a.id.localeCompare(b.id))}
+function podiumModal(){const key=podium&&podium.key;if(!key)return'';const sc=monthScores(key),top=sc.slice(0,3),rest=sc.slice(3,8);
+  const order=top.length>=3?[1,0,2]:top.length===2?[1,0]:[0],H=[210,160,120],col=['#ffcc00','#4cd6a0','#3d6bff','#ff6b81','#c06cff','#ff8a3d'];
+  const conf=Array.from({length:46},(_,i)=>`<i class="cf" style="--x:${Math.round((i*37)%100)}%;--d:${(2.2+(i%7)*.35).toFixed(2)}s;--w:${(i%6)*.12}s;--c:${col[i%col.length]}"></i>`).join('');
+  return`<div class="modal" data-act="podclose"><div class="sheet pod" data-stop role="dialog" aria-label="Podium du mois" style="width:min(640px,100%);overflow:hidden"><button class="x" data-act="podclose" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="confetti" aria-hidden="true">${conf}</div>
+   <div style="text-align:center;position:relative"><div class="k" style="color:var(--acc);font-size:12px;letter-spacing:.14em">PODIUM DES REVIEWERS</div><h2 style="font-size:30px;text-transform:capitalize;margin:4px 0 2px">${monthLabel(key)}</h2><p class="dim" style="font-size:13px">Points : note 1 · avis écrit 3 · like reçu 2 · trophée 5 · plan marquant ou GIF 1</p></div>
+   ${top.length?`<div class="podium">${order.map(i=>{const x=top[i],rk=i+1;return`<div class="pcol p${rk}"><div class="pav">${rk===1?'<div class="crown">👑</div>':''}${emojiOf(x.id)}</div><b style="font-size:14px">${e(nameOf(x.id))}</b><span class="dim" style="font-size:13px">${x.score} pts</span><div class="pbar" style="--h:${H[i]}px;--dl:${(rk===3?0:rk===2?.3:.7)}s">${MED[i]}</div></div>`}).join('')}</div>
+    <p style="text-align:center;position:relative"><b>${e(nameOf(top[0].id))}</b> est le·la meilleur·e reviewer du mois : ${plur(top[0].ratings,'note')}, ${plur(top[0].texts,'avis écrit')}, ${plur(top[0].likes,'like')}${top[0].trophies?`, ${plur(top[0].trophies,'trophée')}`:''}.</p>
+    ${rest.length?`<div class="pn" style="padding:8px 14px;position:relative">${rest.map((x,i)=>`<div class="lb" style="grid-template-columns:30px 1fr auto"><b>${i+4}</b><span>${emojiOf(x.id)} ${e(nameOf(x.id))}</span><span class="dim">${x.score} pts</span></div>`).join('')}</div>`:''}`
+   :'<p class="dim" style="text-align:center;margin:30px 0">Personne n’a encore donné d’avis ce mois-ci.</p>'}</div></div>`}
+function openPodium(k){podium={key:k};SFX.win();render()}
+function maybePodium(){const d=new Date(),prev=new Date(d.getFullYear(),d.getMonth()-1,1),k=prev.getFullYear()+'-'+String(prev.getMonth()+1).padStart(2,'0');
+  let seen=false;try{seen=!!localStorage.getItem('cineclub-podium-'+k)}catch{}
+  if(!seen&&!tour&&monthScores(k).length){podium={key:k};SFX.win();render()}}
+function rankRow(i,x,metric){const f=x.f;
+  return`<div class="frow rk" style="--i:${i}" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${i<3?MED[i]+' ':`<span class="dim">${i+1}.</span> `}${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>${x.a!=null?`<div class="mbar"><i style="--w:${Math.round(x.a/10*100)}%"></i></div>`:''}</div><div class="fside">${metric}</div></div>`}
+function palmares(){
+  const tabs=[['seen',isDir()?'Tous les films':'Films que j’ai vus'],['best','⭐ Les mieux notés'],['worst','👎 Les plus détestés'],['talk','💬 Les plus commentés'],['month','🏆 Reviewers du mois']];
+  const vis=S.films.filter(f=>f.status!=='upcoming'&&!liveOpen(f.id)&&(isDir()||rOf(f.id,S.meId)));
+  const st=vis.map(f=>{const t=team(f.id),a=avg(t.map(r=>r.stars)),rv=S.ratings.filter(r=>r.filmId===f.id);return{f,n:t.length,a,comments:rv.filter(r=>r.text).length,likes:rv.reduce((n,r)=>n+(r.likes||[]).length,0)}});
+  const minN=st.length>=8?2:1,rated=st.filter(x=>x.n>=minN&&x.a!=null);
+  let body='';
+  if(pmTab==='month'){const ms=monthsWithActivity();if(!pmMonth||!ms.includes(pmMonth))pmMonth=ms[0]||null;
+    const sc=pmMonth?monthScores(pmMonth):[];
+    body=ms.length?`<div class="ctl"><label class="dim" for="pmsel">Mois</label><select id="pmsel">${ms.map(k=>`<option value="${k}" ${pmMonth===k?'selected':''}>${monthLabel(k)}</option>`).join('')}</select><button class="btn" data-act="podium" data-id="${pmMonth}" data-tip="Ouvre le podium animé du mois">🏆 Voir le podium</button></div>
+      <div class="pn">${sc.map((x,i)=>`<div class="lb rk" style="--i:${i};grid-template-columns:40px 1fr auto"><b class="serif" style="font-size:20px">${MED[i]||i+1}</b><div><b>${emojiOf(x.id)} ${e(nameOf(x.id))}${x.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${plur(x.ratings,'note')} · ${plur(x.texts,'avis écrit')} · ${plur(x.likes,'like')}${x.trophies?' · '+plur(x.trophies,'trophée'):''}</div></div><b>${x.score} pts</b></div>`).join('')||'<p class="dim">Personne pour ce mois.</p>'}</div>
+      <p class="dim" style="font-size:12px;margin-top:8px">Barème : note 1 · avis écrit 3 · like reçu 2 · trophée du juge 5 · plan marquant ou GIF 1. Hervé n’entre pas dans le classement.</p>`:'<div class="pn empty dim">Les podiums apparaîtront dès les premiers avis.</div>'}
+  else{
+    let list,metric;
+    if(pmTab==='seen'){list=[...st].sort((a,b)=>b.f.added-a.f.added);metric=x=>`${x.a!=null?`<span class="dim">👥 ${fmt(x.a)}</span>`:''}${rOf(x.f.id,S.meId)?stars(rOf(x.f.id,S.meId).stars,null,1):''}`}
+    else if(pmTab==='best'){list=[...rated].sort((a,b)=>b.a-a.a||b.n-a.n);metric=x=>`<b class="serif" style="font-size:20px">${fmt(x.a)}</b><span class="dim">sur 5 · ${plur(x.n,'avis')}</span>`}
+    else if(pmTab==='worst'){list=[...rated].sort((a,b)=>a.a-b.a||b.n-a.n);metric=x=>`<b class="serif" style="font-size:20px">${fmt(x.a)}</b><span class="dim">sur 5 · ${plur(x.n,'avis')}</span>`}
+    else{list=st.filter(x=>x.comments+x.likes>0).sort((a,b)=>(b.comments*2+b.likes)-(a.comments*2+a.likes));metric=x=>`<span>💬 ${x.comments}</span><span>❤ ${x.likes}</span>`}
+    body=list.length?`<div class="flist rkl">${list.slice(0,pmLimit).map((x,i)=>rankRow(i,x,metric(x))).join('')}</div>${list.length>pmLimit?`<div style="text-align:center;margin-top:14px"><button class="btn ghost" data-act="pmmore">Afficher plus (${list.length-pmLimit} restants)</button></div>`:''}`:'<div class="pn empty dim">Rien à afficher pour l’instant.</div>';
+    if(!isDir())body=`<p class="dim" style="font-size:13px;margin-bottom:10px">Seuls les films que vous avez notés apparaissent ici, pour que personne ne vous influence.</p>`+body}
+  return`<div class="gwrap" style="max-width:900px"><div class="row" style="flex-wrap:wrap;margin-bottom:12px"><h2 style="flex:1">Palmarès</h2><button class="btn ghost" data-act="podium" data-id="${monthsWithActivity()[0]||''}" data-tip="Ouvre le podium animé du mois le plus récent">🏆 Dernier podium</button></div>
+   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:14px">${tabs.map(([k,l])=>`<button class="chip ${pmTab===k?'on':''}" data-act="pmtab" data-id="${k}">${l}</button>`).join('')}</div>${body}</div>`}
+function animer(){
+  if(!isDir())return'';
+  const m=monthKey(Date.now()),chs=S.chals.filter(c=>c.month===m),duel=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.created)[0];
+  const opts=S.films.map(f=>`<option value="${e(f.title)}"></option>`).join('');
+  const dv=duel?(()=>{const A=S.films.find(f=>f.id===duel.a),B=S.films.find(f=>f.id===duel.b),vs=S.dvotes.filter(v=>v.duelId===duel.id);return A&&B?`<div class="pn" style="margin-bottom:12px"><b>Duel en cours</b> : ${e(A.title)} contre ${e(B.title)} · ${plur(vs.length,'vote')} <button class="chip" style="margin-left:8px" data-act="closeduel" data-id="${duel.id}" data-tip="Ferme le vote et couronne le film en tête">Clore et couronner</button></div>`:''})():'';
+  return`<div class="gwrap" style="max-width:980px"><h2>Animer l’équipe</h2><p class="dim" style="margin-bottom:6px">Lancez un défi ou un duel en quelques clics : ils apparaissent tout de suite sur l’accueil de l’équipe.</p>
+   <div class="sect"><h3>⛳ Lancer un défi du mois</h3><span class="dim">un clic, jusqu’à la fin du mois</span></div>
+   <div class="tiles">${CHAL_TPL.map((t,i)=>{const lab=chalLabel({type:t[2],value:t[3],target:t[4]}),on=chs.some(c=>c.title===t[0]+' '+t[1]);return`<button class="tile ${on?'on':''}" data-act="chaltpl" data-id="${i}" data-tip="${e('Défi du mois : '+lab)}"><span class="tem">${t[0]}</span><b>${t[1]}</b><span class="dim">${e(lab)}</span>${on?'<span class="badge" style="border-color:var(--ok);color:var(--ok)">✔ Lancé</span>':''}</button>`}).join('')}</div>
+   ${chs.length?`<div class="pn" style="margin-top:12px"><b>Défis de ce mois</b>${chs.map(c=>`<div class="lb" style="grid-template-columns:1fr auto auto"><span>${e(c.title)} <span class="dim">· ${e(chalLabel(c))}</span></span><span class="dim">${cons().filter(x=>chalDone(c,x.id)).length} sur ${cons().length} l’ont relevé</span><button class="chip" data-act="chaldel" data-id="${c.id}" aria-label="Retirer ce défi" data-tip="Retirer ce défi">✕</button></div>`).join('')}</div>`:'<p class="dim" style="margin-top:10px">Aucun défi ce mois-ci pour l’instant.</p>'}
+   <div class="sect"><h3>⚔️ Lancer un duel</h3><span class="dim">deux films, l’équipe vote</span></div>${dv}
+   <div class="pn"><form id="duelf" class="row" style="flex-wrap:wrap;gap:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off" style="flex:1;min-width:200px"><b class="vs">VS</b><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off" style="flex:1;min-width:200px"><button class="btn">Lancer le duel</button></form></div></div>`}
 function home(){
   const films=[...S.films].sort((a,b)=>b.added-a.added),liveF=films.filter(f=>f.status!=='upcoming'),up=films.filter(f=>f.status==='upcoming');
   const feat=films.find(f=>f.featured)||liveF[0],genres=[...new Set(liveF.map(f=>f.genre))];
@@ -506,11 +578,7 @@ function dash(){
    <div class="pn tw"><table><tr><th>Film</th><th>Hervé</th><th>Équipe</th><th>Écart</th><th>Participation</th><th>Pas encore noté</th></tr>
    ${vrows.slice(0,dLimit).map(r=>`<tr data-act="open" data-id="${r.f.id}" style="cursor:pointer"><td><b>${e(r.f.title)}</b></td><td>${fmt(r.h?.stars)}</td><td>${fmt(r.a)}</td><td>${r.h&&r.a!=null?(((r.a-r.h.stars)/2>=0?'+':'')+((r.a-r.h.stars)/2).toFixed(1)).replace('.',','):'?'} ${r.sd>=2?'<span class="badge">⚡ divise</span>':''}</td><td>${Math.round(r.part)}%</td><td class="dim">${r.missing.map(m=>m.emoji+' '+e(nameOf(m.id).split(' ')[0])).join(', ')||'Tout le monde ✔'}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">Les chiffres apparaîtront avec le premier film.</td></tr>'}</table></div>
    ${vrows.length>dLimit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="dmore">Afficher plus (${vrows.length-dLimit} restants)</button></div>`:''}
-   <div class="cols" style="margin-top:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-    <div class="pn"><h3>⚔️ Lancer un duel</h3><p class="dim" style="font-size:13px;margin-top:4px">Deux films s’affrontent, l’équipe vote depuis l’accueil.</p><form id="duelf" style="display:grid;gap:8px;margin-top:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off"><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off"><button class="btn">Lancer le duel</button></form></div>
-    <div class="pn"><h3>⛳ Lancer un défi</h3><p class="dim" style="font-size:13px;margin-top:4px">Un clic suffit : le défi dure jusqu’à la fin du mois et l’équipe suit sa progression sur l’accueil.</p><div class="row" style="flex-wrap:wrap;margin-top:10px;gap:6px">${CHAL_TPL.map((t,i)=>`<button class="chip" data-act="chaltpl" data-id="${i}" data-tip="${e('Défi du mois : '+chalLabel({type:t[2],value:t[3],target:t[4]}))}">${t[0]} ${t[1]}</button>`).join('')}</div></div>
-    <div class="pn"><h3>📣 Relancer l’équipe et exporter</h3><div class="row" style="flex-wrap:wrap;margin-top:10px"><button class="chip" data-act="remind" data-tip="Écrit un texte à copier dans Teams ou un e-mail pour relancer l’équipe">Préparer un message de relance</button>${S.dl?'<button class="chip" data-act="export" data-tip="Enregistre un fichier à ouvrir dans Excel : un film par ligne">Télécharger les notes (Excel)</button>':''}</div>
-     ${showRemind?`<textarea id="rm" rows="5" style="margin-top:10px">${e(remindText())}</textarea><button class="btn" style="margin-top:8px" data-act="copyrm">Copier le message</button>`:''}</div></div>`}
+   ${S.dl?`<div class="row" style="margin-top:16px"><button class="chip" data-act="export" data-tip="Enregistre un fichier à ouvrir dans Excel : un film par ligne">Télécharger les notes (Excel)</button></div>`:''}`}
 function palmes(){const m=new Map();S.ratings.forEach(r=>{const s=seasonOf(r.ts);m.set(s.label,s)});
   return[...m.values()].sort((a,b)=>b.from-a.from).map(s=>{const top=cons().map(x=>({x,s:stats(x.id,s.from,s.to)})).filter(o=>o.s.xp>0).sort((a,b)=>b.s.xp-a.s.xp)[0];return top?{label:s.label,id:top.x.id,xp:top.s.xp}:null}).filter(Boolean)}
 function teamView(){
@@ -847,8 +915,8 @@ const TOUR_DIR=[
  ['🎬','Bienvenue Hervé',['Ici, vous proposez des films et l’équipe vous répond : notes, critiques, paris.','Le tableau de bord vous montre qui a noté quoi, et où l’équipe vous contredit.','Vous pouvez relancer cette visite depuis l’onglet <b>Guide</b>.']],
  ['➕','Proposer un film en quelques secondes',['Appuyez sur <b>N</b> (ou sur le bouton jaune), tapez 3 lettres du titre : la base mondiale Wikidata remplit l’année, la réalisation, le genre et l’affiche.','Ajoutez, si vous voulez, une phrase pour l’équipe (pourquoi vous le proposez), où le voir (Netflix, cinéma, DVD…) et une question à poser à tout le monde.','Pas encore prêt à lancer la séance ? Cochez « Annoncer seulement » (compatible avec « Film de la semaine ») : l’équipe voit le film dans la section « Prochainement » de l’accueil (affiche et phrase d’accroche), mais ne peut pas encore le noter. Le jour J, ouvrez le film et cliquez sur « Mettre à l’affiche ».']],
  ['🔴','Séance en direct et trophées',['Dans la fiche d’un film, « Lancer une séance en direct » masque les résultats à l’équipe pendant qu’elle note. Un clic sur « Révéler » les montre à tous.','Sous chaque avis, décernez un trophée : 😂 plus drôle, 🎯 plus juste, 😈 plus insolent (+25 XP pour l’auteur·rice).']],
- ['⚔️','Duels et défis',['<b>Duel</b> : choisissez deux films dans le tableau de bord, l’équipe vote sur l’accueil. « Clore le duel » couronne le gagnant. Un seul duel ouvert à la fois.','<b>Défi du mois</b> : choisissez un modèle (Classique, Docu du mois, Marathon…). Un clic et c’est lancé jusqu’à la fin du mois.']],
- ['🎡','Roulette et idées',['Pas d’inspiration ? L’onglet <b>Roulette</b> tire 12 films au hasard dans une base mondiale ou dans vos idées.','« Le proposer à l’équipe » préremplit le formulaire. Gardez vos idées pour plus tard dans la liste à droite.','Le tableau de bord prépare aussi un message à copier dans Teams ou par e-mail pour relancer l’équipe qui n’a pas encore noté le film de la semaine, et télécharge tous les films avec leurs notes dans un tableau Excel.']]];
+ ['⚔️','Duels et défis',['<b>Duel</b> : tapez deux titres dans l’onglet Animer, l’équipe vote sur l’accueil. « Clore le duel » couronne le gagnant. Un seul duel ouvert à la fois.','<b>Défi du mois</b> : cliquez sur un modèle dans l’onglet Animer (Classique, Docu du mois, Marathon…). C’est lancé jusqu’à la fin du mois.']],
+ ['🎡','Roulette et idées',['Pas d’inspiration ? L’onglet <b>Roulette</b> tire 12 films au hasard dans une base mondiale ou dans vos idées.','« Le proposer à l’équipe » préremplit le formulaire. Gardez vos idées pour plus tard dans la liste à droite.','Le tableau de bord télécharge aussi tous les films avec leurs notes dans un tableau Excel.']]];
 let tour=null;
 const tourKey=()=>'cineclub-tour-'+S.meId;
 function finishTour(){tour=null;try{localStorage.setItem(tourKey(),'1')}catch{}render()}
@@ -872,6 +940,7 @@ function guideData(){
     ['points','🏆','Points et niveaux',GL(['Note +10 · avis écrit +15 · plan marquant +10 · pari gagné +20','Trophée du juge +25 · défi relevé +40 · semaine active +5 · like reçu +2','Niveaux : Spectateur·rice, Cinéphile (50 XP), Critique (150), Programmateur·rice (300), Palme d’or (600), puis Grand prix (1000), Maître·sse du 7e art (1600), Légende du ciné-club (2500) et Immortel·le (4000)'])],
     ['badges','🏅','Les badges',()=>`<p style="margin-bottom:12px">Il y a des dizaines de badges, rangés par famille : notes et avis, curiosité, assiduité, communauté, jeux et défis, collection. Chacun a plusieurs paliers (Bronze, Argent, Or, Platine…) : certains se gagnent en quelques jours, d’autres en plusieurs mois ou années.</p><button class="btn" data-act="nav" data-id="badges">Voir tous mes badges</button>`],
     ['serie','🔥','Série hebdomadaire','<p>Chaque semaine où vous donnez au moins un avis prolonge votre série (à côté de votre prénom). Une semaine sans avis la remet à zéro.</p>'],
+    ['palmares','🏆','Palmarès et podium du mois','<p>L’onglet Palmarès réunit les films que vous avez vus, les mieux notés, les plus détestés et les plus commentés (seuls les films que vous avez notés apparaissent, pour ne pas vous influencer). L’onglet « Reviewers du mois » désigne la personne qui a le plus contribué ce mois-ci : un podium animé s’ouvre chaque début de mois, et vous pouvez le rouvrir quand vous voulez.</p>'],
     ['saison','🌴','Saison et Palme','<p>Une saison dure 3 mois (par exemple T4 2026) et le classement repart de zéro à chaque saison. La personne en tête à la fin reçoit la Palme de la saison, conservée dans l’onglet Équipe.</p>'],
     ['cartes','✨','Cartes à collectionner',GL(['Chaque film noté ajoute une carte dans Mon profil.','<b>Légendaire</b> : premier avis de l’équipe. <b>Rare</b> : avis dans les 2 jours. <b>Holo</b> : en désaccord total avec Hervé. <b>Commune</b> : les autres.'])],
     ['trophees','🥇','Trophées du juge','<p>Hervé peut décerner un trophée à un avis : 😂 plus drôle, 🎯 plus juste, 😈 plus insolent (+25 XP et le badge Lauréat·e).</p>']]],
@@ -886,12 +955,11 @@ function guideData(){
     ['roulette','🎡','Roulette et idées','<p>Onglet Roulette : 12 films tirés au hasard dans une base mondiale ou dans vos idées. Filtrez par genre, tournez, puis « Le proposer à l’équipe ». La liste d’idées à droite alimente la roue.</p>']]],
    ['Animer',[
     ['direct2','🔴','Séance en direct','<p>Dans la fiche d’un film, « Lancer une séance en direct » cache les résultats à l’équipe pendant qu’elle note. « Révéler les résultats » les montre à tous en même temps, « Terminer la séance » la ferme.</p>'],
-    ['duel2','⚔️','Créer un duel','<p>Tableau de bord, carte « Lancer un duel » : choisissez deux films. L’équipe vote depuis l’accueil. « Clore le duel » couronne le gagnant. Un nouveau duel ferme l’ancien.</p>'],
-    ['defi2','⛳','Créer un défi','<p>Tableau de bord, carte « Lancer un défi » : choisissez un modèle (Classique, Docu du mois, Animation, Marathon, Éclectique…). Un clic, c’est lancé jusqu’à la fin du mois. Le ✕ sur la carte le retire.</p>'],
+    ['duel2','⚔️','Créer un duel','<p>Onglet Animer, section « Lancer un duel » : tapez le début de deux titres. L’équipe vote depuis l’accueil. « Clore le duel » couronne le gagnant. Un nouveau duel ferme l’ancien.</p>'],
+    ['defi2','⛳','Créer un défi','<p>Onglet Animer, section « Lancer un défi du mois » : cliquez sur un modèle (Classique, Docu du mois, Animation, Marathon, Éclectique…). C’est lancé jusqu’à la fin du mois. Le ✕ le retire.</p>'],
     ['troph2','🥇','Décerner des trophées','<p>Dans un film, sous chaque avis : plus drôle, plus juste, plus insolent. Un seul gagnant par trophée et par film.</p>']]],
    ['Suivre',[
-    ['tableau','📊','Tableau de bord','<p>Pour chaque film : votre note, la moyenne de l’équipe, l’écart, la participation et les personnes qui n’ont pas encore noté. Le badge ⚡ signale un film qui divise.</p>'],
-    ['relance','📣','Relancer et exporter','<p>« Préparer un message de relance » écrit un texte à copier dans Teams ou un e-mail. « Télécharger les notes » enregistre un fichier à ouvrir dans Excel.</p>']]]];
+    ['tableau','📊','Tableau de bord','<p>Pour chaque film : votre note, la moyenne de l’équipe, l’écart, la participation et les personnes qui n’ont pas encore noté. Le badge ⚡ signale un film qui divise. « Télécharger les notes » enregistre un fichier à ouvrir dans Excel.</p>']]]];
   return{team,dir}}
 function guide(){
   const tab=gTab||(isDir()?'dir':'team'),D=guideData(),groups=tab==='dir'?D.dir:D.team;
@@ -918,8 +986,8 @@ function render(){
   hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
   if(!S.ready){a.innerHTML='<div class="empty dim" style="padding-top:120px">Ouverture de la salle…</div>';return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
-  const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,guide,badges:badgesView}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'');
+  const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,guide,badges:badgesView,palmares,animer}[view]();
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'');
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
 }
@@ -960,7 +1028,7 @@ document.addEventListener('click',async ev=>{
   if(t.classList.contains('modal')&&ev.target!==t)return;
   if(act==='watch'){SFX.pop();const k=id+'_'+S.meId;watching(id)?del('watch/'+k):put('watch/'+k,{filmId:id,userId:S.meId});return}
   if(act==='close'){editFilm=null;film=null;adding=false;dTxt=dShot=dGif=null;gifOpen=false;prefill=null;render()}
-  else if(act==='atab'){authTab=id;authMsg='';render()}
+  else if(act==='atab'){authTab=id;authMsg='';authOk=false;render()}
   else if(act==='nav'){view=id;film=null;menuOpen=false;render()}
   else if(act==='gtab'){gTab=id;gOpen=null;S._gInit=0;render()}
   else if(act==='gopen'){gOpen=gOpen===id?null:id;render()}
@@ -978,6 +1046,10 @@ document.addEventListener('click',async ev=>{
     if(feat)S.films.filter(x=>x.featured&&x.id!==id).forEach(x=>upd('films/'+x.id,{featured:false}));
     editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,seanceAt:$('#ef_sat').value?new Date($('#ef_sat').value).getTime():0,seancePlace:g('ef_sp'),poster:g('ef_poster'),featured:feat,status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
   else if(act==='sics'){const f=S.films.find(x=>x.id===id);if(f&&f.seanceAt)try{await S.dl.save({filename:'seance-'+norm(f.title).replace(/ /g,'-')+'.ics',data:icsSeance(f)})}catch{}}
+  else if(act==='pmtab'){pmTab=id;pmLimit=20;render()}
+  else if(act==='pmmore'){pmLimit+=20;render()}
+  else if(act==='podium'){if(id)openPodium(id);else toast('Aucun podium pour le moment')}
+  else if(act==='podclose'){if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}}podium=null;render()}
   else if(act==='tvedit'){tvEdit=tvEdit===id?null:id;render()}
   else if(act==='tvsave'){const ch=($('#tvc')?.value||'').trim(),at=$('#tvd')?.value?new Date($('#tvd').value).getTime():0;tvEdit=null;upd('films/'+id,{tvCh:ch,tvAt:at}).then(ok=>ok&&toast('Diffusion enregistrée 📺'))}
   else if(act==='tvclear'){tvEdit=null;upd('films/'+id,{tvCh:'',tvAt:0})}
@@ -1049,13 +1121,14 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(
   $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
   if(!m.poster){(m.qid?wdPoster(m.qid).catch(()=>''):Promise.resolve('')).then(u=>u||wikiPoster(m.title,m.year)).then(u=>setFormPoster(u,false))}});
 document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}
+  if(ev.target.id==='pmsel'){pmMonth=ev.target.value;render()}
   if(ev.target.id==='hsort'){homeSort=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='hdec'){decSel=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='dsort'){dSort=ev.target.value;dLimit=15;render()}
   const m={rfyf:'from',rfyt:'to',rfdir:'dir',rfact:'act'}[ev.target.id];if(m){R.f[m]=ev.target.value.trim();scheduleBuild()}});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-  if(ev.key==='Escape'){if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
@@ -1064,6 +1137,7 @@ document.addEventListener('keydown',ev=>{
 document.addEventListener('submit',async ev=>{
   ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));
   if(f.id==='authf')return doAuth(d);
+  if(f.id==='recf')return doRecovery(d);
   if(f.id==='addf'){const id='f'+uid(),up=!!d.up;
     if(d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
@@ -1133,7 +1207,13 @@ const adapter={doc:p=>({set:d=>wr(p,'set',d),update:d=>wr(p,'update',d),delete:(
 const saver={save:async({filename,data})=>{const b=data instanceof Blob?data:new Blob([data],{type:filename.endsWith('.ics')?'text/calendar;charset=utf-8':'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}};
 
 /* connexion */
-function authScreen(){return`<div class="login" style="min-height:90vh;display:grid;place-items:center"><div style="width:min(420px,100%);text-align:center">
+let authOk=false,recovery=false;
+function authScreen(){
+  if(recovery)return`<div class="login" style="min-height:90vh;display:grid;place-items:center"><div style="width:min(420px,100%);text-align:center"><div class="logo" style="font-size:34px">Ciné-Club <b>Imagerie</b></div><h2 style="margin:22px 0 6px;font-size:22px">Nouveau mot de passe</h2><p class="dim">Choisissez un mot de passe d’au moins 6 caractères.</p>
+   <form id="recf" style="display:grid;gap:10px;margin:18px 0;text-align:left"><div class="field"><label for="np1">Nouveau mot de passe</label><input id="np1" name="p1" type="password" required minlength="6" autocomplete="new-password" autofocus></div><div class="field"><label for="np2">Confirmer</label><input id="np2" name="p2" type="password" required minlength="6" autocomplete="new-password"></div><button class="btn">Enregistrer et entrer</button>${authMsg?`<p style="color:var(--bad);font-size:14px">${e(authMsg)}</p>`:''}</form></div></div>`;
+  if(authTab==='forgot')return`<div class="login" style="min-height:90vh;display:grid;place-items:center"><div style="width:min(420px,100%);text-align:center"><div class="logo" style="font-size:34px">Ciné-Club <b>Imagerie</b></div><h2 style="margin:22px 0 6px;font-size:22px">Mot de passe oublié</h2><p class="dim">Indiquez votre e-mail : vous recevrez un lien pour choisir un nouveau mot de passe.</p>
+   <form id="authf" style="display:grid;gap:10px;margin:18px 0;text-align:left"><div class="field"><label for="ae">E-mail</label><input id="ae" name="email" type="email" required autocomplete="email" autofocus></div><button class="btn">Envoyer le lien</button>${authMsg?`<p style="color:${authOk?'var(--ok)':'var(--bad)'};font-size:14px">${e(authMsg)}</p>`:''}</form><button class="lnk" type="button" data-act="atab" data-id="in">Retour à la connexion</button></div></div>`;
+  return`<div class="login" style="min-height:90vh;display:grid;place-items:center"><div style="width:min(420px,100%);text-align:center">
   <div class="logo" style="font-size:34px">Ciné-Club <b>Imagerie</b></div><p class="dim" style="margin-top:6px">Les films d’Hervé, vos avis. Une séance à la fois.</p>
   <div class="row" style="justify-content:center;margin-top:22px"><button class="chip ${authTab==='in'?'on':''}" data-act="atab" data-id="in">Connexion</button><button class="chip ${authTab==='up'?'on':''}" data-act="atab" data-id="up">Créer mon compte</button></div>
   <form id="authf" style="display:grid;gap:10px;margin:22px 0;text-align:left">
@@ -1142,10 +1222,19 @@ function authScreen(){return`<div class="login" style="min-height:90vh;display:g
    <div class="field"><label for="ap">Mot de passe</label><input id="ap" name="pw" type="password" required minlength="6" autocomplete="${authTab==='up'?'new':'current'}-password"></div>
    ${authTab==='up'?'<div class="field"><label for="ac">Code d’invitation de l’équipe</label><input id="ac" name="invite" required autocomplete="off"></div>':''}
    <button class="btn" style="margin-top:6px">${authTab==='in'?'Entrer':'Rejoindre le ciné-club'}</button>
-   ${authMsg?`<p style="color:var(--bad);font-size:14px">${e(authMsg)}</p>`:''}</form></div></div>`}
+   ${authMsg?`<p style="color:${authOk?'var(--ok)':'var(--bad)'};font-size:14px">${e(authMsg)}</p>`:''}</form>${authTab==='in'?'<button class="lnk" type="button" data-act="atab" data-id="forgot">Mot de passe oublié ?</button>':''}</div></div>`}
 function setupScreen(){return`<div class="empty"><h2>Ciné-club à configurer</h2><p class="dim">Renseignez l’adresse et la clé publique Supabase dans <b>config.js</b> (voir le README).</p></div>`}
+async function doRecovery(d){
+  authMsg='';if(d.p1!==d.p2){authMsg='Les deux mots de passe ne sont pas identiques.';return render()}
+  const {data,error}=await sb.auth.updateUser({password:d.p1});
+  if(error){authMsg=/same|different/i.test(error.message)?'Choisissez un mot de passe différent de l’ancien.':'Impossible de changer le mot de passe : '+error.message;return render()}
+  recovery=false;try{history.replaceState(null,'',location.pathname)}catch{}
+  return enter(data.user)}
 async function doAuth(d){
-  authMsg='';const em=d.email.trim().toLowerCase();
+  authMsg='';authOk=false;const em=d.email.trim().toLowerCase();
+  if(authTab==='forgot'){const {error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
+    if(error){authMsg=/rate|seconds|limit/i.test(error.message)?'Trop de demandes : réessayez dans une minute.':'Envoi impossible : '+error.message}else{authOk=true;authMsg='Si un compte existe pour cette adresse, un e-mail vient d’être envoyé. Pensez à vérifier les courriers indésirables.'}
+    return render()}
   if(authTab==='in'){const {data,error}=await sb.auth.signInWithPassword({email:em,password:d.pw});if(error){authMsg='E-mail ou mot de passe incorrect.';return render()}return enter(data.user)}
   const {data,error}=await sb.auth.signUp({email:em,password:d.pw,options:{data:{name:d.name.trim(),invite:d.invite.trim()}}});
   if(error){authMsg=/database error|invite|invitation/i.test(error.message)?'Code d’invitation invalide.':error.message;return render()}
@@ -1156,14 +1245,16 @@ async function enter(user){
   S.meId=user.id;S.db=adapter;S.dl=saver;S.ready=false;render();
   try{await loadAll()}catch{S.db=null;authMsg='Connexion au serveur impossible.';S.ready=true;return render()}
   if(!cache.members.has(S.meId))put('members/'+S.meId,{emoji:EMOJIS[hash(S.meId)%EMOJIS.length]});
-  S.ready=true;render();fillPosters();try{if(!localStorage.getItem(tourKey())){tour={i:0};render()}}catch{}clearInterval(pollT);
+  S.ready=true;render();fillPosters();setTimeout(maybePodium,900);try{if(!localStorage.getItem(tourKey())){tour={i:0};render()}}catch{}clearInterval(pollT);
   pollT=setInterval(async()=>{if(document.hidden||adding||tour||view==='guide'||dTxt||dShot||dGif||S.db===null||/INPUT|TEXTAREA/.test(document.activeElement?.tagName||''))return;try{await loadAll();render();fillPosters()}catch{}},8000)}
 (async function(){
   const cf=window.CINECLUB||{};
   if(!cf.url||!cf.anonKey||/VOTRE/.test(cf.url)){S.ready=true;S.setup=true;return render()}
   sb=supabase.createClient(cf.url,cf.anonKey);
-  sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'){clearInterval(pollT);S.db=null;S.meId=null;view='home';film=null;render()}});
+  sb.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){recovery=true;clearInterval(pollT);S.db=null;S.ready=true;render();return}if(ev==='SIGNED_OUT'){clearInterval(pollT);S.db=null;S.meId=null;view='home';film=null;render()}});
+  if(/type=recovery/.test(location.hash))recovery=true;
   const {data:{session}}=await sb.auth.getSession();
+  if(recovery){S.ready=true;return render()}
   if(session)await enter(session.user);else{S.ready=true;render()}
 })();
 </script>
