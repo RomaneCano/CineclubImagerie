@@ -140,7 +140,6 @@ const EMOJIS=['🎬','🍿','🦊','🌙','🪐','🌸','🦉','🔥','🐙','�
 const TAGS=['Bouleversant','Drôle','Visuellement sublime','Lent mais beau','Bande-son','Twist','À revoir','Trop long','Fait réfléchir','Feel-good'];
 const LEVELS=[[0,'Spectateur·rice'],[50,'Cinéphile'],[150,'Critique'],[300,'Programmateur·rice'],[600,'Palme d’or'],[1000,'Grand prix'],[1600,'Maître·sse du 7e art'],[2500,'Légende du ciné-club'],[4000,'Immortel·le']];
 const GRAD=[['#ff7a59','#7a1f5c'],['#3d6bff','#0b1a52'],['#ffcc00','#8a3a00'],['#4cd6a0','#06403a'],['#c06cff','#2a0b52'],['#ff6b81','#4a0a1c']];
-const EXAMS=[['IRM','long, bruyant, mais très détaillé'],['Scanner','rapide et précis'],['Échographie','tout en douceur'],['Radio','un grand classique'],['Scintigraphie','il faut attendre le résultat'],['Mammographie','intense mais utile']];
 const VERDICTS={yes:['👍','Je le conseille',8],meh:['🤷','Bof',5],no:['👎','Pas pour moi',2]};
 const TROPHIES={fun:['😂','Plus drôle'],juste:['🎯','Plus juste'],bold:['😈','Plus insolent']};
 const RARITY={legendary:'Légendaire',rare:'Rare',holo:'Holo',common:'Commune'};
@@ -269,8 +268,6 @@ function badgeFams(id,xp,lvl){
    ['Notes et avis','📚','Romancier·ère',[1,5,15,40],rs.filter(r=>(r.text||'').length>=200).length,k=>`Écrivez ${plur(k,'avis')} de plus de 200 caractères`],
    ['Notes et avis','🎞️','Œil de cadreur·se',[2,5,15,40],rs.filter(r=>r.shot).length,k=>`Remplissez « Le plan qui m’a marqué » sur ${k} films`],
    ['Notes et avis','⚡','Verdict express',[5,20,60,150],rs.filter(r=>r.verdict).length,k=>`Utilisez le verdict rapide ${k} fois`],
-   ['Notes et avis','🩻','Radiologue du cinéma',[3,15,50],rs.filter(r=>r.exam).length,k=>`Choisissez ${k} fois « si ce film était un examen »`],
-   ['Notes et avis','🧪','Tous les examens',[3,6],uniq(rs.map(r=>r.exam)),k=>`Utilisez ${k} examens d’imagerie différents`],
    ['Notes et avis','🏷️','Palette d’émotions',[3,6,10],uniq(rs.flatMap(r=>r.tags||[])),k=>`Utilisez ${k} tags d’ambiance différents`],
    ['Curiosité','🌍','Éclectique',[3,5,7],uniq(Object.keys(gc)),k=>`Notez des films de ${k} genres différents`],
    ['Curiosité','⏳','Voyage dans le temps',[2,4,6,8],new Set(years.map(y=>Math.floor(y/10))).size,k=>`Notez des films de ${k} décennies différentes`],
@@ -402,7 +399,6 @@ function filmModal(){
   const revs=S.ratings.filter(r=>r.filmId===f.id&&(r.text||r.shot||isDir()||mine)&&(isDir()||!lo)).sort((a,b)=>b.ts-a.ts);
   const showRevs=isDir()||(mine&&!lo),t=avg(team(f.id).map(r=>r.stars));
   const tagsSel=mine?.tags||[],txt=dTxt??mine?.text??'',shot=dShot??mine?.shot??'';
-  const exams=EXAMS.map(([n])=>[n,team(f.id).filter(r=>r.exam===n).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
   const isLiveF=S.live&&S.live.filmId===f.id;
   return`<div class="modal" data-act="close"><div class="sheet" data-stop role="dialog" aria-label="${e(f.title)}"><button class="x" data-act="close" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="fnav"><button class="chip" data-act="fprev" data-tip="Film précédent (touche ←)" aria-label="Film précédent">←</button><button class="chip" data-act="fnext" data-tip="Film suivant (touche →)" aria-label="Film suivant">→</button></div>
    <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>
@@ -422,17 +418,15 @@ function filmModal(){
      ${gate?`<div class="row" style="margin-bottom:12px;flex-wrap:wrap"><span class="dim">🎯 Pari : la note d’Hervé ?</span>${stars(bet,'bet:'+f.id)}</div>`:''}
      <div style="margin-bottom:12px">${verdictRow(f.id,mine)}</div>
      <div class="row" style="margin-bottom:12px;flex-wrap:wrap"><b>Ma note</b>${stars(mine?.stars||0,'quick:'+f.id)}<span class="dim">${mine?'Note enregistrée, modifiable à tout moment.':'1 clic et c’est noté.'}</span></div>
-     <div class="dim" style="font-size:13px;margin-bottom:6px">Si ce film était un examen d’imagerie ?</div>
-     <div class="row" style="flex-wrap:wrap;margin-bottom:12px;gap:6px">${EXAMS.map(([n,c])=>`<button class="chip ${mine?.exam===n?'on':''}" data-act="exam" data-id="${n}" data-tip="${e(n+' : '+c)}">${n}</button>`).join('')}</div>
      <div class="row" style="flex-wrap:wrap;margin-bottom:12px;gap:6px">${TAGS.map(tg=>`<button class="chip ${tagsSel.includes(tg)?'on':''}" data-act="tag" data-id="${tg}">${tg}</button>`).join('')}</div>
      <div class="field" style="margin-bottom:10px"><label for="shot">🎞️ Le plan qui m’a marqué (+10 XP)</label><input id="shot" value="${e(shot)}" placeholder="Ex : le miroir à la fin, vers 1 h 20"></div>
      <textarea id="txt" rows="3" placeholder="Un mot, une phrase, un pavé… (+15 XP)" aria-label="Mon avis">${e(txt)}</textarea>
      <div class="row" style="margin-top:10px;justify-content:space-between;flex-wrap:wrap">${(()=>{const nx=mine?S.films.filter(x=>x.status!=='upcoming'&&x.id!==f.id&&!rOf(x.id,S.meId)).sort((a,b)=>b.added-a.added)[0]:null;return nx?`<button class="chip" data-act="open" data-id="${nx.id}" data-tip="Passer directement au prochain film que vous n’avez pas noté">Film suivant à noter : ${e(nx.title)} →</button>`:'<span></span>'})()}<button class="btn" data-act="publish" data-id="${f.id}">Publier</button></div></div>`}
-   ${up?'':`${exams.length&&!hideTeam?`<p class="dim" style="margin-top:14px">🩻 Si c’était un examen : ${exams.map(([n,c])=>`${c} ${n}`).join(', ')}.</p>`:''}
+   ${up?'':`
    ${f.tmdb&&f.tmdb.reviews&&f.tmdb.reviews.length&&reveal?`<h3 style="margin:24px 0 4px">Ce qu’en dit le public</h3><p class="dim" style="font-size:12px">Avis publics issus de TMDB, souvent rédigés en anglais.</p>${f.tmdb.reviews.map(r=>`<div class="rev"><b>${e(r.a)}</b>${r.r!=null?` <span class="dim">${r.r} sur 10</span>`:''}<p class="tx" style="margin-left:0">${e(r.t)}${r.t.length>=500?'…':''}</p></div>`).join('')}`:''}
    <h3 style="margin:24px 0 4px">Les avis de l’équipe</h3>
    ${showRevs&&revs.length?revs.map(r=>{const liked=(r.likes||[]).includes(S.meId),tr=r.trophy?TROPHIES[r.trophy]:null;return`<div class="rev"><div class="row" style="flex-wrap:wrap"><span class="av">${emojiOf(r.userId)}</span><b>${e(nameOf(r.userId))}</b>${roleOf(r.userId)==='director'?'<span class="badge">Hervé</span>':''}${stars(r.stars,null,1)}${r.verdict?`<span title="${VERDICTS[r.verdict][1]}">${VERDICTS[r.verdict][0]}</span>`:''}${tr?`<span class="badge">${tr[0]} ${tr[1]}</span>`:''}<span class="sp"></span><button class="chip ${liked?'on':''}" data-act="like" data-id="${e(r.id)}" aria-label="J’aime" data-tip="J’aime cet avis">❤ ${(r.likes||[]).length||''}</button></div>
-     ${r.text?`<p class="tx">${e(r.text)}</p>`:''}${r.shot?`<p class="tx dim">🎞️ Plan marquant : ${e(r.shot)}</p>`:''}${(r.tags||[]).length||r.exam?`<div class="tx">${(r.exam?[`🩻 ${r.exam}`]:[]).concat(r.tags||[]).map(x=>`<span class="badge" style="margin:0 4px 4px 0">${e(x)}</span>`).join('')}</div>`:''}
+     ${r.text?`<p class="tx">${e(r.text)}</p>`:''}${r.shot?`<p class="tx dim">🎞️ Plan marquant : ${e(r.shot)}</p>`:''}${(r.tags||[]).length?`<div class="tx">${(r.tags||[]).map(x=>`<span class="badge" style="margin:0 4px 4px 0">${e(x)}</span>`).join('')}</div>`:''}
      ${r.bet!=null&&reveal&&dh&&roleOf(r.userId)!=='director'?`<div class="dim tx" style="font-size:13px">🎯 Pari ${fmt(r.bet)} · ${Math.abs(r.bet-dh.stars)<=1?'<span style="color:var(--ok)">gagné +20 XP</span>':'raté'}</div>`:''}
      ${isDir()&&roleOf(r.userId)!=='director'?`<div class="trow">${Object.entries(TROPHIES).map(([k,[em,l]])=>`<button class="chip tro ${r.trophy===k?'on':''}" data-act="trophy" data-id="${e(r.id)}" data-v="${k}" data-tip="Décerner le trophée « ${l.toLowerCase()} » : +25 XP pour l’auteur·rice">${em} ${l}</button>`).join('')}</div>`:''}</div>`}).join(''):`<p class="dim">${showRevs?'Pas encore d’avis. Ouvrez le bal !':'🔒 Les avis des collègues apparaissent après votre note'+(lo?' et la révélation de la séance.':'.')}</p>`}`}
   </div></div>`}
@@ -495,13 +489,12 @@ function wrapped(){
   const dis=rs.map(r=>({r,h:dirOf(r.filmId)})).filter(x=>x.h).sort((a,b)=>Math.abs(b.r.stars-b.h.stars)-Math.abs(a.r.stars-a.h.stars))[0];
   const bestRev=[...rs].filter(r=>r.text).sort((a,b)=>(b.likes||[]).length-(a.likes||[]).length)[0];
   const tg={};rs.forEach(r=>(r.tags||[]).forEach(t=>tg[t]=(tg[t]||0)+1));const topT=Object.entries(tg).sort((a,b)=>b[1]-a[1])[0];
-  const ex={};rs.forEach(r=>r.exam&&(ex[r.exam]=(ex[r.exam]||0)+1));const topE=Object.entries(ex).sort((a,b)=>b[1]-a[1])[0];
   return`<h2 style="margin-bottom:6px">Mon Wrapped ${yr}</h2><p class="dim" style="margin-bottom:18px">Votre année de cinéma avec l’équipe.</p><div class="big">
    <div class="pn"><b>${rs.length}</b>films notés</div><div class="pn"><b>${fmt(avg(rs.map(r=>r.stars)))}</b>note moyenne sur 5</div><div class="pn"><b style="font-size:26px">${s.name}</b>${s.xp} XP</div>
    <div class="pn"><b>${bestStreak(S.meId)}</b>semaines d’affilée, votre record</div>
    <div class="pn"><b style="font-size:24px">${topG?e(topG[0]):'?'}</b>votre genre préféré${topG?` (${topG[1]} films)`:''}</div><div class="pn"><b style="font-size:24px">${fav_f?e(fav_f.title):'?'}</b>votre coup de cœur (${fmt(fav.stars)})</div>
    <div class="pn"><b style="font-size:24px">${dis&&Math.abs(dis.r.stars-dis.h.stars)>=2?e(S.films.find(f=>f.id===dis.r.filmId)?.title||'?'):'?'}</b>votre plus grand désaccord avec Hervé</div>
-   <div class="pn"><b style="font-size:24px">${topT?e(topT[0]):'?'}</b>votre tag fétiche</div><div class="pn"><b style="font-size:24px">${topE?e(topE[0]):'?'}</b>votre examen d’imagerie préféré</div>
+   <div class="pn"><b style="font-size:24px">${topT?e(topT[0]):'?'}</b>votre tag fétiche</div>
    <div class="pn"><b style="font-size:20px">${bestRev?e(bestRev.text.slice(0,70)):'?'}</b>votre avis le plus aimé (${bestRev?(bestRev.likes||[]).length:0} ❤)</div></div>`}
 function profile(){
   const s=stats(S.meId),rs=S.ratings.filter(r=>r.userId===S.meId).sort((a,b)=>b.ts-a.ts);
@@ -654,7 +647,7 @@ function rouletteView(){
 /* tutoriel */
 const TOUR_TEAM=[
  ['🎬','Bienvenue au Ciné-Club',['Hervé propose des films, vous donnez votre avis. Le <b>film de la semaine</b> est tout en haut de l’accueil.','Il n’y a rien à installer : une note, un mot, et c’est fait.','Vous pouvez relancer cette visite à tout moment depuis l’onglet <b>Guide</b>.']],
- ['⭐','Noter en un clic',['Cliquez sur les étoiles (les demi-étoiles marchent) ou choisissez un verdict : 👍 je le conseille, 🤷 bof, 👎 pas pour moi.','Si vous avez le temps, ajoutez un avis, des tags, le plan qui vous a marqué, ou l’examen d’imagerie auquel le film ressemble.','🔒 La note d’Hervé et les avis des collègues se révèlent <b>après</b> votre note, pour que personne ne vous influence.']],
+ ['⭐','Noter en un clic',['Cliquez sur les étoiles (les demi-étoiles marchent) ou choisissez un verdict : 👍 je le conseille, 🤷 bof, 👎 pas pour moi.','Si vous avez le temps, ajoutez un avis, des tags ou le plan qui vous a marqué.','🔒 La note d’Hervé et les avis des collègues se révèlent <b>après</b> votre note, pour que personne ne vous influence.']],
  ['🎯','Parier sur la note d’Hervé',['Avant de noter, vous pouvez deviner la note qu’Hervé a donnée.','À une demi-étoile près, c’est gagné : <b>+20 XP</b>.']],
  ['⚔️','Duels et défis',['<b>Un duel</b> oppose deux films choisis par Hervé : cliquez sur l’affiche de votre préféré pour voter. Le gagnant est couronné 👑.','<b>Un défi du mois</b> est un petit objectif lancé par Hervé, par exemple « un documentaire » ou « 3 films ». Chaque film noté qui correspond coche une pastille. Défi relevé : <b>+40 XP</b>.']],
  ['🔴','Séances en direct',['Parfois, Hervé lance une séance en direct : tout le monde note, mais les résultats restent masqués.','Quand Hervé les révèle, la note d’Hervé, la moyenne et les avis s’affichent d’un coup pour tout le monde.']],
@@ -679,7 +672,7 @@ const GL=(items)=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
 function guideData(){
   const team=[['Démarrer',[
     ['principe','🎬','Le principe','<p>Hervé propose un film. Vous le regardez, puis vous donnez votre avis. L’app compte vos points. Le film de la semaine est en haut de l’accueil, les autres films sont en dessous.</p>'],
-    ['noter','⭐','Noter un film',GL(['<b>Étoiles</b> : un clic suffit. Cliquez sur la moitié gauche d’une étoile pour une demi-note.','<b>Verdict rapide</b> : 👍 je le conseille, 🤷 bof, 👎 pas pour moi. Une note en est déduite.','<b>Facultatif</b> : tags d’ambiance, avis écrit, plan marquant, examen d’imagerie.','🔒 La note d’Hervé et les avis des collègues apparaissent après votre note.'])],
+    ['noter','⭐','Noter un film',GL(['<b>Étoiles</b> : un clic suffit. Cliquez sur la moitié gauche d’une étoile pour une demi-note.','<b>Verdict rapide</b> : 👍 je le conseille, 🤷 bof, 👎 pas pour moi. Une note en est déduite.','<b>Facultatif</b> : tags d’ambiance, avis écrit, plan marquant.','🔒 La note d’Hervé et les avis des collègues apparaissent après votre note.'])],
     ['pari','🎯','Parier sur la note d’Hervé','<p>Avant de noter, devinez la note d’Hervé avec les étoiles « Pari ». Si vous tombez à une demi-étoile près, vous gagnez 20 XP.</p>'],
     ['direct','🔴','Séance en direct','<p>Hervé lance une séance sur un film. Tant qu’elle est ouverte, les résultats sont cachés. Notez, puis attendez : Hervé les révèle et tout le monde voit en même temps sa note, la moyenne et les avis.</p>']]],
    ['Jouer',[
@@ -729,7 +722,7 @@ function render(){
 
 /* actions */
 const rid=(f,u)=>f+'_'+u;
-function base(fid,extra){return{id:rid(fid,S.meId),filmId:fid,userId:S.meId,stars:5,text:'',shot:'',tags:[],exam:null,verdict:null,trophy:null,bet:bet||null,likes:[],ts:Date.now(),...extra}}
+function base(fid,extra){return{id:rid(fid,S.meId),filmId:fid,userId:S.meId,stars:5,text:'',shot:'',tags:[],verdict:null,trophy:null,bet:bet||null,likes:[],ts:Date.now(),...extra}}
 function setRating(fid,v){const old=rOf(fid,S.meId),r=old?{...old,stars:v}:base(fid,{stars:v});bet=0;put('ratings/'+r.id,r).then(ok=>ok&&(SFX.ding(),!old&&toast('+10 XP, merci pour votre note !')))}
 function setVerdict(fid,k){const old=rOf(fid,S.meId),r=old?{...old,verdict:k}:base(fid,{verdict:k,stars:VERDICTS[k][2]});bet=0;put('ratings/'+r.id,r).then(ok=>ok&&(SFX.ding(),!old&&toast('+10 XP, merci pour votre verdict !')))}
 function csvExport(){const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',rows=[['Film','Année','Genre','Note Hervé','Moyenne équipe','Participation','Avis écrits']];
@@ -746,7 +739,7 @@ async function shareCard(fid){
   x.font='500 40px Inter,sans-serif';x.fillStyle='#ffffffcc';x.fillText(`${f.year||''}${f.director?' · '+f.director:''}`,100,y+10);
   x.fillStyle='#ffcc00';x.font='96px sans-serif';let s='';for(let i=1;i<=5;i++)s+=r.stars>=i*2?'★':r.stars===i*2-1?'⯪':'☆';x.fillText(s,100,y+170);
   x.fillStyle='#fff';if(r.text)wrapT('« '+r.text+' »',880,y+290,56,'italic 44px Georgia,serif',5);
-  x.font='500 34px Inter,sans-serif';x.fillStyle='#ffffffcc';x.fillText(`${nameOf(S.meId)}${r.exam?' · ce serait une '+(r.exam==='IRM'?'IRM':r.exam):''}`,100,1230);
+  x.font='500 34px Inter,sans-serif';x.fillStyle='#ffffffcc';x.fillText(nameOf(S.meId),100,1230);
   const blob=await new Promise(res=>c.toBlob(res,'image/png'));
   try{await S.dl.save({filename:'carte-'+f.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png',data:blob})}catch{}
 }
@@ -795,7 +788,6 @@ document.addEventListener('click',async ev=>{
     S.ratings.filter(r=>r.filmId===id).forEach(r=>del('ratings/'+r.id));del('films/'+id);if(liveFilm()===id)del('config/live');film=null;render()}
   else if(act==='like'){const r=S.ratings.find(x=>x.id===id);if(!r)return;if(r.userId===S.meId)return toast('On ne se like pas soi-même 😉');SFX.pop();const k='likes/'+id+'_'+S.meId;(r.likes||[]).includes(S.meId)?del(k):put(k,{ratingId:id,userId:S.meId})}
   else if(act==='tag'){const r=rOf(film,S.meId);if(!r)return toast('Notez d’abord le film');SFX.pop();const tg=r.tags||[];dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;upd('ratings/'+r.id,{tags:tg.includes(id)?tg.filter(x=>x!==id):[...tg,id]})}
-  else if(act==='exam'){const r=rOf(film,S.meId);if(!r)return toast('Notez d’abord le film');SFX.pop();dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;upd('ratings/'+r.id,{exam:r.exam===id?null:id})}
   else if(act==='publish'){const r=rOf(id,S.meId);if(!r)return toast('Notez d’abord le film');const text=$('#txt').value.trim(),shot=$('#shot').value.trim();dTxt=dShot=null;upd('ratings/'+r.id,{text,shot}).then(ok=>ok&&(SFX.ding(),toast(text||shot?'Avis publié ✔ +XP':'Enregistré')))}
   else if(act==='trophy'){const r=S.ratings.find(x=>x.id===id);if(!r)return;S.ratings.filter(x=>x.filmId===r.filmId&&x.trophy===v&&x.id!==id).forEach(x=>del('trophies/'+x.id));(r.trophy===v?del('trophies/'+id):put('trophies/'+id,{filmId:r.filmId,kind:v})).then(ok=>ok&&r.trophy!==v&&(SFX.trophy(),toast('Trophée décerné 🏅 +25 XP')))}
   else if(act==='share')shareCard(id)
