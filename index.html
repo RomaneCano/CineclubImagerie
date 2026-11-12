@@ -165,6 +165,27 @@ nav button{padding:9px 16px}
 .bt i{font-style:normal;font-weight:600;font-size:10.5px;letter-spacing:.46em;color:var(--acc);padding-top:4px;border-top:2px dashed #ffcc0099}
 .brand.lg{gap:16px}.brand.lg svg{width:72px;height:72px}.brand.lg .bt{gap:8px}.brand.lg .bt b{font-size:30px;letter-spacing:.2em}.brand.lg .bt i{font-size:16px;letter-spacing:.44em;padding-top:7px}
 @media(max-width:760px){.brand svg{width:30px;height:30px}.bt b{font-size:13px}.bt i{font-size:9px}.brand.lg svg{width:56px;height:56px}.brand.lg .bt b{font-size:22px}.brand.lg .bt i{font-size:12px}}
+
+/* icônes */
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;flex:none;display:inline-block}.ic.gold{color:#ffcc00}.ic.silver{color:#c9ced8}.ic.bronze{color:#d8935a}
+.ph .ic{width:22px;height:22px}.cnt{display:inline-grid;place-items:center;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:#1a1500;font-size:11px;font-weight:700;padding:0 5px;margin-left:4px}
+/* onglets et sous-onglets */
+.tab{padding:10px 14px;border-bottom:2px solid transparent;color:var(--mut);font-weight:600;white-space:nowrap;border-radius:0;margin-bottom:-1px}.tab:hover{color:var(--tx)}.tab.on{color:var(--tx);border-bottom-color:var(--acc)}
+.tabs,.row:has(>.tab),.bar:has(>.tab){display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px;overflow-x:auto;flex-wrap:nowrap!important;align-items:flex-end}
+.stab{padding:6px 12px;border-radius:8px;color:var(--mut);font-size:13px;white-space:nowrap;text-align:center}.stab small{display:block;font-size:11px;font-weight:400;color:var(--mut);margin-top:1px}.stab.on{background:var(--panel2);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line)}.stab.on small{color:var(--acc)}
+.subtabs,.row:has(>.stab){display:inline-flex;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;max-width:100%;overflow-x:auto;flex-wrap:nowrap!important}
+.ck{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);cursor:pointer;font-size:13px}.ck:hover{border-color:var(--acc)}.ck input{width:auto;accent-color:var(--acc);margin:0}.ckgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px}
+/* logo : IMAGERIE centré */
+.bt{align-items:stretch;text-align:center}.bt b{padding-left:.22em}.bt i{padding-left:.46em}
+/* fenêtres et densité */
+body{font-size:14px}
+.sheet{width:min(700px,100%)!important;padding:18px 20px 20px!important;padding-top:48px!important;border-radius:14px!important}
+.sheet[aria-label="Proposer un film"],.sheet[aria-label="Défi"]{width:min(540px,100%)!important}.sheet.pod{width:min(520px,100%)!important}
+.sheet h2{font-size:21px!important}.sheet .cols{grid-template-columns:minmax(0,150px) minmax(0,1fr)!important;gap:18px!important}.x{font-size:17px;right:14px;top:12px}
+.btn{padding:8px 16px;font-size:13.5px}.chip{padding:5px 11px;font-size:12.5px}input,textarea,select{padding:8px 10px;font-size:13.5px;border-radius:9px}
+.abtn{padding:9px 12px;font-size:13px}.abtn .ai{font-size:17px}.actbar{padding:10px}.hero{padding:22px;gap:24px}.hero h2{font-size:30px}
+.kpi .pn b{font-size:24px}.pn{padding:14px}
+.icgrid{display:flex;flex-wrap:wrap;gap:6px}.avb{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;font-size:18px;color:var(--tx)}.avb:hover{border-color:var(--acc)}.avb.on{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 2px #ffcc0033}
 </style>
 </head>
 <body>
@@ -173,6 +194,100 @@ nav button{padding:9px 16px}
 <script src="config.js"></script>
 <script>const $=s=>document.querySelector(s);
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* icônes (traits fins) à la place des emojis */
+const IC={
+ star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+ lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+ target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+ live:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>',
+ up:'<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>',
+ down:'<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>',
+ meh:'<circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
+ smile:'<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>',
+ clap:'<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+ popcorn:'<path d="M18 8a2 2 0 0 0 0-4 2 2 0 0 0-.4 0 2 2 0 0 0-3.6-.8A2 2 0 0 0 10 3.2 2 2 0 0 0 6.4 4 2 2 0 0 0 6 8"/><path d="m6 8 1.5 13h9L18 8"/><path d="M10 12v5M14 12v5"/>',
+ film:'<rect x="2" y="2" width="20" height="20" rx="2.18"/><path d="M7 2v20M17 2v20M2 12h20M2 7h5M2 17h5M17 17h5M17 7h5"/>',
+ pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+ cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ tv:'<rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/>',
+ image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.09-3.09a2 2 0 0 0-2.82 0L6 21"/>',
+ bookmark:'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+ camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+ vol:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+ mute:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/>',
+ logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+ user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+ users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+ award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+ trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+ book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+ swords:'<polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="17" x2="4" y2="20"/><line x1="3" y1="19" x2="5" y2="21"/>',
+ flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+ crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/>',
+ medal:'<path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/>',
+ flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+ sparkles:'<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4M19 17v4M3 5h4M17 19h4"/>',
+ layers:'<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+ globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+ ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 17v2M13 11v2"/>',
+ pen:'<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+ library:'<path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/>',
+ zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+ tag:'<path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.42 0l8.58-8.58a1 1 0 0 0 0-1.42Z"/><path d="M7 7h.01"/>',
+ hourglass:'<path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>',
+ landmark:'<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+ rocket:'<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>',
+ eye:'<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+ search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+ palette:'<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+ video:'<path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+ cake:'<path d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"/><path d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"/><path d="M2 21h20"/><path d="M7 8v3M12 8v3M17 8v3"/><path d="M7 4h.01M12 4h.01M17 4h.01"/>',
+ moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+ sunrise:'<path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/><path d="M16 18a4 4 0 0 0-8 0"/>',
+ sofa:'<path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2M20 18v2"/>',
+ heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+ dice:'<rect x="2" y="2" width="20" height="20" rx="3"/><circle cx="8" cy="8" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/>',
+ filepen:'<path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10.4 12.6a2 2 0 1 1 3 3L8 21l-4 1 1-4Z"/>',
+ wheel:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/><path d="M12 2v8M12 14v8M2 12h8M14 12h8"/>',
+ sliders:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+ refresh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+ trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+ square:'<rect x="4" y="4" width="16" height="16" rx="2"/>',
+ plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+ megaphone:'<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>',
+ chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+ clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+ gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>',
+ msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+ grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+ list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+ copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+ check:'<polyline points="20 6 9 17 4 12"/>',
+ shuffle:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>'};
+const EMO2IC={'⭐':'star','🌟':'star','🔒':'lock','🎯':'target','🔴':'live','👍':'up','👎':'down','🤷':'meh','😂':'smile','🎬':'clap','🍿':'popcorn','🎞':'film','📼':'film','📍':'pin','🗓':'cal','📅':'cal','📆':'cal','📺':'tv','🖼':'image','🔖':'bookmark','📸':'camera','🔊':'vol','🔇':'mute','🚪':'logout','👤':'user','👥':'users','🏅':'award','🏆':'trophy','📖':'book','⚔':'swords','⛳':'flag','👑':'crown','🥇':'medal gold','🥈':'medal silver','🥉':'medal bronze','🔥':'flame','🕯':'flame','✨':'sparkles','🆕':'sparkles','🌈':'sparkles','🔮':'sparkles','💎':'sparkles','🧠':'sparkles','🃏':'layers','🌍':'globe','🎟':'ticket','✍':'pen','✏':'pen','🧶':'pen','📚':'library','⚡':'zap','😈':'zap','🏷':'tag','⏳':'hourglass','🏛':'landmark','🎭':'ticket','🚀':'rocket','🕵':'eye','🔎':'search','🔍':'search','🔭':'search','🎨':'palette','📽':'video','🎥':'video','🎂':'cake','🌙':'moon','🌅':'sunrise','🛋':'sofa','❤':'heart','🤝':'users','🙌':'users','☮':'users','🎲':'dice','🌴':'award','📝':'filepen','🎡':'wheel','🎚':'sliders','🔄':'refresh','🗑':'trash','⏹':'square','🎉':'sparkles','➕':'plus','＋':'plus','📣':'megaphone','📊':'chart','🕒':'clock','🎁':'gift','💬':'msg','▦':'grid','☰':'list','⧉':'copy'};
+function icon(name,cls=''){const [n,c2]=String(name).split(' ');return`<svg class="ic ${c2||''} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.star}</svg>`}
+const ICRE=new RegExp('('+Object.keys(EMO2IC).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\uFE0F?','gu');
+const STRIPRE=/[\u{1F000}-\u{1FAFF}]️?/gu;
+const ALLRE=new RegExp(ICRE.source+'|'+STRIPRE.source,'gu');
+function stripEmoji(t){return String(t).replace(ICRE,'').replace(STRIPRE,'').replace(/\s{2,}/g,' ').trim()}
+function iconizeNode(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];let n;while(n=w.nextNode())nodes.push(n);
+  const tpl=document.createElement('template');
+  nodes.forEach(t=>{const txt=t.nodeValue;if(!txt||txt.search(ALLRE)<0)return;const p=t.parentElement;if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName))return;
+    if(p.tagName==='OPTION'){t.nodeValue=stripEmoji(txt);return}
+    const frag=document.createDocumentFragment();let last=0;
+    for(const m of txt.matchAll(ALLRE)){if(m.index>last)frag.append(txt.slice(last,m.index));
+      if(m[1]){tpl.innerHTML=icon(EMO2IC[m[1]]);frag.append(tpl.content.firstChild)}
+      last=m.index+m[0].length}
+    if(last<txt.length)frag.append(txt.slice(last));
+    t.replaceWith(frag)})}
+new MutationObserver(ms=>{ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)iconizeNode(n);else if(n.nodeType===3&&n.parentElement)iconizeNode(n.parentElement)}))}).observe(document.body,{childList:true,subtree:true,characterData:false});
+const ICON_CHOICES=[['⛳','Drapeau'],['⭐','Étoile'],['🎬','Clap'],['🏆','Trophée'],['🍿','Pop-corn'],['🌍','Globe'],['🚀','Fusée'],['🔥','Flamme'],['❤️','Cœur'],['⚡','Éclair'],['🏅','Médaille'],['📅','Calendrier'],['🎞️','Pellicule'],['📽️','Projecteur'],['🎨','Palette'],['🔎','Loupe']];
+const nv=x=>String(x||'').replace(/️/g,'');
+function iconGrid(cur,act){const l=[...ICON_CHOICES];if(cur&&!l.some(x=>nv(x[0])===nv(cur)))l.push([cur,'Icône actuelle']);
+  return`<div class="icgrid">${l.map(([em,lab])=>`<button type="button" class="avb ${nv(cur)===nv(em)?'on':''}" data-act="${act}" data-id="${e(em)}" data-tip="${e(lab)}" aria-label="${e(lab)}">${icon(EMO2IC[nv(em)]||'star')}</button>`).join('')}</div>`}
+function iconOptions(cur){const l=[...ICON_CHOICES];if(cur&&!l.some(x=>x[0]===cur))l.push([cur,'Actuel']);return l.map(([v,lab])=>`<option value="${e(v)}" ${v===cur?'selected':''}>${lab}</option>`).join('')}
 const uid=()=>Math.random().toString(36).slice(2,10);
 const DAY=864e5;
 const EMOJIS=['🎬','🍿','🦊','🌙','🪐','🌸','🦉','🔥','🐙','🎻'];
@@ -189,7 +304,7 @@ CAT.push(...[["Le Parrain", 1972, "Francis Ford Coppola", "Policier"], ["Taxi Dr
 let sb=null;
 const S={films:[],ratings:[],members:[],cfg:{},live:null,ideas:[],duels:[],dvotes:[],chals:[],watch:[],names:{},meId:null,isOwner:false,ready:false,db:null,assets:null,dl:null};
 let lastDone=null,lastLevel=null,authTab='in',authMsg='',view='home',filter='all',q='',film=null,adding=false,prefill=null,dTxt=null,dShot=null,posterUrl='',addNote=0,bet=0,seasonMode='season',showRemind=false,lastLive=null;
-const R={pool:[],angle:0,spinning:false,result:null,src:'wd',loading:false,err:'',tried:false,f:{genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all'},fopen:false,det:null,detLoading:false};
+const R={pool:[],angle:0,spinning:false,result:null,src:'wd',loading:false,err:'',tried:false,f:{genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all',kind:'all'},fopen:false,ftab:'kind',det:null,detLoading:false};
 let rModal=false;
 
 const member=id=>S.members.find(m=>m.id===id);
@@ -410,7 +525,7 @@ function chalCards(){
   if(act.length)h+=`<div class="sect"><h3>⛳ Défis en cours</h3></div><div class="chs">${act.map(c=>{
    const who=cons().filter(x=>chalDone(c,x.id)),n=dir?0:Math.min(chalCount(c,S.meId),c.target),done=!dir&&chalDone(c,S.meId),help=dir||done?[]:chalHelp(c),rest=c.target-n,left=Math.max(1,Math.ceil((chRange(c)[1]-Date.now())/DAY));
    const pips=Array.from({length:Math.min(c.target,8)},(_,k)=>`<span class="pip ${!dir&&k<n?'on':''}">${!dir&&k<n?'✓':''}</span>`).join('');
-   return`<div class="pn ${done?'chdone':''}"><div class="row" style="align-items:flex-start"><b style="flex:1;font-size:16px">${c.emoji?e(c.emoji)+' ':''}${e(c.title)}</b><span class="dim" style="font-size:12px">fin dans ${left} j</span></div>
+   return`<div class="pn ${done?'chdone':''}"><div class="row" style="align-items:flex-start"><b style="flex:1;font-size:16px">${c.emoji?e(c.emoji)+' ':''}${e(c.title)}</b><span class="dim" style="font-size:12px">Il reste ${left} jour${left>1?'s':''}</span></div>
     <div class="dim" style="font-size:13px;margin:2px 0 10px">${e(chalLabel(c))}</div>
     <div class="pips">${pips}</div>
     ${c.badge?`<div style="margin-top:10px"><span class="badge" data-tip="Badge à gagner en relevant ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span></div>`:''}
@@ -427,21 +542,23 @@ function duelBlock(){const d=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.c
    <div class="vs">VS</div>
    <div>${poster(B,mine?.pick==='b'?'pick':'').replace('class="poster',`data-act="vote" data-id="${d.id}" data-v="b" class="poster`)}${mine||isDir()?`<div style="text-align:center;margin-top:6px"><b class="serif" style="font-size:22px">${nb}</b></div>`:''}</div></div>
    <p class="dim" style="text-align:center;margin-top:10px;font-size:13px">${isDir()?'':mine?'Vote enregistré, vous pouvez le changer en recliquant.':'Cliquez sur l’affiche de votre choix.'}${isDir()?`<br><button class="chip" data-act="closeduel" data-id="${d.id}" data-tip="Ferme le vote et couronne le film en tête">Clore le duel et couronner le gagnant</button>`:''}</p></div>`}
-let homeSort='recent',homeView='grid',homeLimit=24,decSel='',monthState={},dLimit=15,dSort='recent',dQ='',jLimit=15,cLimit=24,revLimit=8,revSort='recent';
+let gSel='',homeSort='recent',homeView='grid',homeLimit=24,decSel='',monthState={},dLimit=15,dSort='recent',dQ='',jLimit=15,cLimit=24,revLimit=8,revSort='recent';
+const genreLabel=f=>f.kind==='tv'?(f.genre||'Film')+' (téléfilm)':f.genre;
 function filmRow(f){const mine=rOf(f.id,S.meId),t=liveOpen(f.id)&&!isDir()?null:avg(team(f.id).map(r=>r.stars));
   const stt=isDir()?'':mine?'<span class="badge" style="border-color:var(--ok);color:var(--ok)">✔ Noté</span>':'<span class="badge">À noter</span>';
-  return`<div class="frow" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div></div><div class="fside">${f.featured?'<span class="badge">⭐</span>':''}${stt}${t!=null?`<span class="dim" data-tip="Moyenne de l’équipe">👥 ${fmt(t)}</span>`:''}${mine?stars(mine.stars,null,1):''}</div></div>`}
+  return`<div class="frow" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,genreLabel(f)].filter(Boolean).map(e).join(' · ')}</div></div><div class="fside">${f.featured?'<span class="badge">⭐</span>':''}${stt}${t!=null?`<span class="dim" data-tip="Moyenne de l’équipe">👥 ${fmt(t)}</span>`:''}${mine?stars(mine.stars,null,1):''}</div></div>`}
 function filmsSection(liveF,genres){
   const sdOf=f=>{const t=team(f.id),a=avg(t.map(r=>r.stars));return t.length>1?Math.sqrt(avg(t.map(r=>(r.stars-a)**2))):0};
   const decs=[...new Set(liveF.map(f=>+f.year).filter(y=>y>1800).map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a);
   let list=liveF.filter(f=>!q||norm(f.title+' '+(f.director||'')+' '+f.genre+' '+f.year).includes(norm(q)));
-  if(filter==='todo')list=list.filter(f=>!rOf(f.id,S.meId));else if(filter==='done')list=list.filter(f=>rOf(f.id,S.meId));else if(filter==='watch')list=list.filter(f=>watching(f.id));else if(filter.startsWith('g:'))list=list.filter(f=>f.genre===filter.slice(2));
+  if(filter==='todo')list=list.filter(f=>!rOf(f.id,S.meId));else if(filter==='done')list=list.filter(f=>rOf(f.id,S.meId));else if(filter==='watch')list=list.filter(f=>watching(f.id));
+  if(gSel)list=list.filter(f=>f.genre===gSel);
   if(decSel)list=list.filter(f=>Math.floor(+f.year/10)*10===+decSel);
   const sorts={recent:['Les plus récents',(a,b)=>b.added-a.added],top:['Les mieux notés',(a,b)=>(avg(team(b.id).map(r=>r.stars))??-1)-(avg(team(a.id).map(r=>r.stars))??-1)],az:['Titre A à Z',(a,b)=>a.title.localeCompare(b.title,'fr')],year:['Année (récents d’abord)',(a,b)=>(+b.year||0)-(+a.year||0)]};
   if(isDir())sorts.divis=['Les plus divisifs',(a,b)=>sdOf(b)-sdOf(a)];else sorts.todo=['À noter d’abord',(a,b)=>(rOf(a.id,S.meId)?1:0)-(rOf(b.id,S.meId)?1:0)||b.added-a.added];
   if(!sorts[homeSort])homeSort='recent';
   list.sort(sorts[homeSort][1]);
-  const grouped=homeSort==='recent'&&!q&&filter==='all'&&!decSel;
+  const grouped=homeSort==='recent'&&!q&&filter==='all'&&!decSel&&!gSel;
   const view=fs=>homeView==='list'?`<div class="flist">${fs.map(filmRow).join('')}</div>`:`<div class="grid">${fs.map(card).join('')}</div>`;
   let body;
   if(!list.length)body='<div class="pn dim empty">Aucun film dans cette sélection.</div>';
@@ -450,10 +567,9 @@ function filmsSection(liveF,genres){
       return`<div class="mg"><button class="mh" data-act="mtoggle" data-id="${g.k}" aria-expanded="${open}"><b>${lab}</b><span class="dim">${g.fs.length} film${g.fs.length>1?'s':''}</span><i>${open?'−':'+'}</i></button>${open?view(g.fs):''}</div>`}).join('')}
   else body=view(list.slice(0,homeLimit))+(list.length>homeLimit?`<div style="text-align:center;margin-top:18px"><button class="btn ghost" data-act="more" data-id="home">Afficher plus (${list.length-homeLimit} restants)</button></div>`:'');
   return`<div class="sect" style="flex-wrap:wrap"><h3>Toutes les séances</h3><span class="dim">${list.length} film${list.length>1?'s':''}</span><span style="flex:1"></span><input class="search" id="q" placeholder="Rechercher ( / )" data-tip="Cherche dans le titre, la réalisation, le genre et l’année" value="${e(q)}" aria-label="Rechercher un film"></div>
-   <div class="bar"><button class="chip ${filter==='all'?'on':''}" data-act="filter" data-id="all">Tous</button>
-   ${isDir()?'':`<button class="chip ${filter==='todo'?'on':''}" data-act="filter" data-id="todo" data-tip="Les films que vous n’avez pas encore notés">À noter (${liveF.filter(f=>!rOf(f.id,S.meId)).length})</button><button class="chip ${filter==='done'?'on':''}" data-act="filter" data-id="done" data-tip="Les films que vous avez déjà notés">Déjà notés</button><button class="chip ${filter==='watch'?'on':''}" data-act="filter" data-id="watch" data-tip="Les films de votre liste « À voir plus tard »">🔖 Ma liste</button>`}
-   ${genres.map(g=>`<button class="chip ${filter==='g:'+g?'on':''}" data-act="filter" data-id="g:${e(g)}">${e(g)}</button>`).join('')}</div>
-   <div class="ctl"><label class="dim" for="hsort">Trier</label><select id="hsort">${Object.entries(sorts).map(([k,v])=>`<option value="${k}" ${homeSort===k?'selected':''}>${v[0]}</option>`).join('')}</select>${decs.length>1?`<label class="dim" for="hdec">Époque</label><select id="hdec"><option value="">Toutes</option>${decs.map(d=>`<option value="${d}" ${String(decSel)===String(d)?'selected':''}>Années ${d}</option>`).join('')}</select>`:''}<span style="flex:1"></span><button class="chip ${homeView==='grid'?'on':''}" data-act="hview" data-id="grid" data-tip="Affichage en affiches">▦ Affiches</button><button class="chip ${homeView==='list'?'on':''}" data-act="hview" data-id="list" data-tip="Affichage en liste compacte, pratique avec beaucoup de films">☰ Liste</button></div>${body}`}
+   <div class="tabs"><button class="tab ${filter==='all'?'on':''}" data-act="filter" data-id="all">Tous</button>${isDir()?'':`<button class="tab ${filter==='todo'?'on':''}" data-act="filter" data-id="todo" data-tip="Les films que vous n’avez pas encore notés">À noter (${liveF.filter(f=>!rOf(f.id,S.meId)).length})</button><button class="tab ${filter==='done'?'on':''}" data-act="filter" data-id="done" data-tip="Les films que vous avez déjà notés">Déjà notés</button><button class="tab ${filter==='watch'?'on':''}" data-act="filter" data-id="watch" data-tip="Les films de votre liste « À voir plus tard »">🔖 Ma liste</button>`}</div>
+   <div class="subtabs" style="margin-bottom:12px"><button class="stab ${!gSel?'on':''}" data-act="genre" data-id="">Tous les genres</button>${genres.map(g=>`<button class="stab ${gSel===g?'on':''}" data-act="genre" data-id="${e(g)}">${e(g)}</button>`).join('')}</div>
+   <div class="ctl"><label class="dim" for="hsort">Trier</label><select id="hsort">${Object.entries(sorts).map(([k,v])=>`<option value="${k}" ${homeSort===k?'selected':''}>${v[0]}</option>`).join('')}</select>${decs.length>1?`<label class="dim" for="hdec">Époque</label><select id="hdec"><option value="">Toutes</option>${decs.map(d=>`<option value="${d}" ${String(decSel)===String(d)?'selected':''}>Années ${d}</option>`).join('')}</select>`:''}<span style="flex:1"></span><button class="stab ${homeView==='grid'?'on':''}" data-act="hview" data-id="grid" data-tip="Affichage en affiches">▦ Affiches</button><button class="stab ${homeView==='list'?'on':''}" data-act="hview" data-id="list" data-tip="Affichage en liste compacte, pratique avec beaucoup de films">☰ Liste</button></div>${body}`}
 
 /* palmarès, reviewers du mois et podium */
 let pmTab='best',pmMonth=null,pmLimit=20,podium=null;
@@ -478,7 +594,7 @@ function maybePodium(){const d=new Date(),prev=new Date(d.getFullYear(),d.getMon
   let seen=false;try{seen=!!localStorage.getItem('cineclub-podium-'+k)}catch{}
   if(!seen&&!tour&&monthScores(k).length){podium={key:k};SFX.win();render()}}
 function rankRow(i,x,metric){const f=x.f;
-  return`<div class="frow rk" style="--i:${i}" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${i<3?MED[i]+' ':`<span class="dim">${i+1}.</span> `}${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>${x.a!=null?`<div class="mbar"><i style="--w:${Math.round(x.a/10*100)}%"></i></div>`:''}</div><div class="fside">${metric}</div></div>`}
+  return`<div class="frow rk" style="--i:${i}" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${i<3?MED[i]+' ':`<span class="dim">${i+1}.</span> `}${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,genreLabel(f)].filter(Boolean).map(e).join(' · ')}</div>${x.a!=null?`<div class="mbar"><i style="--w:${Math.round(x.a/10*100)}%"></i></div>`:''}</div><div class="fside">${metric}</div></div>`}
 function palmares(){
   const tabs=[['seen',isDir()?'Tous les films':'Films que j’ai vus'],['best','⭐ Les mieux notés'],['worst','👎 Les plus détestés'],['talk','💬 Les plus commentés'],['month','🏆 Reviewers du mois']];
   const vis=S.films.filter(f=>f.status!=='upcoming'&&!liveOpen(f.id)&&(isDir()||rOf(f.id,S.meId)));
@@ -499,22 +615,22 @@ function palmares(){
     body=list.length?`<div class="flist rkl">${list.slice(0,pmLimit).map((x,i)=>rankRow(i,x,metric(x))).join('')}</div>${list.length>pmLimit?`<div style="text-align:center;margin-top:14px"><button class="btn ghost" data-act="pmmore">Afficher plus (${list.length-pmLimit} restants)</button></div>`:''}`:'<div class="pn empty dim">Rien à afficher pour l’instant.</div>';
     if(!isDir())body=`<p class="dim" style="font-size:13px;margin-bottom:10px">Seuls les films que vous avez notés apparaissent ici, pour que personne ne vous influence.</p>`+body}
   return`<div class="gwrap" style="max-width:900px"><div class="row" style="flex-wrap:wrap;margin-bottom:12px"><h2 style="flex:1">Palmarès</h2><button class="btn ghost" data-act="podium" data-id="${monthsWithActivity()[0]||''}" data-tip="Ouvre le podium animé du mois le plus récent">🏆 Dernier podium</button></div>
-   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:14px">${tabs.map(([k,l])=>`<button class="chip ${pmTab===k?'on':''}" data-act="pmtab" data-id="${k}">${l}</button>`).join('')}</div>${body}</div>`}
+   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:14px">${tabs.map(([k,l])=>`<button class="tab ${pmTab===k?'on':''}" data-act="pmtab" data-id="${k}">${l}</button>`).join('')}</div>${body}</div>`}
 function animer(){
   if(!isDir())return'';
   const st={active:S.chals.filter(c=>chStatus(c)==='active'),sched:S.chals.filter(c=>chStatus(c)==='sched'),ended:S.chals.filter(c=>chStatus(c)==='ended')};
   const duel=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.created)[0];
-  const tabs=`<div class="row" style="gap:6px;margin:12px 0 14px"><button class="chip ${animTab==='chal'?'on':''}" data-act="animtab" data-id="chal">⛳ Défis (${st.active.length+st.sched.length})</button><button class="chip ${animTab==='duel'?'on':''}" data-act="animtab" data-id="duel">⚔️ Duels</button></div>`;
+  const tabs=`<div class="row" style="gap:6px;margin:12px 0 14px"><button class="tab ${animTab==='chal'?'on':''}" data-act="animtab" data-id="chal">⛳ Défis (${st.active.length+st.sched.length})</button><button class="tab ${animTab==='duel'?'on':''}" data-act="animtab" data-id="duel">⚔️ Duels</button></div>`;
   let body='';
   if(animTab==='chal'){
     const names={active:'En cours',sched:'Programmés',ended:'Terminés'},list=[...st[chList]].sort((a,b)=>chList==='ended'?chRange(b)[1]-chRange(a)[1]:chRange(a)[0]-chRange(b)[0]);
     const fd=ts=>new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-    const row=c=>{const [a,b]=chRange(c),sc=chStatus(c)==='sched';return`<div class="chr"><span class="tem">${e(c.emoji||'⛳')}</span><div style="min-width:0"><b>${e(c.title)}</b><div class="dim" style="font-size:12px">${e(chalLabel(c))} · ${fd(a)} au ${fd(b)}</div>${c.badge?`<span class="badge" style="margin-top:4px" data-tip="Badge lié à ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span>`:''}</div><div class="chb"><span class="dim" style="font-size:12px">${cons().filter(x=>chalDone(c,x.id)).length}/${cons().length}</span><button class="chip" data-act="chedit" data-id="${c.id}" data-tip="Modifier ce défi" aria-label="Modifier">✏️</button><button class="chip" data-act="chdup" data-id="${c.id}" data-tip="Dupliquer pour créer un nouveau défi en changeant les paramètres" aria-label="Dupliquer">⧉</button><button class="chip dgr" data-act="chaldel" data-id="${c.id}" data-tip="${sc?'Annuler ce défi programmé':'Retirer ce défi'}" aria-label="Retirer">✕</button></div></div>`};
+    const row=c=>{const [a,b]=chRange(c),sc=chStatus(c)==='sched';return`<div class="chr"><span class="tem">${e(c.emoji||'⛳')}</span><div style="min-width:0"><b>${e(c.title)}</b><div class="dim" style="font-size:12px">${e(chalLabel(c))}<br>${chWhen(c)}</div>${c.badge?`<span class="badge" style="margin-top:4px" data-tip="Badge lié à ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span>`:''}</div><div class="chb"><span class="dim" style="font-size:12px">${cons().filter(x=>chalDone(c,x.id)).length}/${cons().length}</span><button class="chip" data-act="chedit" data-id="${c.id}" data-tip="Modifier ce défi" aria-label="Modifier">✏️</button><button class="chip" data-act="chdup" data-id="${c.id}" data-tip="Dupliquer pour créer un nouveau défi en changeant les paramètres" aria-label="Dupliquer">⧉</button><button class="chip dgr" data-act="chaldel" data-id="${c.id}" data-tip="${sc?'Annuler ce défi programmé':'Retirer ce défi'}" aria-label="Retirer">✕</button></div></div>`};
     body=`<div class="animgrid"><div class="pn"><div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:8px"><h3 style="flex:1">Lancer un défi</h3><button class="btn" data-act="chnew" data-tip="Créer un défi sur mesure : règle, dates, badge">＋ Créer un défi</button></div>
-      <div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap"><span class="dim" style="font-size:13px">Durée</span>${[['month','Fin du mois'],['7','7 jours'],['14','14 jours']].map(([k,l])=>`<button class="chip ${chDur===k?'on':''}" data-act="chdur" data-id="${k}">${l}</button>`).join('')}</div>
+      <div class="dim" style="font-size:13px;margin:2px 0 6px">Le défi se termine :</div><div class="subtabs" style="margin-bottom:12px">${[['month','Fin du mois'],['7','Dans 1 semaine'],['14','Dans 2 semaines']].map(([k,l])=>`<button class="stab ${chDur===k?'on':''}" data-act="chdur" data-id="${k}">${l}<small>${fdl(chEnd(k))}</small></button>`).join('')}</div>
       <div class="tiles2">${CHAL_TPL.map((t,i)=>`<div class="tile2"><button class="tmain" data-act="chaltpl" data-id="${i}" data-tip="${e('Lancer maintenant : '+chalLabel({type:t[2],value:t[3],target:t[4]})+' (badge : '+t[5]+')')}"><span class="tem">${t[0]}</span><b>${t[1]}</b></button><button class="tmore" data-act="chtpl" data-id="${i}" data-tip="Personnaliser, programmer ou changer le badge" aria-label="Personnaliser">⋯</button></div>`).join('')}</div>
       <p class="dim" style="font-size:12px;margin-top:10px">Un clic lance le défi tout de suite, avec son badge. « ⋯ » permet de choisir les dates ou de modifier le modèle.</p></div>
-     <div class="pn"><div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">${Object.entries(names).map(([k,l])=>`<button class="chip ${chList===k?'on':''}" data-act="chlist" data-id="${k}">${l} (${st[k].length})</button>`).join('')}</div>
+     <div class="pn"><div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">${Object.entries(names).map(([k,l])=>`<button class="stab ${chList===k?'on':''}" data-act="chlist" data-id="${k}">${l} (${st[k].length})</button>`).join('')}</div>
       <div class="chlist">${list.map(row).join('')||`<p class="dim" style="padding:14px 4px">Aucun défi ${chList==='active'?'en cours':chList==='sched'?'programmé':'terminé'}.</p>`}</div></div></div>`}
   else{
     const opts=S.films.map(f=>`<option value="${e(f.title)}"></option>`).join('');
@@ -531,7 +647,7 @@ function home(){
      :`<div class="pn empty"><h2>La salle est encore vide</h2><p class="dim">Hervé n’a pas encore proposé de film. Les séances apparaîtront ici.</p></div>`)}
   if(feat&&filter==='all'){const mine=rOf(feat.id,S.meId),dh=dirOf(feat.id),lo=liveOpen(feat.id);
     h+=`<section class="hero"><div data-act="open" data-id="${feat.id}" data-tip="Ouvrir la fiche du film" style="cursor:pointer" tabindex="0" role="button" aria-label="Ouvrir la fiche de ${e(feat.title)}">${poster(feat)}</div><div class="wrap"><div class="k">⭐ ${feat.status==='upcoming'?'Prochain film de la semaine':'Le film de la semaine'}</div><h2>${e(feat.title)}</h2>
-     <div class="meta">${[feat.year,feat.director,feat.genre].filter(Boolean).map(e).join(' · ')}</div>${feat.seanceAt?`<div class="meta" style="color:var(--ok);margin-top:4px">📅 Séance : ${e(seanceFull(feat.seanceAt))}${feat.seancePlace?' · '+e(feat.seancePlace):''}</div>`:''}${tvLabel(feat)?`<div class="meta" style="color:var(--acc);margin-top:4px">${e(tvLabel(feat))}</div>`:''}
+     <div class="meta">${[feat.year,feat.director,genreLabel(feat)].filter(Boolean).map(e).join(' · ')}</div>${feat.seanceAt?`<div class="meta" style="color:var(--ok);margin-top:4px">📅 Séance : ${e(seanceFull(feat.seanceAt))}${feat.seancePlace?' · '+e(feat.seancePlace):''}</div>`:''}${tvLabel(feat)?`<div class="meta" style="color:var(--acc);margin-top:4px">${e(tvLabel(feat))}</div>`:''}
      ${feat.pitch?`<div class="pitch">« ${e(feat.pitch)} »<div class="meta" style="font-style:normal;margin-top:4px">Hervé</div></div>`:''}${feat.synopsis?`<p class="dim" style="margin-bottom:12px;font-size:14px">${e(feat.synopsis.slice(0,220))}${feat.synopsis.length>220?'…':''}${feat.runtime?` · ${hm(feat.runtime)}`:''}</p>`:''}
      ${feat.status==='upcoming'?`<p class="meta" style="margin:10px 0">🗓️ Les notes ouvriront bientôt. En attendant, découvrez la fiche.</p><button class="btn ghost" data-act="open" data-id="${feat.id}">Voir la fiche</button>`:isDir()?`<div class="meta">${team(feat.id).length} avis de l’équipe${lo?'':' · moyenne '+fmt(avg(team(feat.id).map(r=>r.stars)))}</div><div style="margin-top:14px"><button class="btn ghost" data-act="open" data-id="${feat.id}">Voir la fiche et les avis</button></div>`:
       `<div style="display:grid;gap:12px">${verdictRow(feat.id,mine)}<div class="row" style="flex-wrap:wrap"><span class="dim">Ou notez finement</span>${stars(mine?.stars||0,'quick:'+feat.id)}<button class="btn ghost" data-act="open" data-id="${feat.id}">${mine?'Voir les avis':'Écrire un avis'}</button></div></div>
@@ -548,12 +664,12 @@ function filmModal(){
   const revs=S.ratings.filter(r=>r.filmId===f.id&&(r.text||r.shot||r.gif||isDir()||mine)&&(isDir()||!lo)).sort((a,b)=>b.ts-a.ts);
   const showRevs=isDir()||(mine&&!lo),t=avg(team(f.id).map(r=>r.stars));
   const revsShown=(revSort==='liked'?[...revs].sort((a,b)=>(b.likes||[]).length-(a.likes||[]).length||b.ts-a.ts):revs).slice(0,revLimit);
-  const revCtl=revs.length>3?`<div class="row" style="gap:6px;margin:6px 0 4px"><span class="dim" style="font-size:13px">${revs.length} avis · trier</span><button class="chip ${revSort==='recent'?'on':''}" data-act="rsort" data-id="recent">Récents</button><button class="chip ${revSort==='liked'?'on':''}" data-act="rsort" data-id="liked">Les plus aimés</button></div>`:'';
+  const revCtl=revs.length>3?`<div class="row" style="gap:6px;margin:6px 0 4px"><span class="dim" style="font-size:13px">${revs.length} avis · trier</span><button class="stab ${revSort==='recent'?'on':''}" data-act="rsort" data-id="recent">Récents</button><button class="stab ${revSort==='liked'?'on':''}" data-act="rsort" data-id="liked">Les plus aimés</button></div>`:'';
   const revMore=revs.length>revLimit?`<div style="text-align:center;margin-top:10px"><button class="btn ghost" data-act="rmore">Voir les ${revs.length-revLimit} autres avis</button></div>`:'';
   const tagsSel=mine?.tags||[],txt=dTxt??mine?.text??'',shot=dShot??mine?.shot??'',gif=dGif??mine?.gif??'';
   const isLiveF=S.live&&S.live.filmId===f.id;
   return`<div class="modal" data-act="close"><div class="sheet" data-stop role="dialog" aria-label="${e(f.title)}"><button class="x" data-act="close" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="fnav"><button class="chip" data-act="fprev" data-tip="Film précédent (touche ←)" aria-label="Film précédent">←</button><button class="chip" data-act="fnext" data-tip="Film suivant (touche →)" aria-label="Film suivant">→</button></div>
-   <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>
+   <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,genreLabel(f)].filter(Boolean).map(e).join(' · ')}</div>
     <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${f.where?`<span class="badge">📍 ${e(f.where)}</span>`:''}${f.seanceAt?`<span class="badge" style="border-color:var(--ok);color:var(--ok)">📅 Séance : ${e(seanceFull(f.seanceAt))}${f.seancePlace?' · '+e(f.seancePlace):''}</span>`:''}${tvLabel(f)?`<span class="badge" style="border-color:var(--acc);color:var(--acc)">${e(tvLabel(f))}</span>`:''}${up?'<span class="badge">Bientôt à l’affiche</span>':''}</div>
     ${f.pitch?`<div class="pitch">« ${e(f.pitch)} »</div>`:''}
     ${(()=>{const meta=[f.runtime?`<span class="badge">🕒 ${hm(f.runtime)}</span>`:'',f.country?`<span class="badge">🌍 ${e(f.country)}</span>`:'',f.tmdb&&f.tmdb.votes&&(isDir()||(mine&&!lo))?`<span class="badge">★ ${String(f.tmdb.rating.toFixed(1)).replace('.',',')} sur 10 · ${f.tmdb.votes} votes publics</span>`:''].filter(Boolean).join('');
@@ -602,7 +718,7 @@ function addModal(){const p=prefill||{};
     <div class="field"><label for="fask">Une question pour l’équipe (optionnel)</label><input name="ask" id="fask" placeholder="Et vous, que pensez-vous de la fin ?"></div>
     <div class="field"><label for="fp">Affiche (remplie automatiquement, modifiable)</label><div class="row"><input id="fp" name="posterurl" type="url" placeholder="https://…" value="${e(p.poster||'')}" style="flex:1"><img id="fpv" class="fpv" alt="Aperçu de l’affiche" ${p.poster?`src="${e(p.poster)}"`:'hidden'}></div></div>
     <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
-    <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label></div>
+    <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label><label class="row dim" style="gap:6px"><input type="checkbox" name="tvfilm" id="ftvf" style="width:auto" ${p.tv?'checked':''}> Téléfilm</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
 function remindText(){const f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured)||[...S.films].sort((a,b)=>b.added-a.added)[0];
   return f?`Bonjour à toute l’équipe ! Le film de la semaine est « ${f.title} » (${f.year||'?'}). ${f.seanceAt?'La séance a lieu '+seanceFull(f.seanceAt)+(f.seancePlace?' ('+f.seancePlace+')':'')+'. ':''}Votre avis en deux minutes sur le Ciné-Club Imagerie : une note, un mot, et la note d’Hervé se révèle. Il reste ${S.films.filter(x=>x.status!=='upcoming').length?cons().filter(m=>!rOf(f.id,m.id)).length:0} avis à recueillir.`:'Aucun film proposé pour le moment.'}
@@ -627,7 +743,7 @@ function teamView(){
   const rank=cons().map(m=>({m,s:stats(m.id,...win),all:stats(m.id)})).sort((a,b)=>b.s.xp-a.s.xp);
   const pal=palmes(),duels=S.duels.filter(d=>!d.open&&d.winner).sort((a,b)=>b.created-a.created).slice(0,3);
   const adm=S.isOwner?`<div class="pn" style="margin-top:20px"><h3>Désigner Hervé</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">Seul le propriétaire voit ce bloc. La personne doit avoir ouvert le ciné-club une fois.</p><div class="row" style="flex-wrap:wrap">${S.members.map(m=>`<button class="chip ${S.cfg.directorId===m.id?'on':''}" data-act="setdir" data-id="${m.id}">${m.emoji} ${e(nameOf(m.id))}</button>`).join('')}</div></div>`:'';
-  return`<h2 style="margin-bottom:16px">L’équipe</h2><div class="cols"><div class="pn"><div class="row" style="margin-bottom:6px"><h3 style="flex:1">Classement</h3><button class="chip ${seasonMode==='season'?'on':''}" data-act="smode" data-id="season" data-tip="Le trimestre en cours : le classement repart de zéro tous les 3 mois" title="Le trimestre en cours : le classement repart de zéro tous les 3 mois">Trimestre ${cur.label}</button><button class="chip ${seasonMode==='all'?'on':''}" data-act="smode" data-id="all" data-tip="Le cumul depuis le début du ciné-club">Depuis le début</button></div>
+  return`<h2 style="margin-bottom:16px">L’équipe</h2><div class="cols"><div class="pn"><div class="row" style="margin-bottom:6px"><h3 style="flex:1">Classement</h3><button class="stab ${seasonMode==='season'?'on':''}" data-act="smode" data-id="season" data-tip="Le trimestre en cours : le classement repart de zéro tous les 3 mois" title="Le trimestre en cours : le classement repart de zéro tous les 3 mois">Trimestre ${cur.label}</button><button class="stab ${seasonMode==='all'?'on':''}" data-act="smode" data-id="all" data-tip="Le cumul depuis le début du ciné-club">Depuis le début</button></div>
    ${rank.map((r,i)=>`<div class="lb"><b class="serif" style="font-size:20px">${['🥇','🥈','🥉'][i]||i+1}</b><div><b>${r.m.emoji} ${e(nameOf(r.m.id))}${r.m.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${r.all.name} · ${r.all.count} films notés${r.all.streak?` · 🔥 ${r.all.streak} sem.`:''}</div></div><b>${r.s.xp} XP</b></div>`).join('')||'<p class="dim">Personne pour l’instant.</p>'}
    ${pal.length?`<h3 style="margin:18px 0 6px">🌴 Palmes de la saison</h3>${pal.map(p=>`<div class="lb" style="grid-template-columns:1fr auto"><span><b>${p.label}</b> · ${emojiOf(p.id)} ${e(nameOf(p.id))}</span><span class="dim">${p.xp} XP</span></div>`).join('')}`:''}</div>
    <div class="pn"><h3>Badges à décrocher</h3>${badgeSummary()}
@@ -658,7 +774,7 @@ function wrapped(){
 let pTab='apercu',bCat='close';
 function badgePanel(fs){
   const cats=[...new Set(fs.map(f=>f.cat))];if(bCat!=='close'&&!cats.includes(bCat))bCat='close';
-  const chip=(id,label)=>`<button class="chip ${bCat===id?'on':''}" data-act="bcat" data-id="${e(id)}">${label}</button>`;
+  const chip=(id,label)=>`<button class="stab ${bCat===id?'on':''}" data-act="bcat" data-id="${e(id)}">${label}</button>`;
   const cnt=c=>{const t=badgeTotals(fs.filter(f=>f.cat===c));return`${c} ${t.have}/${t.total}`};
   const list=bCat==='close'?closestBadges(fs,8):fs.filter(f=>f.cat===bCat);
   return`<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">${chip('close','⏳ Plus proches')}${cats.map(c=>chip(c,cnt(c))).join('')}</div><div class="bgrid">${list.map(badgeRow).join('')}</div>`}
@@ -677,7 +793,7 @@ function profile(){
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
     <div class="sect"><h3>Derniers avis</h3><button class="chip" data-act="ptab" data-id="journal">Tout le journal</button></div>${journalRows(rs.slice(0,3))}`;
   return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><span class="av" style="width:56px;height:56px;font-size:28px">${emojiOf(S.meId)}</span><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="nav" data-id="wrapped" data-tip="Le résumé de votre année de cinéma">Mon Wrapped</button></div>
-   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:16px">${tabs.map(([k,l])=>`<button class="chip ${pTab===k?'on':''}" data-act="ptab" data-id="${k}">${l}</button>`).join('')}</div>${body}`}
+   <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:16px">${tabs.map(([k,l])=>`<button class="tab ${pTab===k?'on':''}" data-act="ptab" data-id="${k}">${l}</button>`).join('')}</div>${body}`}
 
 /* roulette */
 function buildLocal(){
@@ -699,7 +815,8 @@ const qidOf=u=>u.slice(u.lastIndexOf('/')+1);
 const LBL='SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }';
 function wdRows(j){const m=new Map();
   (j.results?.bindings||[]).forEach(b=>{const id=qidOf(b.f.value),t=b.fLabel?.value||'';if(!t||/^Q\d+$/.test(t))return;
-    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',sl:0,wiki:'',from:'wd'};
+    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',sl:0,wiki:'',tv:false,from:'wd'};
+    if(b.tvf&&b.tvf.value==='true')o.tv=true;
     if(b.sl)o.sl=Math.max(o.sl,+b.sl.value||0);
     if(b.art&&!o.wiki)o.wiki=decodeURIComponent(qidOf(b.art.value)).replace(/_/g,' ');
     if(b.year&&(!o.year||+b.year.value<+o.year))o.year=b.year.value;
@@ -715,16 +832,18 @@ async function wdPersonIds(name){
   return R.pc[k]=[...new Set(rs.flatMap(r=>(r?.search||[]).map(x=>x.id)))].filter(x=>/^Q\d+$/.test(x)).slice(0,8)}
 async function wdPool(F,y0,y1,ids){
   // requête légère : fenêtre de 2 ans (ou films d'une personne), sans tri ni agrégat, limitée à 120 films
-  const key=JSON.stringify([F.genres,F.dur,F.pop,y0,y1,ids]);R.wd=R.wd||{};if(R.wd[key])return R.wd[key];
+  const key=JSON.stringify([F.genres,F.dur,F.pop,F.kind,y0,y1,ids]);R.wd=R.wd||{};if(R.wd[key])return R.wd[key];
   const gs=(F.genres.length?F.genres.map(g=>WDG[g]):Object.values(WDG)).map(x=>'wd:'+x).join(' ');
   const [smin,smax]=({all:[6,1e9],known:[20,1e9],top:[50,1e9],gems:[6,19]})[F.pop]||[6,1e9];
   const [dmin,dmax]=({short:[1,89],mid:[90,120],long:[121,400]})[F.dur]||[0,0];
   const person=ids.dir.length||ids.act.length;
   const win=(person&&!F.from&&!F.to)?'':`FILTER(?date >= "${y0}-01-01T00:00:00Z"^^xsd:dateTime && ?date < "${y1}-01-01T00:00:00Z"^^xsd:dateTime)`;
-  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel WHERE {
-    { SELECT DISTINCT ?f ?gq ?year WHERE {
-        VALUES ?gq { ${gs} }
-        ?f wdt:P31 wd:Q11424 ; wdt:P136 ?gq ; wdt:P577 ?date ; wikibase:sitelinks ?sl .
+  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?tvf WHERE {
+    { SELECT DISTINCT ?f ?gq ?year ?tvf WHERE {
+        VALUES ?c { ${F.kind==='tv'?'wd:Q506240':F.kind==='cinema'?'wd:Q11424':'wd:Q11424 wd:Q506240'} }
+        ?f wdt:P31 ?c ; wdt:P577 ?date ; wikibase:sitelinks ?sl .
+        ${F.genres.length?`VALUES ?gq { ${gs} } ?f wdt:P136 ?gq .`:'OPTIONAL { ?f wdt:P136 ?gq }'}
+        BIND(IF(?c = wd:Q506240, true, false) AS ?tvf)
         ${ids.dir.length?`VALUES ?pd { ${ids.dir.map(i=>'wd:'+i).join(' ')} } ?f wdt:P57 ?pd .`:''}
         ${ids.act.length?`VALUES ?pa { ${ids.act.map(i=>'wd:'+i).join(' ')} } ?f wdt:P161 ?pa .`:''}
         ${F.dur?`?f wdt:P2047 ?dur . FILTER(?dur >= ${dmin} && ?dur <= ${dmax})`:''}
@@ -740,13 +859,13 @@ async function wdPoster(qid){
   const b=j.results?.bindings?.[0];const u=b?.pf?.value||b?.im?.value;return u?u.replace(/^http:/,'https:')+'?width=400':''}
 const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
 function localSearch(q){const n=norm(q);if(n.length<2)return[];
-  return CAT.filter(c=>norm(c[0]).includes(n)).sort((a,b)=>(norm(a[0]).startsWith(n)?0:1)-(norm(b[0]).startsWith(n)?0:1)).slice(0,5).map(([title,year,director,genre])=>({qid:'',title,year:String(year),director,genre,poster:'',sl:0,wiki:'',from:'cat'}))}
+  return CAT.filter(c=>norm(c[0]).includes(n)||norm(c[2]).includes(n)).sort((a,b)=>(norm(a[0]).startsWith(n)?0:1)-(norm(b[0]).startsWith(n)?0:1)).slice(0,5).map(([title,year,director,genre])=>({qid:'',title,year:String(year),director,genre,poster:'',sl:0,wiki:'',from:'cat'}))}
 function mergeResults(list,q){const n=norm(q),map=new Map();
   list.forEach(x=>{const k=norm(x.title)+'|'+(x.year||'');const o=map.get(k);
     if(!o)map.set(k,{...x});else{if(!o.qid&&x.qid)o.qid=x.qid;if(!o.poster&&x.poster)o.poster=x.poster;if(!o.director&&x.director)o.director=x.director;if(!o.wiki&&x.wiki)o.wiki=x.wiki;o.sl=Math.max(o.sl||0,x.sl||0)}});
   const arr=[...map.values()],dated=new Set(arr.filter(x=>x.year).map(x=>norm(x.title)));
   const rank=x=>{const t=norm(x.title);return t===n?0:t.startsWith(n)?1:t.includes(n)?2:3};
-  return arr.filter(x=>x.year||!dated.has(norm(x.title))).sort((a,b)=>rank(a)-rank(b)||(b.sl||0)-(a.sl||0)).slice(0,8)}
+  return arr.filter(x=>x.year||!dated.has(norm(x.title))).sort((a,b)=>rank(a)-rank(b)||(b.sl||0)-(a.sl||0)).slice(0,10)}
 async function wikiThumbs(items){
   const todo=items.filter(x=>!x.poster&&x.wiki);if(!todo.length)return;
   try{const j=await wdGet('https://fr.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1&format=json&origin=*&titles='+encodeURIComponent(todo.map(x=>x.wiki).join('|')),10000);
@@ -754,14 +873,21 @@ async function wikiThumbs(items){
     [...(j.query?.normalized||[]),...(j.query?.redirects||[])].forEach(r=>al.set(r.from,r.to));
     todo.forEach(x=>{let n=x.wiki;n=al.get(n)||n;n=al.get(n)||n;const u=img.get(n);if(u)x.poster=u})}catch{}}
 async function wdSearch(text){
-  const api=l=>'https://www.wikidata.org/w/api.php?action=wbsearchentities&search='+encodeURIComponent(text)+'&language='+l+'&uselang='+l+'&type=item&limit=30&format=json&origin=*';
-  const rs=await Promise.all(['fr','en'].map(l=>wdGet(api(l),10000).catch(()=>null)));
-  const ids=[...new Set(rs.flatMap(r=>(r?.search||[]).map(x=>x.id)))].filter(x=>/^Q\d+$/.test(x)).slice(0,50);
+  const A='https://www.wikidata.org/w/api.php?origin=*&format=json&',W='https://fr.wikipedia.org/w/api.php?origin=*&format=json&';
+  const ent=l=>A+'action=wbsearchentities&type=item&limit=50&language='+l+'&uselang='+l+'&search='+encodeURIComponent(text);
+  const cir=c=>A+'action=query&list=search&srlimit=15&srsearch='+encodeURIComponent('haswbstatement:P31='+c+' '+text);
+  const wk=suf=>W+'action=query&generator=search&gsrnamespace=0&gsrlimit=20&prop=pageprops&ppprop=wikibase_item&gsrsearch='+encodeURIComponent(text+suf);
+  const rs=await Promise.all([cir('Q11424'),cir('Q506240'),cir('Q202866'),cir('Q93204'),wk(' film'),wk(' téléfilm'),ent('fr'),ent('en')].map(u=>wdGet(u,10000).catch(()=>null)));
+  const fromCir=rs.slice(0,4).flatMap(r=>(r?.query?.search||[]).map(x=>x.title));
+  const fromWk=rs.slice(4,6).flatMap(r=>Object.values(r?.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0)).map(p=>p.pageprops?.wikibase_item));
+  const fromEnt=rs.slice(6).flatMap(r=>(r?.search||[]).map(x=>x.id));
+  const ids=[...new Set([...fromWk,...fromCir,...fromEnt])].filter(x=>/^Q\d+$/.test(x||'')).slice(0,150);
   if(!ids.length)return[];
-  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf ?sl ?art WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
-    ?f wdt:P31/wdt:P279* wd:Q11424 . FILTER NOT EXISTS { ?f wdt:P31 wd:Q24862 } FILTER NOT EXISTS { ?f wdt:P31/wdt:P279* wd:Q5398426 }
+  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf ?sl ?art ?tvf WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
+    { ?f wdt:P31/wdt:P279* wd:Q11424 } UNION { ?f wdt:P31 wd:Q506240 }
+    FILTER NOT EXISTS { ?f wdt:P31 wd:Q24862 } FILTER NOT EXISTS { ?f wdt:P31/wdt:P279* wd:Q5398426 }
     ?f wikibase:sitelinks ?sl . OPTIONAL { ?f wdt:P577 ?date } BIND(YEAR(?date) AS ?year) OPTIONAL { ?f wdt:P57 ?d } OPTIONAL { ?f wdt:P136 ?gq } OPTIONAL { ?f wdt:P3383 ?pf }
-    OPTIONAL { ?art schema:about ?f ; schema:isPartOf <https://fr.wikipedia.org/> } ${LBL} } LIMIT 600`;
+    OPTIONAL { ?art schema:about ?f ; schema:isPartOf <https://fr.wikipedia.org/> } BIND(EXISTS { ?f wdt:P31 wd:Q506240 } AS ?tvf) ${LBL} } LIMIT 1500`;
   const res=mergeResults(wdRows(await sparql(q,15000)),text);await wikiThumbs(res);return res}
 
 /* fiche film : Wikidata + Wikipédia (+ TMDB si une clé est fournie dans config.js) */
@@ -827,7 +953,7 @@ async function fillPosters(){
     if(isDir()){await enrichFilm(f.id,true);
       const g=S.films.find(x=>x.id===f.id);if(g&&!g.poster){const u=await wikiPoster(g.title,g.year);if(u)await upd('films/'+f.id,{poster:u})}}
     else{const u=await wikiPoster(f.title,f.year);if(u){posterCache[f.id]=u;try{localStorage.setItem('cineclub-posters',JSON.stringify(posterCache))}catch{}derive();render()}}}}
-function rFilterCount(){const f=R.f;return(f.genres.length?1:0)+((f.from||f.to)?1:0)+(f.dir.trim()?1:0)+(f.act.trim()?1:0)+(f.dur?1:0)+(f.pop!=='all'?1:0)}
+function rFilterCount(){const f=R.f;return(f.genres.length?1:0)+((f.from||f.to)?1:0)+(f.dir.trim()?1:0)+(f.act.trim()?1:0)+(f.dur?1:0)+(f.pop!=='all'?1:0)+(f.kind&&f.kind!=='all'?1:0)}
 function scheduleBuild(){clearTimeout(R.bt);R.bt=setTimeout(buildPool,450)}
 async function buildPool(){
   const tok=R.tok=(R.tok||0)+1;R.result=null;R.err='';R.det=null;rModal=false;
@@ -860,7 +986,7 @@ async function loadResultDetails(){const r=R.result;if(!r)return;R.detLoading=tr
   try{R.det=await fetchDetails({title:r.title,year:r.year,director:r.director,qid:r.qid||'',poster:''})}catch{R.det={}}
   R.detLoading=false;if(R.result===r)render()}
 function rouletteModal(){const r=R.result;if(!r)return'';const d=R.det||{},pst=d.poster||r.poster||'';
-  const meta=[d.year||r.year,d.director||r.director,r.genre].filter(Boolean).map(e).join(' · ');
+  const meta=[d.year||r.year,d.director||r.director,r.genre,r.tv?'Téléfilm':''].filter(Boolean).map(e).join(' · ');
   const chips=[d.runtime?`<span class="badge">🕒 ${hm(d.runtime)}</span>`:'',d.country?`<span class="badge">🌍 ${e(d.country)}</span>`:'',d.tmdb&&d.tmdb.votes?`<span class="badge">★ ${String(d.tmdb.rating.toFixed(1)).replace('.',',')} sur 10 · ${d.tmdb.votes} votes</span>`:''].join('');
   return`<div class="modal" data-act="rclose"><div class="sheet" data-stop style="width:min(780px,100%)" role="dialog" aria-label="${e(r.title)}"><button class="x" data-act="rclose" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button>
    <div class="k" style="color:var(--acc);font-size:12px;letter-spacing:.14em;margin-bottom:12px">🎡 LE HASARD A CHOISI</div>
@@ -874,7 +1000,7 @@ function rouletteModal(){const r=R.result;if(!r)return'';const d=R.det||{},pst=d
 function drawWheel(){const c=$('#wheel');if(!c||!R.pool.length)return;const x=c.getContext('2d'),W=c.width,cx=W/2,r=W/2-8,n=R.pool.length,seg=2*Math.PI/n;x.clearRect(0,0,W,W);
   for(let i=0;i<n;i++){x.beginPath();x.moveTo(cx,cx);x.arc(cx,cx,r,R.angle+i*seg,R.angle+(i+1)*seg);x.closePath();x.fillStyle=GRAD[i%6][i%2?1:0];x.fill();x.strokeStyle='#0f0e14';x.lineWidth=3;x.stroke();
     x.save();x.translate(cx,cx);x.rotate(R.angle+(i+.5)*seg);x.textAlign='right';x.fillStyle='#fff';const t=R.pool[i].title;x.font=(t.length>15?'600 14px':'600 16px')+' Inter,sans-serif';x.fillText(t.length>19?t.slice(0,18)+'…':t,r-18,6);x.restore()}
-  x.beginPath();x.arc(cx,cx,34,0,7);x.fillStyle='#0f0e14';x.fill();x.fillStyle='#ffcc00';x.font='28px sans-serif';x.textAlign='center';x.fillText('🎬',cx,cx+10)}
+  x.beginPath();x.arc(cx,cx,34,0,7);x.fillStyle='#0f0e14';x.fill();x.fillStyle='#ffcc00';x.beginPath();x.moveTo(cx-8,cx-12);x.lineTo(cx+13,cx);x.lineTo(cx-8,cx+12);x.closePath();x.fill()}
 function spin(){if(R.spinning||R.pool.length<2)return;R.spinning=true;R.result=null;const start=R.angle,extra=2*Math.PI*(5+Math.random()*3)+Math.random()*2*Math.PI,t0=performance.now(),D=4200;
   const step=t=>{const k=Math.min(1,(t-t0)/D);R.angle=start+extra*(1-Math.pow(1-k,3));drawWheel();{const sg=2*Math.PI/R.pool.length,ix=Math.floor((((-Math.PI/2-R.angle)%(2*Math.PI))+2*Math.PI)%(2*Math.PI)/sg);if(ix!==R.lastIx){R.lastIx=ix;SFX.tick()}}
     if(k<1)requestAnimationFrame(step);else{R.spinning=false;const seg=2*Math.PI/R.pool.length,th=((-Math.PI/2-R.angle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);R.result=R.pool[Math.min(R.pool.length-1,Math.floor(th/seg))];SFX.win();rModal=true;loadResultDetails()}};
@@ -882,20 +1008,23 @@ function spin(){if(R.spinning||R.pool.length<2)return;R.spinning=true;R.result=n
 
 const DECADES=[['Avant 1960','',1959],['1960s',1960,1969],['1970s',1970,1979],['1980s',1980,1989],['1990s',1990,1999],['2000s',2000,2009],['2010s',2010,2019],['2020s',2020,2026]];
 function rFilters(){const f=R.f,n=rFilterCount(),wd=R.src==='wd';
-  const ch=(on,act,id,label,tip)=>`<button class="chip ${on?'on':''}" data-act="${act}" data-id="${e(id)}" ${tip?`data-tip="${e(tip)}"`:''}>${label}</button>`;
-  return`<div class="row" style="margin-bottom:10px;flex-wrap:wrap"><button class="chip ${R.fopen?'on':''}" data-act="rfopen" data-tip="Choisir genres, période, réalisation, acteurs, durée, popularité">🎚️ Filtres${n?` (${n})`:''}</button>${n?'<button class="chip" data-act="rreset" data-tip="Retire tous les filtres">Réinitialiser</button>':''}</div>
-  ${R.fopen?`<div class="pn" style="margin-bottom:16px;display:grid;gap:16px">
-   <div><div class="dim fl">Genres (plusieurs possibles)</div><div class="row" style="flex-wrap:wrap;gap:6px">${GENRES.map(g=>ch(f.genres.includes(g),'rfg',g,g)).join('')}</div></div>
-   <div><div class="dim fl">Période</div><div class="row" style="flex-wrap:wrap;gap:6px">${DECADES.map(([l,a,b])=>ch(String(f.from)===String(a)&&String(f.to)===String(b)&&(f.from||f.to),'rfd',a+'-'+b,l)).join('')}<input id="rfyf" type="number" min="1890" max="2030" placeholder="De" value="${e(f.from)}" style="width:90px" aria-label="Année de début"><input id="rfyt" type="number" min="1890" max="2030" placeholder="à" value="${e(f.to)}" style="width:90px" aria-label="Année de fin"></div></div>
-   <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:180px"><label for="rfdir">Réalisation</label><input id="rfdir" value="${e(f.dir)}" placeholder="Ex : Hitchcock" ${wd||R.src==='mix'?'':'disabled'}></div><div class="field" style="flex:1;min-width:180px"><label for="rfact">Acteur ou actrice</label><input id="rfact" value="${e(f.act)}" placeholder="Ex : Marion Cotillard" ${wd?'':'disabled'}></div></div>
-   <div><div class="dim fl">Durée</div><div class="row" style="flex-wrap:wrap;gap:6px">${[['','Toutes'],['short','Court (moins de 1 h 30)'],['mid','Moyen (1 h 30 à 2 h)'],['long','Long (plus de 2 h)']].map(([k,l])=>ch(f.dur===k,'rfdur',k||'none',l)).join('')}</div></div>
-   <div><div class="dim fl">Popularité</div><div class="row" style="flex-wrap:wrap;gap:6px">${[['gems','Pépites rares','Films peu connus : peu de pages Wikipédia'],['all','Tous',''],['known','Connus','Films largement connus'],['top','Très connus','Les grands classiques et succès mondiaux']].map(([k,l,t])=>ch(f.pop===k,'rfpop',k,l,t)).join('')}</div></div>
-   <p class="dim" style="font-size:12px">Les notes et avis du public ne sont pas dans la base ouverte : la popularité (nombre de langues dans lesquelles Wikipédia présente le film) s’en rapproche. ${wd?'La durée et les acteurs ne se filtrent que si Wikidata les connaît.':'Avec « Classiques » ou « Mes idées », seuls genres, période et réalisation s’appliquent (acteurs, durée et popularité sont ignorés).'}</p></div>`:''}`}
+  const tabs=[['kind','Cinéma ou télé',f.kind&&f.kind!=='all'?1:0],['genres','Genres',f.genres.length],['period','Période',(f.from||f.to)?1:0],['people','Réalisation et acteurs',(f.dir.trim()?1:0)+(f.act.trim()?1:0)],['dur','Durée du film',f.dur?1:0],['pop','Popularité',f.pop!=='all'?1:0]];
+  const ck=(type,name,on,act,id,label,tip)=>`<label class="ck" ${tip?`data-tip="${e(tip)}"`:''}><input type="${type}" name="${name}" ${on?'checked':''} data-act="${act}" data-id="${e(id)}"> ${label}</label>`;
+  let panel='';
+  if(R.ftab==='kind')panel=`<div class="ckgrid">${[['all','Films et téléfilms'],['cinema','Films de cinéma'],['tv','Téléfilms uniquement']].map(([k,l])=>ck('radio','kind',(f.kind||'all')===k,'rfkind',k,l)).join('')}</div><p class="dim" style="font-size:12px;margin-top:8px">Les téléfilms viennent de la même base ouverte (Wikidata). Certains n’ont pas de genre renseigné.</p>`;
+  else if(R.ftab==='genres')panel=`<div class="ckgrid">${GENRES.map(g=>ck('checkbox','g',f.genres.includes(g),'rfg',g,g)).join('')}</div><p class="dim" style="font-size:12px;margin-top:8px">Plusieurs genres possibles. Aucun coché : tous les genres.</p>`;
+  else if(R.ftab==='period')panel=`<div class="ckgrid">${ck('radio','dec',!f.from&&!f.to,'rfd','-','Toutes les époques')}${DECADES.map(([l,a,b])=>ck('radio','dec',String(f.from)===String(a)&&String(f.to)===String(b)&&(f.from||f.to),'rfd',a+'-'+b,l)).join('')}</div><div class="row" style="gap:10px;margin-top:12px;flex-wrap:wrap"><span class="dim">Ou précisez</span><input id="rfyf" type="number" min="1890" max="2030" placeholder="De (année)" value="${e(f.from)}" style="width:130px" aria-label="Année de début"><input id="rfyt" type="number" min="1890" max="2030" placeholder="à (année)" value="${e(f.to)}" style="width:130px" aria-label="Année de fin"></div>`;
+  else if(R.ftab==='people')panel=`<div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:180px"><label for="rfdir">Réalisation</label><input id="rfdir" value="${e(f.dir)}" placeholder="Ex : Hitchcock" ${wd||R.src==='mix'?'':'disabled'}></div><div class="field" style="flex:1;min-width:180px"><label for="rfact">Acteur ou actrice</label><input id="rfact" value="${e(f.act)}" placeholder="Ex : Marion Cotillard" ${wd?'':'disabled'}></div></div><p class="dim" style="font-size:12px;margin-top:8px">Tapez un nom puis validez avec Entrée ou en cliquant ailleurs.</p>`;
+  else if(R.ftab==='dur')panel=`<div class="ckgrid">${[['','Toutes les durées'],['short','Court : moins de 1 h 30'],['mid','Moyen : de 1 h 30 à 2 h'],['long','Long : plus de 2 h']].map(([k,l])=>ck('radio','dur',f.dur===k,'rfdur',k||'none',l)).join('')}</div>`;
+  else panel=`<div class="ckgrid">${[['gems','Pépites rares','Films peu connus : peu de pages Wikipédia'],['all','Tous les films',''],['known','Films connus','Films largement connus'],['top','Très connus','Les grands classiques et succès mondiaux']].map(([k,l,t])=>ck('radio','pop',f.pop===k,'rfpop',k,l,t)).join('')}</div><p class="dim" style="font-size:12px;margin-top:8px">Les notes du public ne sont pas dans la base ouverte : la popularité (nombre de langues dans lesquelles Wikipédia présente le film) s’en rapproche.</p>`;
+  return`<div class="row" style="margin-bottom:10px;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="rfopen">${icon('sliders')} Filtres${n?` (${n})`:''}</button>${n?'<button class="chip" data-act="rreset">Réinitialiser</button>':''}</div>
+  ${R.fopen?`<div class="pn" style="margin-bottom:16px;padding:0"><div class="tabs" style="padding:0 12px;margin:0">${tabs.map(([k,l,c])=>`<button class="tab ${R.ftab===k?'on':''}" data-act="rftab" data-id="${k}">${l}${c?` <span class="cnt">${c}</span>`:''}</button>`).join('')}</div><div style="padding:14px 16px">${panel}${wd?'':'<p class="dim" style="font-size:12px;margin-top:8px">Avec « Classiques » ou « Mes idées », acteurs, durée et popularité sont ignorés.</p>'}</div></div>`:''}`}
+
 function rouletteView(){
   if(!isDir())return'';if(!R.pool.length&&!R.result&&!R.loading&&!R.tried){R.tried=true;setTimeout(buildPool,0)}
   const rs=R.result;
   return`<h2 style="margin-bottom:4px">La roulette 🎡</h2><p class="dim" style="margin-bottom:16px">En panne d’inspiration ? Choisissez vos critères si vous voulez, puis laissez le hasard décider.</p>
-   ${R.err?`<p style="color:var(--bad);font-size:14px;margin-bottom:10px">${e(R.err)}</p>`:''}<div class="bar"><button class="chip ${R.src==='wd'?'on':''}" data-act="rsrc" data-id="wd" data-tip="Des milliers de films issus de Wikidata, une période différente à chaque tirage">Base mondiale</button><button class="chip ${R.src==='mix'?'on':''}" data-act="rsrc" data-id="mix" data-tip="Un catalogue local de classiques">Classiques</button><button class="chip ${R.src==='ideas'?'on':''}" data-act="rsrc" data-id="ideas" data-tip="Uniquement les films de votre liste d’idées">Mes idées seulement</button></div>${rFilters()}
+   ${R.err?`<p style="color:var(--bad);font-size:14px;margin-bottom:10px">${e(R.err)}</p>`:''}<div class="bar"><button class="tab ${R.src==='wd'?'on':''}" data-act="rsrc" data-id="wd" data-tip="Des milliers de films issus de Wikidata, une période différente à chaque tirage">Base mondiale</button><button class="tab ${R.src==='mix'?'on':''}" data-act="rsrc" data-id="mix" data-tip="Un catalogue local de classiques">Classiques</button><button class="tab ${R.src==='ideas'?'on':''}" data-act="rsrc" data-id="ideas" data-tip="Uniquement les films de votre liste d’idées">Mes idées seulement</button></div>${rFilters()}
    <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start"><div>
     ${R.loading?`<div class="pn empty dim">Chargement de la base mondiale de films…</div>`:R.pool.length>=2?`<div class="wheelbox"><div class="ptr"></div><canvas id="wheel" width="440" height="440" aria-label="Roulette des films"></canvas></div>
     <div class="row" style="justify-content:center;margin-top:16px"><button class="btn" data-act="spin" data-tip="Lance la roue : le hasard choisit le prochain film" ${R.spinning?'disabled':''}>${R.spinning?'La roue tourne…':'Tourner la roulette'}</button><button class="btn ghost" data-act="reshuffle" data-tip="Charge d’autres titres sur la roue">Nouveau tirage</button></div><p class="dim" style="text-align:center;font-size:13px;margin-top:8px">${R.src==='wd'&&!R.err?'Base mondiale Wikidata (données ouvertes CC0) : chaque tirage explore une autre période.':R.total+' films possibles avec ces filtres. Chaque nouveau tirage propose d’autres titres.'}</p>`
@@ -933,6 +1062,10 @@ function icsSeance(f){const st=new Date(f.seanceAt),en=new Date(f.seanceAt+((f.r
 
 /* défis : création, doublons, annulation */
 let animTab='chal',chList='active',chDur='month',chForm=null;
+const fdl=ts=>new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
+const chEnd=k=>{const s0=dayStart(Date.now());return k==='7'?s0+7*DAY-1:k==='14'?s0+14*DAY-1:monthEnd(s0)};
+function chWhen(c){const [a,b]=chRange(c),st=chStatus(c),n=Math.max(1,Math.ceil((b-Date.now())/DAY));
+  return st==='sched'?`Commence le ${fdl(a)} et se termine le ${fdl(b)}`:st==='active'?`Se termine le ${fdl(b)} : il reste ${n} jour${n>1?'s':''}`:`Terminé le ${fdl(b)}`}
 function toastAction(text,label,fn){const n=document.createElement('div');n.className='toast';n.style.cssText+=';display:flex;gap:12px;align-items:center';const sp=document.createElement('span');sp.textContent=text;const b=document.createElement('button');b.textContent=label;b.style.cssText='background:#1a1500;color:#ffcc00;border-radius:99px;padding:4px 14px;font-weight:700';b.onclick=()=>{n.remove();fn()};n.append(sp,b);document.body.append(n);setTimeout(()=>n.remove(),9000)}
 function chDupCheck(c,ignoreId){
   const key=x=>norm(x.type+' '+(x.value||'')+' '+x.target),[a,b]=[c.start,c.end];
@@ -962,13 +1095,14 @@ function chFormModal(){const d=chForm.d,edit=chForm.mode==='edit';
   return`<div class="modal" data-act="chclose"><div class="sheet" data-stop style="width:min(660px,100%)" role="dialog" aria-label="Défi"><button class="x" data-act="chclose" aria-label="Fermer">✕</button>
    <h2>${edit?'Modifier le défi':chForm.mode==='dup'?'Dupliquer un défi':'Créer un défi'}</h2><p class="dim" style="margin-bottom:12px">Un défi donne au plus un badge. Les doublons sont refusés.</p>
    <form id="chf" onsubmit="return false" style="display:grid;gap:12px">
-    <div class="row" style="gap:10px"><div class="field" style="width:84px"><label for="cf_emoji">Emoji</label><input id="cf_emoji" value="${e(d.emoji)}" maxlength="4" style="text-align:center;font-size:20px"></div><div class="field" style="flex:1"><label for="cf_title">Nom du défi</label><input id="cf_title" value="${e(d.title)}" maxlength="40" placeholder="Ex : Mois du polar"></div></div>
+    <div class="row" style="gap:10px"><div class="field" style="flex:1"><label for="cf_title">Nom du défi</label><input id="cf_title" value="${e(d.title)}" maxlength="40" placeholder="Ex : Mois du polar"></div></div>
+    <div><div class="dim fl">Icône du défi (liste prédéfinie)</div>${iconGrid(d.emoji,'chico')}</div>
     <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:210px"><label for="cf_type">Règle</label><select id="cf_type">${[['genre','Un genre'],['before','Films d’avant une année'],['after','Films sortis depuis une année'],['count','Un nombre de films'],['genres','Des genres différents']].map(([k,l])=>`<option value="${k}" ${d.type===k?'selected':''}>${l}</option>`).join('')}</select></div>${valField}<div class="field" style="width:110px"><label for="cf_target">Objectif</label><input id="cf_target" type="number" min="1" max="30" value="${e(d.target)}"></div></div>
     <p class="dim" style="font-size:13px">Règle : ${e(chalLabel(prev))}.</p>
     <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:150px"><label for="cf_start">Début</label><input id="cf_start" type="date" value="${e(d.start)}"></div><div class="field" style="flex:1;min-width:150px"><label for="cf_end">Fin</label><input id="cf_end" type="date" value="${e(d.end)}"></div></div>
-    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="dim" style="font-size:13px">Durée rapide</span><button class="chip" type="button" data-act="chq" data-id="7">7 jours</button><button class="chip" type="button" data-act="chq" data-id="14">14 jours</button><button class="chip" type="button" data-act="chq" data-id="month">Jusqu’à la fin du mois</button></div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="dim" style="font-size:13px">Se termine</span><button class="chip" type="button" data-act="chq" data-id="7">dans 1 semaine</button><button class="chip" type="button" data-act="chq" data-id="14">dans 2 semaines</button><button class="chip" type="button" data-act="chq" data-id="month">à la fin du mois</button></div>
     <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:200px"><label for="cf_bmode">Badge à gagner</label><select id="cf_bmode"><option value="none" ${d.bmode==='none'?'selected':''}>Aucun badge</option><option value="preset" ${d.bmode==='preset'?'selected':''}>Un badge prêt à l’emploi</option><option value="custom" ${d.bmode==='custom'?'selected':''}>Mon propre badge</option></select></div>
-     ${d.bmode==='preset'?`<div class="field" style="flex:1;min-width:200px"><label for="cf_bpreset">Choisir</label><select id="cf_bpreset">${BADGE_PRESETS.map((b,i)=>`<option value="${i}" ${+d.bpreset===i?'selected':''}>${b[0]} ${b[1]}</option>`).join('')}</select></div>`:d.bmode==='custom'?`<div class="field" style="width:84px"><label for="cf_bemoji">Emoji</label><input id="cf_bemoji" value="${e(d.bemoji)}" maxlength="4" style="text-align:center;font-size:20px"></div><div class="field" style="flex:1;min-width:160px"><label for="cf_bname">Nom du badge</label><input id="cf_bname" value="${e(d.bname)}" maxlength="30"></div>`:''}</div>
+     ${d.bmode==='preset'?`<div class="field" style="flex:1;min-width:200px"><label for="cf_bpreset">Choisir</label><select id="cf_bpreset">${BADGE_PRESETS.map((b,i)=>`<option value="${i}" ${+d.bpreset===i?'selected':''}>${b[0]} ${b[1]}</option>`).join('')}</select></div>`:d.bmode==='custom'?`<div class="field" style="flex:1;min-width:160px"><label for="cf_bname">Nom du badge</label><input id="cf_bname" value="${e(d.bname)}" maxlength="30"></div><div style="width:100%"><div class="dim fl">Icône du badge</div>${iconGrid(d.bemoji,'chbico')}</div>`:''}</div>
     <div class="row" style="justify-content:flex-end"><button class="chip" type="button" data-act="chclose">Annuler</button><button class="btn" type="button" data-act="chsave">${edit?'Enregistrer':new Date(d.start+'T00:00:00').getTime()>Date.now()+864e5?'Programmer le défi':'Lancer le défi'}</button></div></form></div></div>`}
 async function saveChForm(){
   readChForm();const d=chForm.d,title=d.title.trim();
@@ -1066,7 +1200,7 @@ function guide(){
   const tab=gTab||(isDir()?'dir':'team'),D=guideData(),groups=tab==='dir'?D.dir:D.team;
   if(gOpen===null&&!S._gInit){S._gInit=1;gOpen=tab==='dir'?'proposer':'principe'}
   return`<div class="gwrap"><div class="row" style="flex-wrap:wrap;margin-bottom:14px"><h2 style="flex:1">Guide</h2><button class="btn ghost" data-act="tourstart" data-tip="Revoir les écrans d’accueil du ciné-club">Revoir la visite guidée</button></div>
-   ${isDir()?`<div class="row" style="margin-bottom:6px"><button class="chip ${tab==='dir'?'on':''}" data-act="gtab" data-id="dir">Pour Hervé</button><button class="chip ${tab==='team'?'on':''}" data-act="gtab" data-id="team">Ce que voit l’équipe</button></div>`:''}
+   ${isDir()?`<div class="row" style="margin-bottom:6px"><button class="tab ${tab==='dir'?'on':''}" data-act="gtab" data-id="dir">Pour Hervé</button><button class="tab ${tab==='team'?'on':''}" data-act="gtab" data-id="team">Ce que voit l’équipe</button></div>`:''}
    ${groups.map(([gt,items])=>`<div class="gh">${gt}</div><div class="pn gl">${items.map(([id,em,t,c])=>{const o=gOpen===id;return`<div class="gi"><button class="gq ${o?'on':''}" data-act="gopen" data-id="${id}" aria-expanded="${o}"><span>${em}</span><b>${t}</b><i>${o?'−':'+'}</i></button>${o?`<div class="ga">${typeof c==='function'?c():c}</div>`:''}</div>`}).join('')}</div>`).join('')}</div>`}
 let editFilm=null;
 function editForm(f){const v=x=>e(x??'');
@@ -1079,7 +1213,7 @@ function editForm(f){const v=x=>e(x??'');
    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:170px"><label for="ef_tvch">Chaîne de diffusion</label><input id="ef_tvch" list="tvl3" value="${v(f.tvCh)}"></div><div class="field" style="flex:1;min-width:200px"><label for="ef_tvat">Date et heure de diffusion</label><input id="ef_tvat" type="datetime-local" value="${toLocalInput(f.tvAt)}"></div></div>
    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:200px"><label for="ef_sat">Date et heure de la séance d’équipe</label><input id="ef_sat" type="datetime-local" value="${toLocalInput(f.seanceAt)}"></div><div class="field" style="flex:1;min-width:170px"><label for="ef_sp">Lieu ou lien (salle, Teams…)</label><input id="ef_sp" value="${v(f.seancePlace)}"></div></div>
    <div class="field"><label for="ef_poster">Affiche (adresse d’une image)</label><div class="row"><input id="ef_poster" type="url" value="${v(f.poster)}" style="flex:1"><img id="efpv" class="fpv" alt="Aperçu de l’affiche" ${f.poster?`src="${v(f.poster)}"`:'hidden'}><button type="button" class="chip" data-act="efposter" data-tip="Cherche l’affiche d’après le titre et l’année">🔎 Chercher</button></div></div>
-   <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_feat" ${f.featured?'checked':''} style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_up" ${f.status==='upcoming'?'checked':''} style="width:auto"> Annoncer seulement, sans ouvrir les notes</label></div>
+   <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_feat" ${f.featured?'checked':''} style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_up" ${f.status==='upcoming'?'checked':''} style="width:auto"> Annoncer seulement, sans ouvrir les notes</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_tvf" ${f.kind==='tv'?'checked':''} style="width:auto"> Téléfilm</label></div>
    <div class="row"><button class="btn" type="button" data-act="editsave" data-id="${f.id}">Enregistrer</button><button class="chip" type="button" data-act="editcancel">Annuler</button></div></form>`}
 function filmStep(d){editFilm=null;revLimit=8;revSort='recent';const l=[...S.films].sort((a,b)=>b.added-a.added),i=l.findIndex(x=>x.id===film);if(i<0)return;film=l[(i+d+l.length)%l.length].id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(film)}
 function render(){
@@ -1138,6 +1272,8 @@ document.addEventListener('click',async ev=>{
   else if(act==='animtab'){animTab=id;render()}
   else if(act==='chlist'){chList=id;render()}
   else if(act==='chdur'){chDur=id;render()}
+  else if(act==='chico'){readChForm();chForm.d.emoji=id;$('#chf')?.remove();render()}
+  else if(act==='chbico'){readChForm();chForm.d.bemoji=id;$('#chf')?.remove();render()}
   else if(act==='chnew'){chForm=chFormOf({},'new');render()}
   else if(act==='chtpl'){const c=chFromTpl(CHAL_TPL[+id]);chForm=chFormOf(c,'new');chForm.d.bmode='custom';render()}
   else if(act==='chedit'){const c=S.chals.find(x=>x.id===id);if(c){chForm=chFormOf(c,'edit');render()}}
@@ -1154,7 +1290,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='editsave'){const g=x=>($('#'+x)?.value||'').trim(),f=S.films.find(x=>x.id===id);if(!f)return;if(!g('ef_title'))return toast('Le titre ne peut pas être vide');
     const feat=$('#ef_feat').checked,up=$('#ef_up').checked,at=$('#ef_tvat').value?new Date($('#ef_tvat').value).getTime():0;
     if(feat)S.films.filter(x=>x.featured&&x.id!==id).forEach(x=>upd('films/'+x.id,{featured:false}));
-    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,seanceAt:$('#ef_sat').value?new Date($('#ef_sat').value).getTime():0,seancePlace:g('ef_sp'),poster:g('ef_poster'),featured:feat,status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
+    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,seanceAt:$('#ef_sat').value?new Date($('#ef_sat').value).getTime():0,seancePlace:g('ef_sp'),poster:g('ef_poster'),featured:feat,kind:$('#ef_tvf')?.checked?'tv':'',status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
   else if(act==='sics'){const f=S.films.find(x=>x.id===id);if(f&&f.seanceAt)try{await S.dl.save({filename:'seance-'+norm(f.title).replace(/ /g,'-')+'.ics',data:icsSeance(f)})}catch{}}
   else if(act==='pmtab'){pmTab=id;pmLimit=20;render()}
   else if(act==='pmmore'){pmLimit+=20;render()}
@@ -1174,6 +1310,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='tourprev'){tour.i=Math.max(0,tour.i-1);render()}
   else if(act==='tourskip')finishTour()
   else if(act==='filter'){filter=id;homeLimit=24;render()}
+  else if(act==='genre'){gSel=id;homeLimit=24;render()}
   else if(act==='hview'){homeView=id;render()}
   else if(act==='mtoggle'){monthState[id]=t.getAttribute('aria-expanded')!=='true';render()}
   else if(act==='more'){homeLimit+=24;render()}
@@ -1209,9 +1346,11 @@ document.addEventListener('click',async ev=>{
   else if(act==='export'){try{await S.dl.save({filename:'notes-cine-club.csv',data:csvExport()})}catch{}}
   else if(act==='rsrc'){R.src=id;buildPool()}
   else if(act==='rfopen'){R.fopen=!R.fopen;render()}
-  else if(act==='rreset'){R.f={genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all'};scheduleBuild();render()}
+  else if(act==='rfkind'){R.f.kind=id;scheduleBuild();render()}
+  else if(act==='rftab'){R.ftab=id;render()}
+  else if(act==='rreset'){R.f={genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all',kind:'all'};scheduleBuild();render()}
   else if(act==='rfg'){const g=R.f.genres;R.f.genres=g.includes(id)?g.filter(x=>x!==id):[...g,id];scheduleBuild();render()}
-  else if(act==='rfd'){const [a,b]=id.split('-');if(String(R.f.from)===a&&String(R.f.to)===b){R.f.from='';R.f.to=''}else{R.f.from=a;R.f.to=b}scheduleBuild();render()}
+  else if(act==='rfd'){const [a,b]=id.split('-');R.f.from=a;R.f.to=b;scheduleBuild();render()}
   else if(act==='rfdur'){R.f.dur=id==='none'?'':id;scheduleBuild();render()}
   else if(act==='rfpop'){R.f.pop=id;scheduleBuild();render()}
   else if(act==='rclose'){rModal=false;render()}
@@ -1228,7 +1367,7 @@ function previewPoster(){const i=$('#fp'),v=$('#fpv');if(!i||!v)return;const u=i
 function setFormPoster(u,auto){const i=$('#fp');if(!i||!u||i.value.trim())return;i.value=u;window._fpAuto=!!auto;previewPoster()}
 let acT=null;
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(!b)return;const m=JSON.parse(b.dataset.s);
-  $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
+  $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';if($('#ftvf'))$('#ftvf').checked=!!m.tv;window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
   if(!m.poster){(m.qid?wdPoster(m.qid).catch(()=>''):Promise.resolve('')).then(u=>u||wikiPoster(m.title,m.year)).then(u=>setFormPoster(u,false))}});
 document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}
   if(ev.target.id==='pmsel'){pmMonth=ev.target.value;render()}
@@ -1253,7 +1392,7 @@ document.addEventListener('submit',async ev=>{
   if(f.id==='addf'){const id='f'+uid(),up=!!d.up;
     if(d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
-    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,seanceAt:d.seat?new Date(d.seat).getTime():0,seancePlace:(d.seplace||'').trim(),ask:(d.ask||'').trim(),poster,qid:d.qid||'',featured:!!d.feat,status:up?'upcoming':'live',added:Date.now()})];
+    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,seanceAt:d.seat?new Date(d.seat).getTime():0,seancePlace:(d.seplace||'').trim(),ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:!!d.feat,status:up?'upcoming':'live',added:Date.now()})];
     if(addNote&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote})));
     const fromIdea=prefill&&prefill.from==='idea'?prefill.id:null;if(fromIdea)ops.push(del('ideas/'+fromIdea));
     adding=false;prefill=null;render();Promise.all(ops).then(()=>{SFX.win();toast(up?'Film annoncé dans Prochainement 🗓️':'Film publié pour l’équipe 🎬');enrichFilm(id)})}
@@ -1271,7 +1410,7 @@ document.addEventListener('input',ev=>{
   if(ev.target.id==='ef_poster'){const v=$('#efpv'),u=ev.target.value.trim();if(v){v.hidden=!u;if(u)v.src=u}}
   if(ev.target.id==='ft'&&window._fpAuto){window._fpAuto=false;const a=$('#fp'),q2=$('#fq');if(a)a.value='';if(q2)q2.value='';previewPoster()}
   if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim(),z=$('#sug');if(!z)return;
-    const show=(r0,wait)=>{const r=r0.map(m=>({...m,poster:m.poster||thumbCache[thumbKey(m)]||''}));setTimeout(()=>r.slice(0,8).forEach(m=>{if(!m.poster&&!thumbTried.has(thumbKey(m)))fillThumb(m)}),0);z.innerHTML=r.map(m=>`<button type="button" data-key="${e(thumbKey(m))}" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}</span></span></button>`).join('')+(wait?'<p class="dim" style="font-size:13px">Recherche dans la base mondiale…</p>':!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat. Saisissez le titre à la main : les infos seront cherchées après la publication.</p>':'')};
+    const show=(r0,wait)=>{const r=r0.map(m=>({...m,poster:m.poster||thumbCache[thumbKey(m)]||''}));setTimeout(()=>r.slice(0,8).forEach(m=>{if(!m.poster&&!thumbTried.has(thumbKey(m)))fillThumb(m)}),0);z.innerHTML=r.map(m=>`<button type="button" data-key="${e(thumbKey(m))}" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}${m.tv?' · Téléfilm':''}</span></span></button>`).join('')+(wait?'<p class="dim" style="font-size:13px">Recherche dans la base mondiale…</p>':!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat. Saisissez le titre à la main : les infos seront cherchées après la publication.</p>':'')};
     if(v.length<2){z.innerHTML='';return}
     show(localSearch(v),v.length>=3);if(v.length<3)return;
     acT=setTimeout(async()=>{try{const r=await wdSearch(v);if($('#ft')?.value.trim()!==v)return;{const mr=mergeResults([...localSearch(v),...r],v);show(mr,false);const t0=mr[0];if(t0&&norm(t0.title)===norm(v)){if(t0.qid&&!$('#fq').value)$('#fq').value=t0.qid;if(t0.poster)setFormPoster(t0.poster,true);else wikiPoster(t0.title,t0.year).then(u=>setFormPoster(u,true))}}}catch{if($('#ft')?.value.trim()===v)show(localSearch(v),false)}},350)}
@@ -1281,7 +1420,7 @@ document.addEventListener('input',ev=>{
 /* info-bulles au survol et au clavier */
 const tipEl=document.createElement('div');tipEl.id='tip';tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
 function hideTip(){tipEl.style.display='none'}
-function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=txt;tipEl.style.display='block';
+function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=stripEmoji(txt);tipEl.style.display='block';
   const r=t.getBoundingClientRect(),w=tipEl.offsetWidth,h=tipEl.offsetHeight;let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);tipEl.style.left=x+'px';tipEl.style.top=y+'px'}
 document.addEventListener('mouseover',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusin',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
