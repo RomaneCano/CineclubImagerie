@@ -156,6 +156,10 @@ nav button{padding:9px 16px}
 .actbar{margin-top:16px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}.actbar .al{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
 .abg{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.abtn{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:var(--panel2);border:1px solid var(--line);font-weight:600;font-size:14px;text-align:left;transition:.15s}.abtn:hover{border-color:var(--acc);transform:translateY(-1px)}.abtn .ai{font-size:20px;width:26px;text-align:center;flex:none}
 .abtn.pri{background:var(--acc);color:#1a1500;border-color:var(--acc)}.abtn.on{border-color:var(--acc);color:var(--acc)}.abtn.danger{color:var(--bad)}.abtn.danger:hover{border-color:var(--bad)}
+.animgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start}@media(max-width:900px){.animgrid{grid-template-columns:1fr}}
+.tiles2{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}.tile2{display:flex;border:1px solid var(--line);border-radius:12px;background:var(--panel2);overflow:hidden;transition:.15s}.tile2:hover{border-color:var(--acc)}
+.tmain{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px;text-align:left;min-width:0}.tmain .tem{font-size:24px}.tmain b{font-size:14px}.tmore{padding:0 10px;color:var(--mut);border-left:1px solid var(--line);font-size:18px}.tmore:hover{color:var(--acc)}
+.chlist{max-height:430px;overflow:auto}.chr{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}.chr:last-child{border:0}.chr .tem{font-size:22px;text-align:center}.chb{display:flex;gap:6px;align-items:center}.chip.dgr:hover{border-color:var(--bad);color:var(--bad)}
 </style>
 </head>
 <body>
@@ -230,12 +234,17 @@ function seasonOf(ts){const d=new Date(ts),q=Math.floor(d.getMonth()/3);return{l
 const monthKey=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
 
 /* défis */
-function chalMatch(c,r){const f=S.films.find(x=>x.id===r.filmId);if(!f||monthKey(r.ts)!==c.month)return false;
-  if(c.type==='genre')return f.genre===c.value;if(c.type==='before')return !!(+f.year&&+f.year<+c.value);return true}
+const dayStart=ts=>{const d=new Date(ts);return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime()};
+const monthEnd=ts=>{const d=new Date(ts);return new Date(d.getFullYear(),d.getMonth()+1,1).getTime()-1};
+const ymd=ts=>{const d=new Date(ts),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`};
+function chRange(c){if(c.start)return[c.start,c.end||c.start+30*DAY];const [y,m]=(c.month||monthKey(Date.now())).split('-');return[new Date(+y,+m-1,1).getTime(),new Date(+y,+m,1).getTime()]}
+function chStatus(c){const [a,b]=chRange(c),n=Date.now();return n<a?'sched':n<b?'active':'ended'}
+function chalMatch(c,r){const f=S.films.find(x=>x.id===r.filmId),[a,b]=chRange(c);if(!f||r.ts<a||r.ts>=b)return false;
+  if(c.type==='genre')return f.genre===c.value;if(c.type==='before')return !!(+f.year&&+f.year<+c.value);if(c.type==='after')return !!(+f.year&&+f.year>=+c.value);return true}
 function chalCount(c,id){const rs=S.ratings.filter(r=>r.userId===id&&chalMatch(c,r));
   if(c.type==='genres')return new Set(rs.map(r=>S.films.find(f=>f.id===r.filmId)?.genre).filter(Boolean)).size;return rs.length}
 const chalDone=(c,id)=>chalCount(c,id)>=c.target;
-const chalLabel=c=>{const n=c.target,p=n>1?'s':'';return c.type==='genre'?`Notez ${n} film${p} de genre « ${c.value} »`:c.type==='before'?`Notez ${n} film${p} d’avant ${c.value}`:c.type==='genres'?`Notez des films de ${n} genres différents`:`Notez ${n} films ce mois-ci`};
+const chalLabel=c=>{const n=c.target,p=n>1?'s':'';return c.type==='genre'?`Notez ${n} film${p} de genre « ${c.value} »`:c.type==='before'?`Notez ${n} film${p} d’avant ${c.value}`:c.type==='after'?`Notez ${n} film${p} sorti${p} depuis ${c.value}`:c.type==='genres'?`Notez des films de ${n} genres différents`:`Notez ${n} films`};
 
 /* cartes à collectionner */
 function cardOf(r){const f=S.films.find(x=>x.id===r.filmId);if(!f)return'common';
@@ -334,6 +343,7 @@ function badgeFams(id,xp,lvl){
    ['Collection','🃏','Collectionneur·se',[3,10,30,80],cards.filter(c=>c==='rare'||c==='legendary').length,k=>`Obtenez ${plur(k,'carte')} Rare ou Légendaire`],
    ['Collection','✨','Légendaire',[1,5,15,40],cards.filter(c=>c==='legendary').length,k=>`Soyez ${k} fois le premier avis de l’équipe sur un film`],
    ['Collection','🌈','Holo',[1,5,15],cards.filter(c=>c==='holo').length,k=>`Obtenez ${plur(k,'carte')} Holo (désaccord total avec Hervé)`],
+   ...S.chals.filter(c=>c.badge&&c.badge.name).map(c=>['Défis',c.badge.emoji||'🏅',c.badge.name,[c.target],chalCount(c,id),()=>`${chalLabel(c)} (défi « ${c.title} »)`]),
    ['Progression','🏆','Grimpeur·se',[1,2,3,4,5,6,7,8],lvl,k=>`Atteignez le niveau « ${LEVELS[k][1]} »`]];
   return fams.map(mk)}
 function famInfo(f){let k=0;f.tiers.forEach(t=>{if(f.cur>=t)k++});const done=k>=f.tiers.length,nx=f.tiers[Math.min(k,f.tiers.length-1)];return{k,done,nx,cur:Math.min(f.cur,nx)}}
@@ -374,7 +384,7 @@ function profileMenu(s){return`<div class="menu" role="menu"><div class="row" st
 function banners(films){
   let h='';
   if(!S.cfg.directorId)h+=`<div class="banner"><span><b>Hervé n’a pas encore créé son compte.</b> Il doit s’inscrire avec le code réservé au directeur. Les séances démarreront ensuite.</span></div>`;
-  if(isDir()&&films.length&&!S.chals.some(c=>c.month===monthKey(Date.now())))h+=`<div class="banner"><span>⛳ <b>Aucun défi ce mois-ci.</b> Un clic suffit pour en lancer un.</span><button class="btn" data-act="nav" data-id="animer">Lancer un défi</button></div>`;
+  if(isDir()&&films.length&&!S.chals.some(c=>chStatus(c)!=='ended'))h+=`<div class="banner"><span>⛳ <b>Aucun défi en cours.</b> Un clic suffit pour en lancer un.</span><button class="btn" data-act="nav" data-id="animer">Lancer un défi</button></div>`;
   const tvf=films.filter(f=>f.tvAt&&f.tvAt>Date.now()-2*3600e3&&f.tvAt<Date.now()+36*3600e3).sort((a,b)=>a.tvAt-b.tvAt)[0];
   if(tvf)h+=`<div class="banner"><span>📺 <b>${e(tvWhen(tvf.tvAt))}${tvf.tvCh?' sur '+e(tvf.tvCh):''}</b> : ${e(tvf.title)}</span><button class="btn" data-act="open" data-id="${tvf.id}">Voir le film</button></div>`;
   const lf=films.find(f=>f.id===liveFilm());
@@ -383,20 +393,25 @@ function banners(films){
   if(!isDir()&&S.cfg.directorId){const todo=films.filter(f=>f.status!=='upcoming'&&!rOf(f.id,S.meId));
     if(todo.length&&!lf)h+=`<div class="banner"><span>Il vous reste <b>${todo.length} film${todo.length>1?'s':''}</b> à noter.</span><button class="btn" data-act="open" data-id="${todo[todo.length-1].id}">Noter le plus ancien</button></div>`}
   return h}
-const CHAL_TPL=[['🎞️','Classique','before','1980',2],['📽️','Docu du mois','genre','Documentaire',1],['🎨','Animation','genre','Animation',1],['🚀','Science-fiction','genre','Science-fiction',2],['😂','Fou rire','genre','Comédie',2],['🕵️','Frissons','genre','Thriller',2],['🍿','Marathon','count','',3],['🌍','Éclectique','genres','',3]];
+const CHAL_TPL=[['🎞️','Classique','before','1980',2,'Rat de cinémathèque'],['📽️','Docu du mois','genre','Documentaire',1,'Curieux·se du réel'],['🎨','Animation','genre','Animation',1,'Cœur d’enfant'],['🚀','Science-fiction','genre','Science-fiction',2,'Voyageur·se du futur'],['😂','Fou rire','genre','Comédie',2,'Zygomatique'],['🕵️','Frissons','genre','Thriller',2,'Sang-froid'],['🔎','Polar','genre','Policier',2,'Fin limier'],['🆕','Nouveautés','after','2020',2,'À la page'],['🍿','Marathon','count','',3,'Marathonien·ne'],['🌍','Éclectique','genres','',3,'Papillon de salle']];
+const BADGE_PRESETS=[['🎬','Cinéphile du mois'],['🌟','Étoile montante'],['🔭','Explorateur·rice'],['🎯','Pile dans le mille'],['🧠','Esprit critique'],['💎','Pépite dénichée'],['🔥','Sur une lancée'],['🍿','Pop-corn addict'],['🌍','Globe-trotter'],['🏛️','Mémoire du cinéma'],['🆕','Dans le coup'],['🎭','Grand·e spectateur·rice']];
 function chalHelp(c){const used=new Set(S.ratings.filter(r=>r.userId===S.meId&&chalMatch(c,r)).map(r=>S.films.find(f=>f.id===r.filmId)?.genre));
-  return S.films.filter(f=>f.status!=='upcoming'&&!rOf(f.id,S.meId)&&(c.type==='genre'?f.genre===c.value:c.type==='before'?!!(+f.year&&+f.year<+c.value):c.type==='genres'?!used.has(f.genre):true)).slice(0,3)}
-function chalCards(){const m=monthKey(Date.now()),cs=S.chals.filter(c=>c.month===m);if(!cs.length)return'';
-  const nd=new Date(),left=Math.max(1,Math.ceil((new Date(nd.getFullYear(),nd.getMonth()+1,1)-nd)/DAY));
-  return`<div class="sect"><h3>⛳ Défis du mois</h3><span class="dim">fin dans ${left} jour${left>1?'s':''}</span></div><div class="chs">${cs.map(c=>{
-   const who=cons().filter(x=>chalDone(c,x.id)),dir=isDir(),n=dir?0:Math.min(chalCount(c,S.meId),c.target),done=!dir&&chalDone(c,S.meId),help=dir||done?[]:chalHelp(c),rest=c.target-n;
+  return S.films.filter(f=>f.status!=='upcoming'&&!rOf(f.id,S.meId)&&(c.type==='genre'?f.genre===c.value:c.type==='before'?!!(+f.year&&+f.year<+c.value):c.type==='after'?!!(+f.year&&+f.year>=+c.value):c.type==='genres'?!used.has(f.genre):true)).slice(0,3)}
+function chalCards(){
+  const act=S.chals.filter(c=>chStatus(c)==='active').sort((a,b)=>chRange(a)[1]-chRange(b)[1]),sch=S.chals.filter(c=>chStatus(c)==='sched').sort((a,b)=>chRange(a)[0]-chRange(b)[0]);
+  if(!act.length&&!sch.length)return'';const dir=isDir();let h='';
+  if(act.length)h+=`<div class="sect"><h3>⛳ Défis en cours</h3></div><div class="chs">${act.map(c=>{
+   const who=cons().filter(x=>chalDone(c,x.id)),n=dir?0:Math.min(chalCount(c,S.meId),c.target),done=!dir&&chalDone(c,S.meId),help=dir||done?[]:chalHelp(c),rest=c.target-n,left=Math.max(1,Math.ceil((chRange(c)[1]-Date.now())/DAY));
    const pips=Array.from({length:Math.min(c.target,8)},(_,k)=>`<span class="pip ${!dir&&k<n?'on':''}">${!dir&&k<n?'✓':''}</span>`).join('');
-   return`<div class="pn ${done?'chdone':''}"><div class="row" style="align-items:flex-start"><b style="flex:1;font-size:16px">${e(c.title)}</b>${dir?`<button class="chip" data-act="chaldel" data-id="${c.id}" aria-label="Retirer ce défi" data-tip="Retirer ce défi">✕</button>`:''}</div>
+   return`<div class="pn ${done?'chdone':''}"><div class="row" style="align-items:flex-start"><b style="flex:1;font-size:16px">${c.emoji?e(c.emoji)+' ':''}${e(c.title)}</b><span class="dim" style="font-size:12px">fin dans ${left} j</span></div>
     <div class="dim" style="font-size:13px;margin:2px 0 10px">${e(chalLabel(c))}</div>
     <div class="pips">${pips}</div>
-    ${dir?'':`<div style="font-size:14px;margin-top:10px">${done?'🎉 Défi relevé : +40 XP':rest===1?'Plus que <b>1</b> film !':`Encore <b>${rest}</b> à faire`}</div>`}
+    ${c.badge?`<div style="margin-top:10px"><span class="badge" data-tip="Badge à gagner en relevant ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span></div>`:''}
+    ${dir?'':`<div style="font-size:14px;margin-top:10px">${done?`🎉 Défi relevé : +40 XP${c.badge?' et badge débloqué':''}`:rest===1?'Plus que <b>1</b> film !':`Encore <b>${rest}</b> à faire`}</div>`}
     ${help.length?`<div class="dim" style="font-size:12px;margin:10px 0 6px">Pour avancer, essayez :</div><div class="row" style="flex-wrap:wrap;gap:6px">${help.map(f=>`<button class="chip" data-act="open" data-id="${f.id}">${e(f.title)}</button>`).join('')}</div>`:(!dir&&!done?'<div class="dim" style="font-size:12px;margin-top:10px">Aucun film proposé ne correspond pour le moment.</div>':'')}
-    <div class="dim" style="font-size:13px;margin-top:12px">👥 ${who.length} sur ${cons().length} l’ont relevé ${who.map(x=>`<span title="${e(nameOf(x.id))}">${x.emoji}</span>`).join(' ')}</div></div>`}).join('')}</div>`}
+    <div class="dim" style="font-size:13px;margin-top:12px">👥 ${who.length} sur ${cons().length} l’ont relevé ${who.map(x=>`<span title="${e(nameOf(x.id))}">${x.emoji}</span>`).join(' ')}</div></div>`}).join('')}</div>`;
+  if(sch.length)h+=`<p class="dim" style="margin:${act.length?'-8px':'0'} 0 20px">⏳ ${dir?'Programmé':'À venir'} : ${sch.slice(0,3).map(c=>`<b>${c.emoji?e(c.emoji)+' ':''}${e(c.title)}</b> dès le ${new Date(chRange(c)[0]).toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}`).join(' · ')}</p>`;
+  return h}
 function duelBlock(){const d=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.created)[0];if(!d)return'';
   const A=S.films.find(f=>f.id===d.a),B=S.films.find(f=>f.id===d.b);if(!A||!B)return'';
   const vs=S.dvotes.filter(v=>v.duelId===d.id),na=vs.filter(v=>v.pick==='a').length,nb=vs.filter(v=>v.pick==='b').length,mine=vs.find(v=>v.userId===S.meId);
@@ -480,15 +495,26 @@ function palmares(){
    <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:14px">${tabs.map(([k,l])=>`<button class="chip ${pmTab===k?'on':''}" data-act="pmtab" data-id="${k}">${l}</button>`).join('')}</div>${body}</div>`}
 function animer(){
   if(!isDir())return'';
-  const m=monthKey(Date.now()),chs=S.chals.filter(c=>c.month===m),duel=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.created)[0];
-  const opts=S.films.map(f=>`<option value="${e(f.title)}"></option>`).join('');
-  const dv=duel?(()=>{const A=S.films.find(f=>f.id===duel.a),B=S.films.find(f=>f.id===duel.b),vs=S.dvotes.filter(v=>v.duelId===duel.id);return A&&B?`<div class="pn" style="margin-bottom:12px"><b>Duel en cours</b> : ${e(A.title)} contre ${e(B.title)} · ${plur(vs.length,'vote')} <button class="chip" style="margin-left:8px" data-act="closeduel" data-id="${duel.id}" data-tip="Ferme le vote et couronne le film en tête">Clore et couronner</button></div>`:''})():'';
-  return`<div class="gwrap" style="max-width:980px"><h2>Animer l’équipe</h2><p class="dim" style="margin-bottom:6px">Lancez un défi ou un duel en quelques clics : ils apparaissent tout de suite sur l’accueil de l’équipe.</p>
-   <div class="sect"><h3>⛳ Lancer un défi du mois</h3><span class="dim">un clic, jusqu’à la fin du mois</span></div>
-   <div class="tiles">${CHAL_TPL.map((t,i)=>{const lab=chalLabel({type:t[2],value:t[3],target:t[4]}),on=chs.some(c=>c.title===t[0]+' '+t[1]);return`<button class="tile ${on?'on':''}" data-act="chaltpl" data-id="${i}" data-tip="${e('Défi du mois : '+lab)}"><span class="tem">${t[0]}</span><b>${t[1]}</b><span class="dim">${e(lab)}</span>${on?'<span class="badge" style="border-color:var(--ok);color:var(--ok)">✔ Lancé</span>':''}</button>`}).join('')}</div>
-   ${chs.length?`<div class="pn" style="margin-top:12px"><b>Défis de ce mois</b>${chs.map(c=>`<div class="lb" style="grid-template-columns:1fr auto auto"><span>${e(c.title)} <span class="dim">· ${e(chalLabel(c))}</span></span><span class="dim">${cons().filter(x=>chalDone(c,x.id)).length} sur ${cons().length} l’ont relevé</span><button class="chip" data-act="chaldel" data-id="${c.id}" aria-label="Retirer ce défi" data-tip="Retirer ce défi">✕</button></div>`).join('')}</div>`:'<p class="dim" style="margin-top:10px">Aucun défi ce mois-ci pour l’instant.</p>'}
-   <div class="sect"><h3>⚔️ Lancer un duel</h3><span class="dim">deux films, l’équipe vote</span></div>${dv}
-   <div class="pn"><form id="duelf" class="row" style="flex-wrap:wrap;gap:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off" style="flex:1;min-width:200px"><b class="vs">VS</b><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off" style="flex:1;min-width:200px"><button class="btn">Lancer le duel</button></form></div></div>`}
+  const st={active:S.chals.filter(c=>chStatus(c)==='active'),sched:S.chals.filter(c=>chStatus(c)==='sched'),ended:S.chals.filter(c=>chStatus(c)==='ended')};
+  const duel=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.created)[0];
+  const tabs=`<div class="row" style="gap:6px;margin:12px 0 14px"><button class="chip ${animTab==='chal'?'on':''}" data-act="animtab" data-id="chal">⛳ Défis (${st.active.length+st.sched.length})</button><button class="chip ${animTab==='duel'?'on':''}" data-act="animtab" data-id="duel">⚔️ Duels</button></div>`;
+  let body='';
+  if(animTab==='chal'){
+    const names={active:'En cours',sched:'Programmés',ended:'Terminés'},list=[...st[chList]].sort((a,b)=>chList==='ended'?chRange(b)[1]-chRange(a)[1]:chRange(a)[0]-chRange(b)[0]);
+    const fd=ts=>new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    const row=c=>{const [a,b]=chRange(c),sc=chStatus(c)==='sched';return`<div class="chr"><span class="tem">${e(c.emoji||'⛳')}</span><div style="min-width:0"><b>${e(c.title)}</b><div class="dim" style="font-size:12px">${e(chalLabel(c))} · ${fd(a)} au ${fd(b)}</div>${c.badge?`<span class="badge" style="margin-top:4px" data-tip="Badge lié à ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span>`:''}</div><div class="chb"><span class="dim" style="font-size:12px">${cons().filter(x=>chalDone(c,x.id)).length}/${cons().length}</span><button class="chip" data-act="chedit" data-id="${c.id}" data-tip="Modifier ce défi" aria-label="Modifier">✏️</button><button class="chip" data-act="chdup" data-id="${c.id}" data-tip="Dupliquer pour créer un nouveau défi en changeant les paramètres" aria-label="Dupliquer">⧉</button><button class="chip dgr" data-act="chaldel" data-id="${c.id}" data-tip="${sc?'Annuler ce défi programmé':'Retirer ce défi'}" aria-label="Retirer">✕</button></div></div>`};
+    body=`<div class="animgrid"><div class="pn"><div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:8px"><h3 style="flex:1">Lancer un défi</h3><button class="btn" data-act="chnew" data-tip="Créer un défi sur mesure : règle, dates, badge">＋ Créer un défi</button></div>
+      <div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap"><span class="dim" style="font-size:13px">Durée</span>${[['month','Fin du mois'],['7','7 jours'],['14','14 jours']].map(([k,l])=>`<button class="chip ${chDur===k?'on':''}" data-act="chdur" data-id="${k}">${l}</button>`).join('')}</div>
+      <div class="tiles2">${CHAL_TPL.map((t,i)=>`<div class="tile2"><button class="tmain" data-act="chaltpl" data-id="${i}" data-tip="${e('Lancer maintenant : '+chalLabel({type:t[2],value:t[3],target:t[4]})+' (badge : '+t[5]+')')}"><span class="tem">${t[0]}</span><b>${t[1]}</b></button><button class="tmore" data-act="chtpl" data-id="${i}" data-tip="Personnaliser, programmer ou changer le badge" aria-label="Personnaliser">⋯</button></div>`).join('')}</div>
+      <p class="dim" style="font-size:12px;margin-top:10px">Un clic lance le défi tout de suite, avec son badge. « ⋯ » permet de choisir les dates ou de modifier le modèle.</p></div>
+     <div class="pn"><div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">${Object.entries(names).map(([k,l])=>`<button class="chip ${chList===k?'on':''}" data-act="chlist" data-id="${k}">${l} (${st[k].length})</button>`).join('')}</div>
+      <div class="chlist">${list.map(row).join('')||`<p class="dim" style="padding:14px 4px">Aucun défi ${chList==='active'?'en cours':chList==='sched'?'programmé':'terminé'}.</p>`}</div></div></div>`}
+  else{
+    const opts=S.films.map(f=>`<option value="${e(f.title)}"></option>`).join('');
+    const dv=duel?(()=>{const A=S.films.find(f=>f.id===duel.a),B=S.films.find(f=>f.id===duel.b),vs=S.dvotes.filter(v=>v.duelId===duel.id);return A&&B?`<div class="pn" style="margin-bottom:12px"><b>Duel en cours</b> : ${e(A.title)} contre ${e(B.title)} · ${plur(vs.length,'vote')} <button class="chip" style="margin-left:8px" data-act="closeduel" data-id="${duel.id}" data-tip="Ferme le vote et couronne le film en tête">Clore et couronner</button></div>`:''})():'';
+    body=`<div style="max-width:760px">${dv}<div class="pn"><h3 style="margin-bottom:10px">Lancer un duel</h3><form id="duelf" class="row" style="flex-wrap:wrap;gap:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off" style="flex:1;min-width:200px"><b class="vs">VS</b><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off" style="flex:1;min-width:200px"><button class="btn">Lancer le duel</button></form><p class="dim" style="font-size:12px;margin-top:8px">Deux films s’affrontent, l’équipe vote depuis l’accueil. Un nouveau duel ferme l’ancien.</p></div></div>`}
+  return`<div class="gwrap" style="max-width:1040px"><h2>Animer l’équipe</h2><p class="dim">Lancez ou programmez un défi, ou opposez deux films dans un duel.</p>${tabs}${body}</div>`}
+
 function home(){
   const films=[...S.films].sort((a,b)=>b.added-a.added),liveF=films.filter(f=>f.status!=='upcoming'),up=films.filter(f=>f.status==='upcoming');
   const feat=films.find(f=>f.featured)||liveF[0],genres=[...new Set(liveF.map(f=>f.genre))];
@@ -897,6 +923,66 @@ function seanceBanner(){const f=nextSeance();if(!f)return'';
 function icsSeance(f){const st=new Date(f.seanceAt),en=new Date(f.seanceAt+((f.runtime||110)+30)*60000),z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
   return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Cine-Club Imagerie//FR','BEGIN:VEVENT','UID:seance-'+f.id+'@cineclub','DTSTAMP:'+z(new Date()),'DTSTART:'+z(st),'DTEND:'+z(en),'SUMMARY:'+('Séance ciné-club : '+f.title).replace(/[,;]/g,' '),...(f.seancePlace?['LOCATION:'+f.seancePlace.replace(/[,;]/g,' ')]:[]),'END:VEVENT','END:VCALENDAR'].join('\r\n')}
 
+
+/* défis : création, doublons, annulation */
+let animTab='chal',chList='active',chDur='month',chForm=null;
+function toastAction(text,label,fn){const n=document.createElement('div');n.className='toast';n.style.cssText+=';display:flex;gap:12px;align-items:center';const sp=document.createElement('span');sp.textContent=text;const b=document.createElement('button');b.textContent=label;b.style.cssText='background:#1a1500;color:#ffcc00;border-radius:99px;padding:4px 14px;font-weight:700';b.onclick=()=>{n.remove();fn()};n.append(sp,b);document.body.append(n);setTimeout(()=>n.remove(),9000)}
+function chDupCheck(c,ignoreId){
+  const key=x=>norm(x.type+' '+(x.value||'')+' '+x.target),[a,b]=[c.start,c.end];
+  for(const o of S.chals){if(o.id===ignoreId)continue;const [oa,ob]=chRange(o),over=a<ob&&oa<b;
+    if(over&&norm(o.title)===norm(c.title))return`Un défi « ${o.title} » existe déjà sur ces dates.`;
+    if(over&&key(o)===key(c))return`Un défi identique existe déjà sur ces dates : « ${o.title} » (${chalLabel(o)}).`;
+    if(c.badge&&o.badge&&norm(o.badge.name)===norm(c.badge.name))return`Le badge « ${c.badge.name} » est déjà lié au défi « ${o.title} ». Un défi donne un seul badge, et un badge n’appartient qu’à un défi.`}
+  return''}
+const chId=c=>'c'+hash(norm(c.title)+'|'+dayStart(c.start));
+async function launchChallenge(c){
+  const err=chDupCheck(c,null);if(err)return toast(err);const id=chId(c);
+  if(S.chals.some(x=>x.id===id))return toast('Ce défi existe déjà.');
+  const doc={...c};if(!doc.badge)delete doc.badge;
+  if(await put('challenges/'+id,doc)){SFX.ding();toastAction(c.start>Date.now()+3600e3?'Défi programmé 📅':'Défi lancé ⛳','Annuler',()=>del('challenges/'+id))}}
+function chFromTpl(t,start){const s0=dayStart(start||Date.now()),end=chDur==='7'?s0+7*DAY-1:chDur==='14'?s0+14*DAY-1:monthEnd(s0);
+  return{title:t[1],emoji:t[0],type:t[2],value:t[3],target:t[4],start:s0,end,badge:t[5]?{name:t[5],emoji:t[0]}:null}}
+async function removeChallenge(id){const c=S.chals.find(x=>x.id===id);if(!c)return;const doc={...c};delete doc.id;
+  if(await del('challenges/'+id))toastAction(chStatus(c)==='sched'?'Lancement annulé':'Défi retiré','Annuler',()=>put('challenges/'+id,doc))}
+function chFormOf(c,mode){const today=Date.now(),b=c.badge;
+  const d={title:c.title||'',emoji:c.emoji||'⛳',type:c.type||'genre',value:c.value||(c.type==='before'?'1980':c.type==='after'?'2020':'Drame'),target:c.target||2,start:ymd(c.start||today),end:ymd(c.end||monthEnd(today)),bmode:b?'custom':'none',bpreset:0,bemoji:b?.emoji||'🏅',bname:b?.name||''};
+  if(mode==='dup'){const len=(c.end&&c.start)?c.end-c.start:monthEnd(today)-dayStart(today);d.title=(c.title||'')+' (copie)';d.start=ymd(today);d.end=ymd(dayStart(today)+len);d.bmode='none';d.bname='';}
+  return{id:mode==='edit'?c.id:null,mode,d}}
+function readChForm(){if(!chForm)return;const d=chForm.d;['title','emoji','type','value','target','start','end','bmode','bpreset','bemoji','bname'].forEach(k=>{const el=$('#cf_'+k);if(el)d[k]=el.value})}
+function chFormModal(){const d=chForm.d,edit=chForm.mode==='edit';
+  const valField=d.type==='genre'?`<div class="field"><label for="cf_value">Genre</label><select id="cf_value">${GENRES.map(g=>`<option ${d.value===g?'selected':''}>${g}</option>`).join('')}</select></div>`:(d.type==='before'||d.type==='after')?`<div class="field"><label for="cf_value">${d.type==='before'?'Avant l’année':'Depuis l’année'}</label><input id="cf_value" type="number" min="1890" max="2100" value="${e(d.value)}"></div>`:'';
+  const prev={type:d.type,value:d.value,target:Math.max(1,+d.target||1)};
+  return`<div class="modal" data-act="chclose"><div class="sheet" data-stop style="width:min(660px,100%)" role="dialog" aria-label="Défi"><button class="x" data-act="chclose" aria-label="Fermer">✕</button>
+   <h2>${edit?'Modifier le défi':chForm.mode==='dup'?'Dupliquer un défi':'Créer un défi'}</h2><p class="dim" style="margin-bottom:12px">Un défi donne au plus un badge. Les doublons sont refusés.</p>
+   <form id="chf" onsubmit="return false" style="display:grid;gap:12px">
+    <div class="row" style="gap:10px"><div class="field" style="width:84px"><label for="cf_emoji">Emoji</label><input id="cf_emoji" value="${e(d.emoji)}" maxlength="4" style="text-align:center;font-size:20px"></div><div class="field" style="flex:1"><label for="cf_title">Nom du défi</label><input id="cf_title" value="${e(d.title)}" maxlength="40" placeholder="Ex : Mois du polar"></div></div>
+    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:210px"><label for="cf_type">Règle</label><select id="cf_type">${[['genre','Un genre'],['before','Films d’avant une année'],['after','Films sortis depuis une année'],['count','Un nombre de films'],['genres','Des genres différents']].map(([k,l])=>`<option value="${k}" ${d.type===k?'selected':''}>${l}</option>`).join('')}</select></div>${valField}<div class="field" style="width:110px"><label for="cf_target">Objectif</label><input id="cf_target" type="number" min="1" max="30" value="${e(d.target)}"></div></div>
+    <p class="dim" style="font-size:13px">Règle : ${e(chalLabel(prev))}.</p>
+    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:150px"><label for="cf_start">Début</label><input id="cf_start" type="date" value="${e(d.start)}"></div><div class="field" style="flex:1;min-width:150px"><label for="cf_end">Fin</label><input id="cf_end" type="date" value="${e(d.end)}"></div></div>
+    <div class="row" style="gap:6px;flex-wrap:wrap"><span class="dim" style="font-size:13px">Durée rapide</span><button class="chip" type="button" data-act="chq" data-id="7">7 jours</button><button class="chip" type="button" data-act="chq" data-id="14">14 jours</button><button class="chip" type="button" data-act="chq" data-id="month">Jusqu’à la fin du mois</button></div>
+    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:200px"><label for="cf_bmode">Badge à gagner</label><select id="cf_bmode"><option value="none" ${d.bmode==='none'?'selected':''}>Aucun badge</option><option value="preset" ${d.bmode==='preset'?'selected':''}>Un badge prêt à l’emploi</option><option value="custom" ${d.bmode==='custom'?'selected':''}>Mon propre badge</option></select></div>
+     ${d.bmode==='preset'?`<div class="field" style="flex:1;min-width:200px"><label for="cf_bpreset">Choisir</label><select id="cf_bpreset">${BADGE_PRESETS.map((b,i)=>`<option value="${i}" ${+d.bpreset===i?'selected':''}>${b[0]} ${b[1]}</option>`).join('')}</select></div>`:d.bmode==='custom'?`<div class="field" style="width:84px"><label for="cf_bemoji">Emoji</label><input id="cf_bemoji" value="${e(d.bemoji)}" maxlength="4" style="text-align:center;font-size:20px"></div><div class="field" style="flex:1;min-width:160px"><label for="cf_bname">Nom du badge</label><input id="cf_bname" value="${e(d.bname)}" maxlength="30"></div>`:''}</div>
+    <div class="row" style="justify-content:flex-end"><button class="chip" type="button" data-act="chclose">Annuler</button><button class="btn" type="button" data-act="chsave">${edit?'Enregistrer':new Date(d.start+'T00:00:00').getTime()>Date.now()+864e5?'Programmer le défi':'Lancer le défi'}</button></div></form></div></div>`}
+async function saveChForm(){
+  readChForm();const d=chForm.d,title=d.title.trim();
+  if(title.length<2)return toast('Donnez un nom au défi.');
+  const target=+d.target;if(!(target>=1&&target<=30))return toast('L’objectif doit être entre 1 et 30.');
+  let value=d.value;if(d.type==='genre'&&!GENRES.includes(value))return toast('Choisissez un genre.');
+  if((d.type==='before'||d.type==='after')&&!(+value>=1890&&+value<=2100))return toast('Indiquez une année valide.');
+  if(d.type==='count'||d.type==='genres')value='';
+  if(!d.start||!d.end)return toast('Indiquez les dates de début et de fin.');
+  const start=new Date(d.start+'T00:00:00').getTime(),end=new Date(d.end+'T23:59:59').getTime();
+  if(!(end>start))return toast('La fin doit être après le début.');
+  let badge=null;
+  if(d.bmode==='preset'){const b=BADGE_PRESETS[+d.bpreset]||BADGE_PRESETS[0];badge={name:b[1],emoji:b[0]}}
+  else if(d.bmode==='custom'){const nm=d.bname.trim();if(nm.length<2)return toast('Donnez un nom à votre badge.');badge={name:nm,emoji:(d.bemoji.trim()||'🏅').slice(0,4)}}
+  const c={title,emoji:(d.emoji.trim()||'⛳').slice(0,4),type:d.type,value,target,start,end,badge};
+  const err=chDupCheck(c,chForm.id);if(err)return toast(err);
+  const doc={...c};if(!doc.badge)delete doc.badge;
+  if(chForm.id){const old=S.chals.find(x=>x.id===chForm.id);const o={...old};delete o.id;if(!doc.badge&&o.badge)o.badge=null;if(await put('challenges/'+chForm.id,{...doc})){chForm=null;render();SFX.ding();toastAction('Défi modifié ✔','Annuler',()=>put('challenges/'+old.id,(()=>{const x={...old};delete x.id;return x})()))}return}
+  const id=chId(c);if(S.chals.some(x=>x.id===id))return toast('Un défi avec ce nom et cette date de début existe déjà.');
+  if(await put('challenges/'+id,doc)){chForm=null;render();SFX.ding();toastAction(start>Date.now()+864e5?'Défi programmé 📅':'Défi lancé ⛳','Annuler',()=>del('challenges/'+id))}}
+
 /* GIF dans un avis */
 let dGif=null,gifOpen=false,gifRes=[],gifQ='',gifTimer=null;
 const gifKey=()=>(window.CINECLUB||{}).giphyKey||'';
@@ -944,7 +1030,7 @@ function guideData(){
     ['direct','🔴','Séance en direct','<p>Hervé lance une séance sur un film. Tant qu’elle est ouverte, les résultats sont cachés. Notez, puis attendez : Hervé les révèle et tout le monde voit en même temps sa note, la moyenne et les avis.</p>']]],
    ['Jouer',[
     ['duels','⚔️','Les duels','<p>Hervé oppose deux films. Cliquez sur l’affiche de votre préféré pour voter (vous pouvez changer d’avis tant que le duel est ouvert). Les scores s’affichent après votre vote. Le gagnant est couronné 👑 quand Hervé clôt le duel.</p>'],
-    ['defis','⛳','Les défis du mois','<p>Hervé lance un défi en un clic (Classique, Documentaire, Marathon, Éclectique…) jusqu’à la fin du mois. Sur l’accueil, la carte du défi montre vos pastilles à cocher, quelques films qui comptent, et qui l’a déjà relevé. Chaque film noté qui correspond coche une pastille. Défi relevé : +40 XP.</p>'],
+    ['defis','⛳','Les défis du mois','<p>Hervé lance un défi (Classique, Documentaire, Marathon, Éclectique…) pour quelques jours ou jusqu’à la fin du mois, et peut en programmer à l’avance. Certains donnent un badge. Sur l’accueil, la carte du défi montre vos pastilles à cocher, quelques films qui comptent, et qui l’a déjà relevé. Chaque film noté qui correspond coche une pastille. Défi relevé : +40 XP.</p>'],
     ['points','🏆','Points et niveaux',GL(['Note +10 · avis écrit +15 · plan marquant +10 · pari gagné +20','Trophée du juge +25 · défi relevé +40 · semaine active +5 · like reçu +2','Niveaux : Spectateur·rice, Cinéphile (50 XP), Critique (150), Programmateur·rice (300), Palme d’or (600), puis Grand prix (1000), Maître·sse du 7e art (1600), Légende du ciné-club (2500) et Immortel·le (4000)'])],
     ['badges','🏅','Les badges',()=>`<p style="margin-bottom:12px">Il y a des dizaines de badges, rangés par famille : notes et avis, curiosité, assiduité, communauté, jeux et défis, collection. Chacun a plusieurs paliers (Bronze, Argent, Or, Platine…) : certains se gagnent en quelques jours, d’autres en plusieurs mois ou années.</p><button class="btn" data-act="nav" data-id="badges">Voir tous mes badges</button>`],
     ['serie','🔥','Série hebdomadaire','<p>Chaque semaine où vous donnez au moins un avis prolonge votre série (à côté de votre prénom). Une semaine sans avis la remet à zéro.</p>'],
@@ -964,7 +1050,7 @@ function guideData(){
    ['Animer',[
     ['direct2','🔴','Séance en direct','<p>Dans la fiche d’un film, « Lancer une séance en direct » cache les résultats à l’équipe pendant qu’elle note. « Révéler les résultats » les montre à tous en même temps, « Terminer la séance » la ferme.</p>'],
     ['duel2','⚔️','Créer un duel','<p>Onglet Animer, section « Lancer un duel » : tapez le début de deux titres. L’équipe vote depuis l’accueil. « Clore le duel » couronne le gagnant. Un nouveau duel ferme l’ancien.</p>'],
-    ['defi2','⛳','Créer un défi','<p>Onglet Animer, section « Lancer un défi du mois » : cliquez sur un modèle (Classique, Docu du mois, Animation, Marathon, Éclectique…). C’est lancé jusqu’à la fin du mois. Le ✕ le retire.</p>'],
+    ['defi2','⛳','Créer un défi','<p>Onglet Animer, Défis : cliquez sur un modèle pour le lancer tout de suite (avec son badge), ou sur « ⋯ » pour choisir les dates et le badge, ou « Créer un défi » pour votre propre règle. Un défi donne au plus un badge. Les doublons sont refusés. Vous pouvez programmer un défi à l’avance, le modifier, le dupliquer ou l’annuler (bouton Annuler dans le message qui suit).</p>'],
     ['troph2','🥇','Décerner des trophées','<p>Dans un film, sous chaque avis : plus drôle, plus juste, plus insolent. Un seul gagnant par trophée et par film.</p>']]],
    ['Suivre',[
     ['tableau','📊','Tableau de bord','<p>Pour chaque film : votre note, la moyenne de l’équipe, l’écart, la participation et les personnes qui n’ont pas encore noté. Le badge ⚡ signale un film qui divise. « Télécharger les notes » enregistre un fichier à ouvrir dans Excel.</p>']]]];
@@ -990,12 +1076,12 @@ function editForm(f){const v=x=>e(x??'');
    <div class="row"><button class="btn" type="button" data-act="editsave" data-id="${f.id}">Enregistrer</button><button class="chip" type="button" data-act="editcancel">Annuler</button></div></form>`}
 function filmStep(d){editFilm=null;revLimit=8;revSort='recent';const l=[...S.films].sort((a,b)=>b.added-a.added),i=l.findIndex(x=>x.id===film);if(i<0)return;film=l[(i+d+l.length)%l.length].id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(film)}
 function render(){
-  if((adding&&$('#addf'))||(editFilm&&$('#editf'))){return}
+  if((adding&&$('#addf'))||(editFilm&&$('#editf'))||(chForm&&$('#chf'))){return}
   hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
   if(!S.ready){a.innerHTML='<div class="empty dim" style="padding-top:120px">Ouverture de la salle…</div>';return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'');
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
 }
@@ -1040,9 +1126,18 @@ document.addEventListener('click',async ev=>{
   else if(act==='nav'){view=id;film=null;menuOpen=false;render()}
   else if(act==='gtab'){gTab=id;gOpen=null;S._gInit=0;render()}
   else if(act==='gopen'){gOpen=gOpen===id?null:id;render()}
-  else if(act==='chaltpl'){const t=CHAL_TPL[+id],title=t[0]+' '+t[1],m=monthKey(Date.now());if(S.chals.some(c=>c.month===m&&c.title===title))return toast('Ce défi est déjà lancé ce mois-ci');
-    put('challenges/'+uid(),{title,type:t[2],value:t[3],target:t[4],month:m}).then(ok=>ok&&(SFX.ding(),toast('Défi lancé ⛳')))}
-  else if(act==='chaldel')del('challenges/'+id)
+  else if(act==='chaltpl'){launchChallenge(chFromTpl(CHAL_TPL[+id]))}
+  else if(act==='chaldel'){removeChallenge(id)}
+  else if(act==='animtab'){animTab=id;render()}
+  else if(act==='chlist'){chList=id;render()}
+  else if(act==='chdur'){chDur=id;render()}
+  else if(act==='chnew'){chForm=chFormOf({},'new');render()}
+  else if(act==='chtpl'){const c=chFromTpl(CHAL_TPL[+id]);chForm=chFormOf(c,'new');chForm.d.bmode='custom';render()}
+  else if(act==='chedit'){const c=S.chals.find(x=>x.id===id);if(c){chForm=chFormOf(c,'edit');render()}}
+  else if(act==='chdup'){const c=S.chals.find(x=>x.id===id);if(c){chForm=chFormOf(c,'dup');render()}}
+  else if(act==='chclose'){chForm=null;render()}
+  else if(act==='chsave'){saveChForm()}
+  else if(act==='chq'){readChForm();const s0=new Date(chForm.d.start+'T00:00:00').getTime()||dayStart(Date.now());chForm.d.end=ymd(id==='month'?monthEnd(s0):s0+(+id-1)*DAY);$('#chf')?.remove();render()}
   else if(act==='savename'){const v=($('#myname')?.value||'').trim();if(v.length<2)return toast('Le nom doit faire au moins 2 caractères');upd('members/'+S.meId,{name:v}).then(ok=>ok&&toast('Nom enregistré'))}
   else if(act==='ptab'){pTab=id;render()}
   else if(act==='bcat'){bCat=id;render()}
@@ -1130,13 +1225,15 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(
   if(!m.poster){(m.qid?wdPoster(m.qid).catch(()=>''):Promise.resolve('')).then(u=>u||wikiPoster(m.title,m.year)).then(u=>setFormPoster(u,false))}});
 document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}
   if(ev.target.id==='pmsel'){pmMonth=ev.target.value;render()}
+  if(ev.target.id==='cf_type'||ev.target.id==='cf_bmode'){readChForm();const d=chForm.d;if(ev.target.id==='cf_type'){d.value=d.type==='before'?'1980':d.type==='after'?'2020':d.type==='genre'?'Drame':''}$('#chf')?.remove();render();return}
+  if(ev.target.id&&ev.target.id.startsWith('cf_')){readChForm();return}
   if(ev.target.id==='hsort'){homeSort=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='hdec'){decSel=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='dsort'){dSort=ev.target.value;dLimit=15;render()}
   const m={rfyf:'from',rfyt:'to',rfdir:'dir',rfact:'act'}[ev.target.id];if(m){R.f[m]=ev.target.value.trim();scheduleBuild()}});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-  if(ev.key==='Escape'){if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
