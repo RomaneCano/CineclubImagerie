@@ -229,6 +229,7 @@ nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{op
 .irow{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}.irow:last-child{border:0}
 .sug button.manual{border:1px dashed var(--acc);background:transparent}.sug button.manual .ph{font-size:22px;color:var(--acc);display:grid;place-items:center}
 .tiles2{grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:6px}.tile2{border-radius:10px}.tmain{flex-direction:row;align-items:center;gap:8px;padding:0 10px;min-height:44px}.tmain .tem{font-size:17px;flex:none;display:grid;place-items:center}.tmain b{font-size:13px;line-height:1.15;overflow-wrap:anywhere}.tmore{padding:0 8px;font-size:15px}
+@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}nav{flex-wrap:nowrap!important;overflow-x:auto!important;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{flex:none}.fab{padding:12px 18px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}main{padding-left:14px;padding-right:14px}}
 </style>
 </head>
 <body>
@@ -773,7 +774,7 @@ async function wrapShareCard(){
   x.fillStyle='#ffcc00';x.font='700 36px Inter,sans-serif';x.fillText('CINÉ-CLUB IMAGERIE',80,120);
   x.fillStyle='#fff';x.font='800 120px Inter,sans-serif';x.fillText(String(new Date().getFullYear()),80,290);
   x.font='600 44px Inter,sans-serif';x.fillText(nameOf(S.meId),80,360);
-  const lines=D?[[D.n,'films notés'],[(D.avgS/2).toFixed(1).replace('.',','),'note moyenne'],[D.texts.length,'avis écrits'],[D.st.xp,'XP · '+D.st.name]]:[[S.films.length,'films proposés'],[S.duels.length,'duels'],[S.chals.length,'défis'],[S.ratings.filter(r=>r.trophy).length,'trophées']];
+  const lines=D?[[D.n,D.n>1?'films notés':'film noté'],[(D.avgS/2).toFixed(1).replace('.',','),'note moyenne'],[D.texts.length,'avis écrits'],[D.st.xp,'XP · '+D.st.name]]:[[S.films.length,'films proposés'],[S.duels.length,'duels'],[S.chals.length,'défis'],[S.ratings.filter(r=>r.trophy).length,'trophées']];
   lines.forEach(([v,l],i)=>{x.fillStyle='#ffcc00';x.font='800 96px Inter,sans-serif';x.fillText(String(v),80,520+i*170);x.fillStyle='#ffffffcc';x.font='500 40px Inter,sans-serif';x.fillText(l,80,566+i*170)});
   x.fillStyle='#fff';x.font='700 56px Inter,sans-serif';x.fillText((D?D.pers[0]:'').replace('·',''),80,1250);
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));try{await S.dl.save({filename:'wrapped-'+new Date().getFullYear()+'.png',data:blob})}catch{}}
@@ -883,7 +884,7 @@ function teamView(){
   const pal=palmes(),duels=S.duels.filter(d=>!d.open&&d.winner).sort((a,b)=>b.created-a.created).slice(0,3);
   const adm=S.isOwner?`<div class="pn" style="margin-top:20px"><h3>Désigner Hervé</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">Seul le propriétaire voit ce bloc. La personne doit avoir ouvert le ciné-club une fois.</p><div class="row" style="flex-wrap:wrap">${S.members.map(m=>`<button class="chip ${S.cfg.directorId===m.id?'on':''}" data-act="setdir" data-id="${m.id}">${m.emoji} ${e(nameOf(m.id))}</button>`).join('')}</div></div>`:'';
   return`<h2 style="margin-bottom:16px">L’équipe</h2><div class="cols"><div class="pn"><div class="row" style="margin-bottom:6px"><h3 style="flex:1">Classement</h3><button class="stab ${seasonMode==='season'?'on':''}" data-act="smode" data-id="season" data-tip="Le trimestre en cours : le classement repart de zéro tous les 3 mois" title="Le trimestre en cours : le classement repart de zéro tous les 3 mois">Trimestre ${cur.label}</button><button class="stab ${seasonMode==='all'?'on':''}" data-act="smode" data-id="all" data-tip="Le cumul depuis le début du ciné-club">Depuis le début</button></div>
-   ${rank.map((r,i)=>`<div class="lb"><b class="serif" style="font-size:20px">${['🥇','🥈','🥉'][i]||i+1}</b><div><b>${r.m.emoji} ${e(nameOf(r.m.id))}${r.m.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${r.all.name} · ${r.all.count} films notés${r.all.streak?` · 🔥 ${r.all.streak} sem.`:''}</div></div><b>${r.s.xp} XP</b></div>`).join('')||'<p class="dim">Personne pour l’instant.</p>'}
+   ${rank.map((r,i)=>`<div class="lb"><b class="serif" style="font-size:20px">${['🥇','🥈','🥉'][i]||i+1}</b><div><b>${r.m.emoji} ${e(nameOf(r.m.id))}${r.m.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${r.all.name} · ${r.all.count} ${r.all.count>1?'films notés':'film noté'}${r.all.streak?` · 🔥 ${r.all.streak} sem.`:''}</div></div><b>${r.s.xp} XP</b></div>`).join('')||'<p class="dim">Personne pour l’instant.</p>'}
    ${pal.length?`<h3 style="margin:18px 0 6px">🌴 Palmes de la saison</h3>${pal.map(p=>`<div class="lb" style="grid-template-columns:1fr auto"><span><b>${p.label}</b> · ${emojiOf(p.id)} ${e(nameOf(p.id))}</span><span class="dim">${p.xp} XP</span></div>`).join('')}`:''}</div>
    <div class="pn"><h3>Badges à décrocher</h3>${badgeSummary()}
    <p class="dim" style="font-size:13px;margin-top:12px">Barème : note +10 · critique +15 · plan marquant +10 · pari gagné +20 · trophée du juge +25 · défi +40 · semaine active +5 · like reçu +2.</p>
@@ -904,7 +905,7 @@ function wrapped(){
   const bestRev=[...rs].filter(r=>r.text).sort((a,b)=>(b.likes||[]).length-(a.likes||[]).length)[0];
   const tg={};rs.forEach(r=>(r.tags||[]).forEach(t=>tg[t]=(tg[t]||0)+1));const topT=Object.entries(tg).sort((a,b)=>b[1]-a[1])[0];
   return`<h2 style="margin-bottom:6px">Mon Wrapped ${yr}</h2><p class="dim" style="margin-bottom:18px">Votre année de cinéma avec l’équipe.</p><div class="big">
-   <div class="pn"><b>${rs.length}</b>films notés</div><div class="pn"><b>${fmt(avg(rs.map(r=>r.stars)))}</b>note moyenne sur 5</div><div class="pn"><b style="font-size:26px">${s.name}</b>${s.xp} XP</div>
+   <div class="pn"><b>${rs.length}</b>${rs.length>1?'films notés':'film noté'}</div><div class="pn"><b>${fmt(avg(rs.map(r=>r.stars)))}</b>note moyenne sur 5</div><div class="pn"><b style="font-size:26px">${s.name}</b>${s.xp} XP</div>
    <div class="pn"><b>${bestStreak(S.meId)}</b>semaines d’affilée, votre record</div>
    <div class="pn"><b style="font-size:24px">${topG?e(topG[0]):'?'}</b>votre genre préféré${topG?` (${topG[1]} films)`:''}</div><div class="pn"><b style="font-size:24px">${fav_f?e(fav_f.title):'?'}</b>votre coup de cœur (${fmt(fav.stars)})</div>
    <div class="pn"><b style="font-size:24px">${dis&&Math.abs(dis.r.stars-dis.h.stars)>=2?e(S.films.find(f=>f.id===dis.r.filmId)?.title||'?'):'?'}</b>votre plus grand désaccord avec Hervé</div>
@@ -974,7 +975,7 @@ function profile(){
   else if(pTab==='journal')body=journalRows(rs,jLimit);
   else if(pTab==='avatar')body=avatarTab();
   else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div></div>`;
-  else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,'films notés')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
+  else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,rs.length>1?'films notés':'film noté')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
     <div class="sect"><h3>Derniers avis</h3><button class="chip" data-act="ptab" data-id="journal">Tout le journal</button></div>${journalRows(rs.slice(0,3))}`;
   return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><button class="av avbtn" style="width:56px;height:56px;font-size:28px" data-act="goavatar" data-tip="Créer ou modifier mon avatar">${emojiOf(S.meId)}<span class="avedit">${icon('pen')}</span></button><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="wrapopen" data-tip="Votre année de cinéma racontée en diapositives animées">${icon('sparkles')} Mon Wrapped</button></div>
