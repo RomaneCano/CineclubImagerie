@@ -26,3 +26,9 @@ Site statique (GitHub Pages) + Supabase pour les comptes et les données.
 
 La roulette et l'autocomplétion de « Proposer un film » interrogent Wikidata (données ouvertes CC0) depuis le navigateur : aucun compte ni clé n'est nécessaire.
 Si Wikidata ne répond pas, la roulette retombe sur un catalogue local de 281 films.
+
+## Fiche de chaque film
+
+À la proposition d'un film, l'app complète automatiquement la fiche (affiche, année, durée, réalisation, distribution, synopsis, lien Wikipédia) depuis Wikidata et Wikipédia (CC0 / CC BY-SA), sans clé.
+Pour ajouter la note du public, des avis publics et un synopsis plus complet en français, créez une clé API gratuite sur https://www.themoviedb.org/settings/api et collez-la dans `tmdbKey` (config.js). Les données TMDB sont affichées avec leur mention de source.
+Hervé peut relancer la recherche avec « Actualiser les infos » dans la fiche du film.
