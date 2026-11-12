@@ -121,7 +121,7 @@ CAT.push(...[["Le Parrain", 1972, "Francis Ford Coppola", "Policier"], ["Taxi Dr
 let sb=null;
 const S={films:[],ratings:[],members:[],cfg:{},live:null,ideas:[],duels:[],dvotes:[],chals:[],watch:[],names:{},meId:null,isOwner:false,ready:false,db:null,assets:null,dl:null};
 let authTab='in',authMsg='',view='home',filter='all',q='',film=null,adding=false,prefill=null,dTxt=null,dShot=null,posterUrl='',addNote=0,bet=0,seasonMode='season',showRemind=false,lastLive=null;
-const R={pool:[],angle:0,spinning:false,result:null,genre:'all',src:'mix'};
+const R={pool:[],angle:0,spinning:false,result:null,genre:'all',src:'wd',loading:false,err:'',tried:false};
 
 const member=id=>S.members.find(m=>m.id===id);
 const isDir=()=>!!S.meId&&S.cfg.directorId===S.meId;
@@ -283,12 +283,13 @@ function addModal(){const p=prefill||{};
   return`<div class="modal" data-act="close"><div class="sheet" data-stop style="width:min(620px,100%)" role="dialog" aria-label="Proposer un film"><button class="x" data-act="close" aria-label="Fermer">✕</button>
    <h2>Proposer un film</h2><p class="dim">Un titre, un mot pour l’équipe. Entrée pour publier.</p>
    <form id="addf" style="display:grid;gap:12px;margin-top:16px">
-    <div class="field"><label for="ft">Titre</label><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"></div>
+    <div class="field"><label for="ft">Titre</label><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"><span class="dim" style="font-size:12px">Tapez 3 lettres : la base mondiale Wikidata propose les films et remplit les champs.</span></div>
+    <div id="sug" class="sug"></div>
     <div class="field"><label for="fpitch">Pourquoi je vous le propose</label><textarea name="pitch" id="fpitch" rows="2"></textarea></div>
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||'Drame')}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:170px"><label for="fth">Thème de la BU</label><select name="theme" id="fth"><option value="">Aucun</option>${THEMES.map(t=>`<option>${t}</option>`).join('')}</select></div><div class="field" style="flex:1;min-width:170px"><label for="fw">Où le voir</label><input name="where" id="fw" placeholder="Netflix, Prime, cinéma, DVD…"></div></div>
     <div class="field"><label for="fask">Question pour la réunion (optionnel)</label><input name="ask" id="fask" placeholder="Que dit ce film de notre façon de regarder une image ?"></div>
-    <div class="field"><label for="fp">Affiche (adresse d’une image, optionnel)</label><input id="fp" name="posterurl" type="url" placeholder="https://…"></div>
+    <div class="field"><label for="fp">Affiche (adresse d’une image, optionnel)</label><input id="fp" name="posterurl" type="url" placeholder="https://…" value="${e(p.poster||'')}"></div>
     <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
     <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Programmer pour plus tard</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
@@ -354,7 +355,7 @@ function profile(){
    <h3 style="margin-bottom:6px">Mon journal</h3><div class="pn">${rs.map(r=>{const f=S.films.find(x=>x.id===r.filmId);return f?`<div class="rev row" style="cursor:pointer;flex-wrap:wrap" data-act="open" data-id="${f.id}"><b style="min-width:140px">${e(f.title)}</b>${stars(r.stars,null,1)}<span class="dim" style="flex:1;min-width:0">${e(r.text)}</span></div>`:''}).join('')||'<p class="dim">Votre journal est vide. Notez un premier film !</p>'}</div>`}
 
 /* roulette */
-function buildPool(){
+function buildLocal(){
   const have=new Set(S.films.map(f=>f.title.toLowerCase())),seen=new Set();
   const ideas=S.ideas.map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||'Drame',from:'idea',id:i.id}));
   const cat=CAT.map(([title,year,director,genre])=>({title,year,director,genre,from:'cat'}));
@@ -362,6 +363,67 @@ function buildPool(){
   R.total=p.length;if(!R.seen)R.seen=new Set();
   let fresh=p.filter(x=>!R.seen.has(x.title));if(fresh.length<12){R.seen=new Set();fresh=p}
   R.pool=[...fresh.filter(x=>x.from==='idea').slice(0,4),...fresh.filter(x=>x.from!=='idea')].slice(0,12);R.pool=shuffle(R.pool);R.pool.forEach(x=>R.seen.add(x.title));R.result=null}
+
+/* Wikidata : base ouverte (CC0), interrogée depuis le navigateur */
+const WDG={'Drame':'Q130232','Comédie':'Q157443','Science-fiction':'Q471839','Thriller':'Q2484376','Documentaire':'Q93204','Animation':'Q202866','Policier':'Q959790'};
+const WDQ=Object.fromEntries(Object.entries(WDG).map(([k,v])=>[v,k]));
+async function wdGet(url,ms=20000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{const r=await fetch(url,{signal:c.signal});if(!r.ok)throw new Error('http '+r.status);return await r.json()}finally{clearTimeout(t)}}
+const sparql=q=>wdGet('https://query.wikidata.org/sparql?format=json&query='+encodeURIComponent(q));
+const qidOf=u=>u.slice(u.lastIndexOf('/')+1);
+const LBL='SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }';
+function wdRows(j){const m=new Map();
+  (j.results?.bindings||[]).forEach(b=>{const id=qidOf(b.f.value),t=b.fLabel?.value||'';if(!t||/^Q\d+$/.test(t))return;
+    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',from:'wd'};
+    if(b.year&&(!o.year||+b.year.value<+o.year))o.year=b.year.value;
+    if(b.dLabel&&!o.director&&!/^Q\d+$/.test(b.dLabel.value))o.director=b.dLabel.value;
+    if(b.gq){const g=WDQ[qidOf(b.gq.value)];if(g)o.genre=g}
+    if(b.pf&&!o.poster)o.poster=b.pf.value.replace(/^http:/,'https:')+'?width=400';
+    m.set(id,o)});
+  return[...m.values()]}
+async function wdPool(genre,off){
+  const key=genre+'|'+off;R.wd=R.wd||{};if(R.wd[key])return R.wd[key];
+  const gs=(genre==='all'?Object.values(WDG):[WDG[genre]]).map(x=>'wd:'+x).join(' ');
+  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel WHERE {
+    { SELECT ?f (MIN(?y) AS ?year) (SAMPLE(?g) AS ?gq) (MAX(?s) AS ?sl) WHERE {
+        VALUES ?g { ${gs} }
+        VALUES ?c { wd:Q11424 wd:Q202866 wd:Q93204 }
+        ?f wdt:P31 ?c . ?f wdt:P31|wdt:P136 ?g . ?f wdt:P577 ?date . ?f wikibase:sitelinks ?s .
+        BIND(YEAR(?date) AS ?y) FILTER(?s >= 12)
+      } GROUP BY ?f ORDER BY DESC(?sl) LIMIT 300 OFFSET ${off} }
+    OPTIONAL { ?f wdt:P57 ?d }
+    ${LBL} }`;
+  const rows=wdRows(await sparql(q));R.wd[key]=rows;return rows}
+async function wdPoster(qid){
+  const j=await sparql(`SELECT ?pf ?im WHERE { OPTIONAL { wd:${qid} wdt:P3383 ?pf } OPTIONAL { wd:${qid} wdt:P18 ?im } } LIMIT 1`);
+  const b=j.results?.bindings?.[0];const u=b?.pf?.value||b?.im?.value;return u?u.replace(/^http:/,'https:')+'?width=400':''}
+async function wdSearch(text){
+  const u=c=>'https://www.wikidata.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent('haswbstatement:P31='+c+' '+text)+'&srlimit=6&format=json&origin=*';
+  const rs=await Promise.all(['Q11424','Q202866','Q93204'].map(c=>wdGet(u(c),10000).catch(()=>null)));
+  const ids=[...new Set(rs.flatMap(r=>(r?.query?.search||[]).map(x=>x.title)))].filter(x=>/^Q\d+$/.test(x)).slice(0,8);
+  if(!ids.length)return[];
+  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
+    OPTIONAL { ?f wdt:P577 ?date } BIND(YEAR(?date) AS ?year) OPTIONAL { ?f wdt:P57 ?d } OPTIONAL { ?f wdt:P136 ?gq } OPTIONAL { ?f wdt:P3383 ?pf } ${LBL} }`;
+  return wdRows(await sparql(q)).sort((a,b)=>ids.indexOf(a.qid)-ids.indexOf(b.qid))}
+async function buildPool(){
+  R.result=null;R.err='';
+  if(R.src!=='wd'){buildLocal();R.loading=false;return render()}
+  R.loading=true;R.pool=[];render();
+  try{
+    const have=new Set(S.films.map(f=>f.title.toLowerCase()));
+    const ideas=shuffle(S.ideas.map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||'Drame',from:'idea',id:i.id}))).filter(x=>R.genre==='all'||x.genre===R.genre).slice(0,3);
+    R.wdSeen=R.wdSeen||new Set();R.offs=R.offs||{};
+    let rows=[];
+    for(let tries=0;tries<3&&rows.length<6;tries++){
+      const used=R.offs[R.genre]=R.offs[R.genre]||new Set();
+      let opts=[0,300,600,900,1200,1800,2400,3000,3600,4500].filter(o=>!used.has(o));
+      if(!opts.length){used.clear();R.wdSeen.clear();opts=[0,300,600,900]}
+      const off=opts[Math.floor(Math.random()*opts.length)];used.add(off);
+      rows=(await wdPool(R.genre,off)).filter(x=>!have.has(x.title.toLowerCase())&&!R.wdSeen.has(x.qid))}
+    if(rows.length<2)throw new Error('vide');
+    const pick=shuffle(rows).slice(0,12-ideas.length);pick.forEach(x=>R.wdSeen.add(x.qid));
+    R.pool=shuffle([...ideas,...pick])}
+  catch(x){R.err='La base en ligne ne répond pas : catalogue local utilisé.';buildLocal()}
+  R.loading=false;render()}
 function drawWheel(){const c=$('#wheel');if(!c||!R.pool.length)return;const x=c.getContext('2d'),W=c.width,cx=W/2,r=W/2-8,n=R.pool.length,seg=2*Math.PI/n;x.clearRect(0,0,W,W);
   for(let i=0;i<n;i++){x.beginPath();x.moveTo(cx,cx);x.arc(cx,cx,r,R.angle+i*seg,R.angle+(i+1)*seg);x.closePath();x.fillStyle=GRAD[i%6][i%2?1:0];x.fill();x.strokeStyle='#0f0e14';x.lineWidth=3;x.stroke();
     x.save();x.translate(cx,cx);x.rotate(R.angle+(i+.5)*seg);x.textAlign='right';x.fillStyle='#fff';const t=R.pool[i].title;x.font=(t.length>15?'600 14px':'600 16px')+' Inter,sans-serif';x.fillText(t.length>19?t.slice(0,18)+'…':t,r-18,6);x.restore()}
@@ -371,17 +433,17 @@ function spin(){if(R.spinning||R.pool.length<2)return;R.spinning=true;R.result=n
     if(k<1)requestAnimationFrame(step);else{R.spinning=false;const seg=2*Math.PI/R.pool.length,th=((-Math.PI/2-R.angle)%(2*Math.PI)+2*Math.PI)%(2*Math.PI);R.result=R.pool[Math.min(R.pool.length-1,Math.floor(th/seg))];render()}};
   requestAnimationFrame(step)}
 function rouletteView(){
-  if(!isDir())return'';if(!R.pool.length&&!R.result)buildPool();
+  if(!isDir())return'';if(!R.pool.length&&!R.result&&!R.loading&&!R.tried){R.tried=true;setTimeout(buildPool,0)}
   const rs=R.result;
   return`<h2 style="margin-bottom:4px">La roulette 🎡</h2><p class="dim" style="margin-bottom:16px">En panne d’inspiration ? Laissez le hasard choisir parmi vos idées et une sélection de classiques.</p>
-   <div class="bar"><button class="chip ${R.src==='mix'?'on':''}" data-act="rsrc" data-id="mix">Idées et classiques</button><button class="chip ${R.src==='ideas'?'on':''}" data-act="rsrc" data-id="ideas">Mes idées seulement</button><span style="width:10px"></span>
+   ${R.err?`<p style="color:var(--bad);font-size:14px;margin-bottom:10px">${e(R.err)}</p>`:''}<div class="bar"><button class="chip ${R.src==='wd'?'on':''}" data-act="rsrc" data-id="wd">Base mondiale</button><button class="chip ${R.src==='mix'?'on':''}" data-act="rsrc" data-id="mix">Classiques</button><button class="chip ${R.src==='ideas'?'on':''}" data-act="rsrc" data-id="ideas">Mes idées seulement</button><span style="width:10px"></span>
     <button class="chip ${R.genre==='all'?'on':''}" data-act="rgenre" data-id="all">Tous genres</button>${GENRES.map(g=>`<button class="chip ${R.genre===g?'on':''}" data-act="rgenre" data-id="${g}">${g}</button>`).join('')}</div>
    <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr));align-items:start"><div>
-    ${R.pool.length>=2?`<div class="wheelbox"><div class="ptr"></div><canvas id="wheel" width="440" height="440" aria-label="Roulette des films"></canvas></div>
-    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn" data-act="spin" ${R.spinning?'disabled':''}>${R.spinning?'La roue tourne…':'Tourner la roulette'}</button><button class="btn ghost" data-act="reshuffle">Nouveau tirage</button></div><p class="dim" style="text-align:center;font-size:13px;margin-top:8px">${R.total} films possibles avec ces filtres. Chaque nouveau tirage propose d’autres titres.</p>`
+    ${R.loading?`<div class="pn empty dim">Chargement de la base mondiale de films…</div>`:R.pool.length>=2?`<div class="wheelbox"><div class="ptr"></div><canvas id="wheel" width="440" height="440" aria-label="Roulette des films"></canvas></div>
+    <div class="row" style="justify-content:center;margin-top:16px"><button class="btn" data-act="spin" ${R.spinning?'disabled':''}>${R.spinning?'La roue tourne…':'Tourner la roulette'}</button><button class="btn ghost" data-act="reshuffle">Nouveau tirage</button></div><p class="dim" style="text-align:center;font-size:13px;margin-top:8px">${R.src==='wd'&&!R.err?'Base mondiale Wikidata (données ouvertes CC0) : des milliers de films, un autre lot à chaque tirage.':R.total+' films possibles avec ces filtres. Chaque nouveau tirage propose d’autres titres.'}</p>`
     :`<div class="pn empty dim">Pas assez de films pour ce filtre. Ajoutez des idées ou changez de genre.</div>`}
     ${rs?`<div class="pn" style="margin-top:18px;text-align:center"><div class="k" style="color:var(--acc);font-size:12px;letter-spacing:.14em">LE HASARD A CHOISI</div><h2 style="margin:6px 0 2px">${e(rs.title)}</h2><div class="meta">${e(rs.year)}${rs.director?' · '+e(rs.director):''} · ${e(rs.genre)}</div>
-      <div class="row" style="justify-content:center;margin-top:14px;flex-wrap:wrap"><button class="btn" data-act="rpropose">Le proposer à l’équipe</button>${rs.from==='cat'?'<button class="chip" data-act="rkeep">Garder en idée</button>':''}</div></div>`:''}</div>
+      <div class="row" style="justify-content:center;margin-top:14px;flex-wrap:wrap"><button class="btn" data-act="rpropose">Le proposer à l’équipe</button>${rs.from!=='idea'?'<button class="chip" data-act="rkeep">Garder en idée</button>':''}</div></div>`:''}</div>
    <div class="pn"><h3>📝 Mes idées pour plus tard</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">Notez un titre dès qu’il vous passe par la tête. La roulette piochera dedans.</p>
     <form id="ideaf" class="row"><input id="idt" name="title" placeholder="Un titre, puis Entrée" required autocomplete="off"><button class="btn">Ajouter</button></form>
     <div style="margin-top:10px">${S.ideas.map(i=>`<div class="lb" style="grid-template-columns:1fr auto auto"><span><b>${e(i.title)}</b><span class="dim"> ${e(i.year||'')}${i.director?' · '+e(i.director):''}</span></span><button class="chip" data-act="ipropose" data-id="${i.id}">Proposer</button><button class="chip" data-act="idel" data-id="${i.id}" aria-label="Retirer">✕</button></div>`).join('')||'<p class="dim">Aucune idée pour l’instant.</p>'}</div></div></div>`}
@@ -457,15 +519,18 @@ document.addEventListener('click',async ev=>{
   else if(act==='remind'){showRemind=!showRemind;render()}
   else if(act==='copyrm'){const ta=$('#rm');try{await navigator.clipboard.writeText(ta.value);toast('Message copié')}catch{ta.select();toast('Sélectionné : copiez avec Ctrl+C')}}
   else if(act==='export'){try{await S.dl.save({filename:'saison-cine-club.csv',data:csvExport()})}catch{}}
-  else if(act==='rsrc'){R.src=id;buildPool();render()}
-  else if(act==='rgenre'){R.genre=id;buildPool();render()}
-  else if(act==='reshuffle'){buildPool();render()}
+  else if(act==='rsrc'){R.src=id;buildPool()}
+  else if(act==='rgenre'){R.genre=id;buildPool()}
+  else if(act==='reshuffle'){buildPool()}
   else if(act==='spin')spin()
-  else if(act==='rpropose'){prefill=R.result;adding=true;addNote=0;posterUrl='';render();$('#ft')?.focus()}
+  else if(act==='rpropose'){prefill=R.result;adding=true;addNote=0;posterUrl='';render();$('#ft')?.focus();if(prefill?.qid&&!prefill.poster)wdPoster(prefill.qid).then(u=>{const i=$('#fp');if(u&&i&&!i.value)i.value=u}).catch(()=>{})}
   else if(act==='rkeep'){const r=R.result;put('ideas/'+uid(),{title:r.title,year:r.year,director:r.director,genre:r.genre,added:Date.now()}).then(ok=>ok&&toast('Ajouté à vos idées'))}
   else if(act==='ipropose'){prefill=S.ideas.find(x=>x.id===id);adding=true;addNote=0;posterUrl='';render();$('#ft')?.focus()}
   else if(act==='idel')del('ideas/'+id)
 });
+let acT=null;
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(!b)return;const m=JSON.parse(b.dataset.s);
+  $('#ft').value=m.title;$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';if(m.poster)$('#fp').value=m.poster;$('#sug').innerHTML='';$('#fpitch').focus()});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(ev.key==='Escape'){film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
@@ -489,6 +554,8 @@ document.addEventListener('submit',async ev=>{
 document.addEventListener('input',ev=>{
   if(ev.target.id==='q'){q=ev.target.value;render()}
   if(ev.target.id==='txt')dTxt=ev.target.value;
+  if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim();if(v.length<3){const z=$('#sug');if(z)z.innerHTML='';return}
+    acT=setTimeout(async()=>{try{const r=await wdSearch(v);if($('#ft')?.value.trim()!==v)return;$('#sug').innerHTML=r.map(m=>`<button type="button" data-s='${e(JSON.stringify(m))}'>🎞️ <span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span></span></button>`).join('')}catch{}},400)}
   if(ev.target.id==='shot')dShot=ev.target.value;
 });
 /* données : Supabase */

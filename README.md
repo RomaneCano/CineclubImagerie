@@ -21,3 +21,8 @@ Site statique (GitHub Pages) + Supabase pour les comptes et les données.
 - Hervé s'inscrit avec le code directeur (un seul compte possible).
 - Les consultantes s'inscrivent avec le code équipe.
 - Les règles de sécurité sont dans `schema.sql` : seul Hervé peut proposer, programmer, lancer une séance, créer duels et défis, décerner les trophées.
+
+## Base de films
+
+La roulette et l'autocomplétion de « Proposer un film » interrogent Wikidata (données ouvertes CC0) depuis le navigateur : aucun compte ni clé n'est nécessaire.
+Si Wikidata ne répond pas, la roulette retombe sur un catalogue local de 281 films.
