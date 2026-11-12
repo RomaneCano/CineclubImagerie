@@ -133,6 +133,13 @@ nav button{padding:9px 16px}
 .fl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
 .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:8px}
 .hero [data-act=open] .poster{transition:.18s}.hero [data-act=open]:hover .poster{transform:translateY(-3px);box-shadow:0 18px 40px #000a}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:0 -16px;background:#0f0e14cc;backdrop-filter:blur(14px)}.top header{position:static;margin:0;backdrop-filter:none;background:transparent;border-bottom:0}
+.sbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:8px 16px;background:linear-gradient(90deg,#ffcc0038,#ffcc0014);border-top:1px solid #ffcc0066;border-bottom:1px solid #ffcc0066;font-size:14px}.lnk{color:var(--acc);text-decoration:underline;font-weight:600;padding:0}
+.frow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer}.frow:hover{background:var(--panel2)}
+.fthumb{position:relative;width:44px;height:64px;border-radius:6px;background:var(--panel2);overflow:hidden;display:grid;place-items:center;font:700 18px Fraunces;color:var(--mut)}.fthumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fside{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.flist{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}.flist .frow:last-child{border:0}
+.mg{margin-bottom:12px}.mh{display:flex;gap:12px;align-items:center;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left;margin-bottom:14px}.mh b{flex:1;text-transform:capitalize;font:600 18px Fraunces}.mh i{font-style:normal;color:var(--mut);font-size:22px}
+.ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}.ctl select{width:auto}
 </style>
 </head>
 <body>
@@ -380,28 +387,50 @@ function duelBlock(){const d=S.duels.filter(x=>x.open).sort((a,b)=>b.created-a.c
    <div class="vs">VS</div>
    <div>${poster(B,mine?.pick==='b'?'pick':'').replace('class="poster',`data-act="vote" data-id="${d.id}" data-v="b" class="poster`)}${mine||isDir()?`<div style="text-align:center;margin-top:6px"><b class="serif" style="font-size:22px">${nb}</b></div>`:''}</div></div>
    <p class="dim" style="text-align:center;margin-top:10px;font-size:13px">${isDir()?'':mine?'Vote enregistré, vous pouvez le changer en recliquant.':'Cliquez sur l’affiche de votre choix.'}${isDir()?`<br><button class="chip" data-act="closeduel" data-id="${d.id}" data-tip="Ferme le vote et couronne le film en tête">Clore le duel et couronner le gagnant</button>`:''}</p></div>`}
+let homeSort='recent',homeView='grid',homeLimit=24,decSel='',monthState={},dLimit=15,dSort='recent',dQ='',jLimit=15,cLimit=24,revLimit=8,revSort='recent';
+function filmRow(f){const mine=rOf(f.id,S.meId),t=liveOpen(f.id)&&!isDir()?null:avg(team(f.id).map(r=>r.stars));
+  const stt=isDir()?'':mine?'<span class="badge" style="border-color:var(--ok);color:var(--ok)">✔ Noté</span>':'<span class="badge">À noter</span>';
+  return`<div class="frow" data-act="open" data-id="${f.id}" tabindex="0" role="button" aria-label="${e(f.title)}"><div class="fthumb"><span>${e((f.title||'?').slice(0,1))}</span>${f.poster?`<img src="${e(f.poster)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}</div><div style="min-width:0"><b>${e(f.title)}</b><div class="dim" style="font-size:13px">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div></div><div class="fside">${f.featured?'<span class="badge">⭐</span>':''}${stt}${t!=null?`<span class="dim" data-tip="Moyenne de l’équipe">👥 ${fmt(t)}</span>`:''}${mine?stars(mine.stars,null,1):''}</div></div>`}
+function filmsSection(liveF,genres){
+  const sdOf=f=>{const t=team(f.id),a=avg(t.map(r=>r.stars));return t.length>1?Math.sqrt(avg(t.map(r=>(r.stars-a)**2))):0};
+  const decs=[...new Set(liveF.map(f=>+f.year).filter(y=>y>1800).map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a);
+  let list=liveF.filter(f=>!q||norm(f.title+' '+(f.director||'')+' '+f.genre+' '+f.year).includes(norm(q)));
+  if(filter==='todo')list=list.filter(f=>!rOf(f.id,S.meId));else if(filter==='done')list=list.filter(f=>rOf(f.id,S.meId));else if(filter==='watch')list=list.filter(f=>watching(f.id));else if(filter.startsWith('g:'))list=list.filter(f=>f.genre===filter.slice(2));
+  if(decSel)list=list.filter(f=>Math.floor(+f.year/10)*10===+decSel);
+  const sorts={recent:['Les plus récents',(a,b)=>b.added-a.added],top:['Les mieux notés',(a,b)=>(avg(team(b.id).map(r=>r.stars))??-1)-(avg(team(a.id).map(r=>r.stars))??-1)],az:['Titre A à Z',(a,b)=>a.title.localeCompare(b.title,'fr')],year:['Année (récents d’abord)',(a,b)=>(+b.year||0)-(+a.year||0)]};
+  if(isDir())sorts.divis=['Les plus divisifs',(a,b)=>sdOf(b)-sdOf(a)];else sorts.todo=['À noter d’abord',(a,b)=>(rOf(a.id,S.meId)?1:0)-(rOf(b.id,S.meId)?1:0)||b.added-a.added];
+  if(!sorts[homeSort])homeSort='recent';
+  list.sort(sorts[homeSort][1]);
+  const grouped=homeSort==='recent'&&!q&&filter==='all'&&!decSel;
+  const view=fs=>homeView==='list'?`<div class="flist">${fs.map(filmRow).join('')}</div>`:`<div class="grid">${fs.map(card).join('')}</div>`;
+  let body;
+  if(!list.length)body='<div class="pn dim empty">Aucun film dans cette sélection.</div>';
+  else if(grouped){const groups=[];list.forEach(f=>{const k=monthKey(f.added);let g=groups.find(x=>x.k===k);if(!g)groups.push(g={k,fs:[]});g.fs.push(f)});
+    body=groups.map((g,i)=>{const open=monthState[g.k]!==undefined?monthState[g.k]:i<2,[y,m]=g.k.split('-'),lab=new Date(+y,+m-1,1).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+      return`<div class="mg"><button class="mh" data-act="mtoggle" data-id="${g.k}" aria-expanded="${open}"><b>${lab}</b><span class="dim">${g.fs.length} film${g.fs.length>1?'s':''}</span><i>${open?'−':'+'}</i></button>${open?view(g.fs):''}</div>`}).join('')}
+  else body=view(list.slice(0,homeLimit))+(list.length>homeLimit?`<div style="text-align:center;margin-top:18px"><button class="btn ghost" data-act="more" data-id="home">Afficher plus (${list.length-homeLimit} restants)</button></div>`:'');
+  return`<div class="sect" style="flex-wrap:wrap"><h3>Toutes les séances</h3><span class="dim">${list.length} film${list.length>1?'s':''}</span><span style="flex:1"></span><input class="search" id="q" placeholder="Rechercher ( / )" data-tip="Cherche dans le titre, la réalisation, le genre et l’année" value="${e(q)}" aria-label="Rechercher un film"></div>
+   <div class="bar"><button class="chip ${filter==='all'?'on':''}" data-act="filter" data-id="all">Tous</button>
+   ${isDir()?'':`<button class="chip ${filter==='todo'?'on':''}" data-act="filter" data-id="todo" data-tip="Les films que vous n’avez pas encore notés">À noter (${liveF.filter(f=>!rOf(f.id,S.meId)).length})</button><button class="chip ${filter==='done'?'on':''}" data-act="filter" data-id="done" data-tip="Les films que vous avez déjà notés">Déjà notés</button><button class="chip ${filter==='watch'?'on':''}" data-act="filter" data-id="watch" data-tip="Les films de votre liste « À voir plus tard »">🔖 Ma liste</button>`}
+   ${genres.map(g=>`<button class="chip ${filter==='g:'+g?'on':''}" data-act="filter" data-id="g:${e(g)}">${e(g)}</button>`).join('')}</div>
+   <div class="ctl"><label class="dim" for="hsort">Trier</label><select id="hsort">${Object.entries(sorts).map(([k,v])=>`<option value="${k}" ${homeSort===k?'selected':''}>${v[0]}</option>`).join('')}</select>${decs.length>1?`<label class="dim" for="hdec">Époque</label><select id="hdec"><option value="">Toutes</option>${decs.map(d=>`<option value="${d}" ${String(decSel)===String(d)?'selected':''}>Années ${d}</option>`).join('')}</select>`:''}<span style="flex:1"></span><button class="chip ${homeView==='grid'?'on':''}" data-act="hview" data-id="grid" data-tip="Affichage en affiches">▦ Affiches</button><button class="chip ${homeView==='list'?'on':''}" data-act="hview" data-id="list" data-tip="Affichage en liste compacte, pratique avec beaucoup de films">☰ Liste</button></div>${body}`}
 function home(){
   const films=[...S.films].sort((a,b)=>b.added-a.added),liveF=films.filter(f=>f.status!=='upcoming'),up=films.filter(f=>f.status==='upcoming');
   const feat=films.find(f=>f.featured)||liveF[0],genres=[...new Set(liveF.map(f=>f.genre))];
-  let list=liveF.filter(f=>!q||(f.title+(f.director||'')+f.genre).toLowerCase().includes(q.toLowerCase()));
-  if(filter==='todo')list=list.filter(f=>!rOf(f.id,S.meId));else if(filter==='done')list=list.filter(f=>rOf(f.id,S.meId));else if(filter==='watch')list=list.filter(f=>watching(f.id));else if(filter.startsWith('g:'))list=list.filter(f=>f.genre===filter.slice(2));
   let h=banners(films);
   if(!films.length){
     return h+(isDir()?`<div class="pn empty"><h2>Votre première séance</h2><p class="dim" style="margin-bottom:18px">Un titre, une phrase pour l’équipe, et c’est publié. En panne d’idée ? La roulette est là.</p><div class="row" style="justify-content:center"><button class="btn" data-act="add">Proposer un film</button><button class="btn ghost" data-act="nav" data-id="roulette">Tourner la roulette 🎡</button></div></div>`
      :`<div class="pn empty"><h2>La salle est encore vide</h2><p class="dim">Hervé n’a pas encore proposé de film. Les séances apparaîtront ici.</p></div>`)}
   if(feat&&filter==='all'){const mine=rOf(feat.id,S.meId),dh=dirOf(feat.id),lo=liveOpen(feat.id);
     h+=`<section class="hero"><div data-act="open" data-id="${feat.id}" data-tip="Ouvrir la fiche du film" style="cursor:pointer" tabindex="0" role="button" aria-label="Ouvrir la fiche de ${e(feat.title)}">${poster(feat)}</div><div class="wrap"><div class="k">⭐ ${feat.status==='upcoming'?'Prochain film de la semaine':'Le film de la semaine'}</div><h2>${e(feat.title)}</h2>
-     <div class="meta">${[feat.year,feat.director,feat.genre].filter(Boolean).map(e).join(' · ')}</div>${tvLabel(feat)?`<div class="meta" style="color:var(--acc);margin-top:4px">${e(tvLabel(feat))}</div>`:''}
+     <div class="meta">${[feat.year,feat.director,feat.genre].filter(Boolean).map(e).join(' · ')}</div>${feat.seanceAt?`<div class="meta" style="color:var(--ok);margin-top:4px">📅 Séance : ${e(seanceFull(feat.seanceAt))}${feat.seancePlace?' · '+e(feat.seancePlace):''}</div>`:''}${tvLabel(feat)?`<div class="meta" style="color:var(--acc);margin-top:4px">${e(tvLabel(feat))}</div>`:''}
      ${feat.pitch?`<div class="pitch">« ${e(feat.pitch)} »<div class="meta" style="font-style:normal;margin-top:4px">Hervé</div></div>`:''}${feat.synopsis?`<p class="dim" style="margin-bottom:12px;font-size:14px">${e(feat.synopsis.slice(0,220))}${feat.synopsis.length>220?'…':''}${feat.runtime?` · ${hm(feat.runtime)}`:''}</p>`:''}
      ${feat.status==='upcoming'?`<p class="meta" style="margin:10px 0">🗓️ Les notes ouvriront bientôt. En attendant, découvrez la fiche.</p><button class="btn ghost" data-act="open" data-id="${feat.id}">Voir la fiche</button>`:isDir()?`<div class="meta">${team(feat.id).length} avis de l’équipe${lo?'':' · moyenne '+fmt(avg(team(feat.id).map(r=>r.stars)))}</div><div style="margin-top:14px"><button class="btn ghost" data-act="open" data-id="${feat.id}">Voir la fiche et les avis</button></div>`:
       `<div style="display:grid;gap:12px">${verdictRow(feat.id,mine)}<div class="row" style="flex-wrap:wrap"><span class="dim">Ou notez finement</span>${stars(mine?.stars||0,'quick:'+feat.id)}<button class="btn ghost" data-act="open" data-id="${feat.id}">${mine?'Voir les avis':'Écrire un avis'}</button></div></div>
        ${!mine&&dh?'<p class="meta" style="margin-top:10px">🔒 La note d’Hervé se révèle quand vous avez noté. Un pari sur sa note rapporte +20 XP.</p>':''}`}</div></section>`}
   if(filter==='all')h+=duelBlock()+chalCards();
   if(up.filter(f=>f!==feat).length&&filter==='all')h+=`<div class="sect"><h3>Prochainement</h3><span class="dim">annoncés par Hervé, bientôt notables</span></div><div class="grid" style="margin-bottom:10px">${up.filter(f=>f!==feat).map(card).join('')}</div>`;
-  h+=`<div class="sect" style="flex-wrap:wrap"><h3>Toutes les séances</h3><span style="flex:1"></span><input class="search" id="q" placeholder="Rechercher un film ( / )" value="${e(q)}" aria-label="Rechercher un film"></div><div class="bar"><button class="chip ${filter==='all'?'on':''}" data-act="filter" data-id="all">Tous</button>
-   ${isDir()?'':`<button class="chip ${filter==='todo'?'on':''}" data-act="filter" data-id="todo" data-tip="Les films que vous n’avez pas encore notés">À noter (${liveF.filter(f=>!rOf(f.id,S.meId)).length})</button><button class="chip ${filter==='done'?'on':''}" data-act="filter" data-id="done" data-tip="Les films que vous avez déjà notés">Déjà notés</button><button class="chip ${filter==='watch'?'on':''}" data-act="filter" data-id="watch" data-tip="Les films de votre liste « À voir plus tard »">🔖 Ma liste</button>`}
-   ${genres.map(g=>`<button class="chip ${filter==='g:'+g?'on':''}" data-act="filter" data-id="g:${e(g)}">${e(g)}</button>`).join('')}</div>`;
-  h+=list.length?`<div class="grid">${list.map(card).join('')}</div>`:`<div class="pn dim empty">Aucun film dans cette sélection.</div>`;
+  h+=filmsSection(liveF,genres);
   if(isDir())h+=`<button class="btn fab" data-act="add">＋ Proposer un film</button>`;
   return h}
 function filmModal(){
@@ -410,11 +439,14 @@ function filmModal(){
   const reveal=isDir()||(mine&&!lo),gate=!isDir()&&!mine&&!up;
   const revs=S.ratings.filter(r=>r.filmId===f.id&&(r.text||r.shot||r.gif||isDir()||mine)&&(isDir()||!lo)).sort((a,b)=>b.ts-a.ts);
   const showRevs=isDir()||(mine&&!lo),t=avg(team(f.id).map(r=>r.stars));
+  const revsShown=(revSort==='liked'?[...revs].sort((a,b)=>(b.likes||[]).length-(a.likes||[]).length||b.ts-a.ts):revs).slice(0,revLimit);
+  const revCtl=revs.length>3?`<div class="row" style="gap:6px;margin:6px 0 4px"><span class="dim" style="font-size:13px">${revs.length} avis · trier</span><button class="chip ${revSort==='recent'?'on':''}" data-act="rsort" data-id="recent">Récents</button><button class="chip ${revSort==='liked'?'on':''}" data-act="rsort" data-id="liked">Les plus aimés</button></div>`:'';
+  const revMore=revs.length>revLimit?`<div style="text-align:center;margin-top:10px"><button class="btn ghost" data-act="rmore">Voir les ${revs.length-revLimit} autres avis</button></div>`:'';
   const tagsSel=mine?.tags||[],txt=dTxt??mine?.text??'',shot=dShot??mine?.shot??'',gif=dGif??mine?.gif??'';
   const isLiveF=S.live&&S.live.filmId===f.id;
   return`<div class="modal" data-act="close"><div class="sheet" data-stop role="dialog" aria-label="${e(f.title)}"><button class="x" data-act="close" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="fnav"><button class="chip" data-act="fprev" data-tip="Film précédent (touche ←)" aria-label="Film précédent">←</button><button class="chip" data-act="fnext" data-tip="Film suivant (touche →)" aria-label="Film suivant">→</button></div>
    <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>
-    <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${f.where?`<span class="badge">📍 ${e(f.where)}</span>`:''}${tvLabel(f)?`<span class="badge" style="border-color:var(--acc);color:var(--acc)">${e(tvLabel(f))}</span>`:''}${up?'<span class="badge">Bientôt à l’affiche</span>':''}</div>
+    <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${f.where?`<span class="badge">📍 ${e(f.where)}</span>`:''}${f.seanceAt?`<span class="badge" style="border-color:var(--ok);color:var(--ok)">📅 Séance : ${e(seanceFull(f.seanceAt))}${f.seancePlace?' · '+e(f.seancePlace):''}</span>`:''}${tvLabel(f)?`<span class="badge" style="border-color:var(--acc);color:var(--acc)">${e(tvLabel(f))}</span>`:''}${up?'<span class="badge">Bientôt à l’affiche</span>':''}</div>
     ${f.pitch?`<div class="pitch">« ${e(f.pitch)} »</div>`:''}
     ${(()=>{const meta=[f.runtime?`<span class="badge">🕒 ${hm(f.runtime)}</span>`:'',f.country?`<span class="badge">🌍 ${e(f.country)}</span>`:'',f.tmdb&&f.tmdb.votes&&(isDir()||(mine&&!lo))?`<span class="badge">★ ${String(f.tmdb.rating.toFixed(1)).replace('.',',')} sur 10 · ${f.tmdb.votes} votes publics</span>`:''].filter(Boolean).join('');
      return `${meta?`<div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${meta}</div>`:''}${f.cast&&f.cast.length?`<p class="dim" style="margin-top:10px;font-size:14px">Avec ${f.cast.map(e).join(', ')}</p>`:''}${f.synopsis?`<p style="margin:10px 0;color:#dcd9e6;line-height:1.55">${e(f.synopsis)}</p>`:''}${f.synopsis||f.wiki?`<p class="dim" style="font-size:12px">Sources : ${f.wiki?`<a href="${e(f.wiki)}" target="_blank" rel="noopener" style="color:var(--acc)">Wikipédia</a> (CC BY-SA), `:''}Wikidata${f.tmdb?', TMDB':''}.</p>`:''}`})()}
@@ -438,10 +470,10 @@ function filmModal(){
    ${up?'':`
    ${f.tmdb&&f.tmdb.reviews&&f.tmdb.reviews.length&&reveal?`<h3 style="margin:24px 0 4px">Ce qu’en dit le public</h3><p class="dim" style="font-size:12px">Avis publics issus de TMDB, souvent rédigés en anglais.</p>${f.tmdb.reviews.map(r=>`<div class="rev"><b>${e(r.a)}</b>${r.r!=null?` <span class="dim">${r.r} sur 10</span>`:''}<p class="tx" style="margin-left:0">${e(r.t)}${r.t.length>=500?'…':''}</p></div>`).join('')}`:''}
    <h3 style="margin:24px 0 4px">Les avis de l’équipe</h3>
-   ${showRevs&&revs.length?revs.map(r=>{const liked=(r.likes||[]).includes(S.meId),tr=r.trophy?TROPHIES[r.trophy]:null;return`<div class="rev"><div class="row" style="flex-wrap:wrap"><span class="av">${emojiOf(r.userId)}</span><b>${e(nameOf(r.userId))}</b>${roleOf(r.userId)==='director'?'<span class="badge">Hervé</span>':''}${stars(r.stars,null,1)}${r.verdict?`<span title="${VERDICTS[r.verdict][1]}">${VERDICTS[r.verdict][0]}</span>`:''}${tr?`<span class="badge">${tr[0]} ${tr[1]}</span>`:''}<span class="sp"></span><button class="chip ${liked?'on':''}" data-act="like" data-id="${e(r.id)}" aria-label="J’aime" data-tip="J’aime cet avis">❤ ${(r.likes||[]).length||''}</button></div>
+   ${showRevs&&revs.length?revCtl+revsShown.map(r=>{const liked=(r.likes||[]).includes(S.meId),tr=r.trophy?TROPHIES[r.trophy]:null;return`<div class="rev"><div class="row" style="flex-wrap:wrap"><span class="av">${emojiOf(r.userId)}</span><b>${e(nameOf(r.userId))}</b>${roleOf(r.userId)==='director'?'<span class="badge">Hervé</span>':''}${stars(r.stars,null,1)}${r.verdict?`<span title="${VERDICTS[r.verdict][1]}">${VERDICTS[r.verdict][0]}</span>`:''}${tr?`<span class="badge">${tr[0]} ${tr[1]}</span>`:''}<span class="sp"></span><button class="chip ${liked?'on':''}" data-act="like" data-id="${e(r.id)}" aria-label="J’aime" data-tip="J’aime cet avis">❤ ${(r.likes||[]).length||''}</button></div>
      ${r.text?`<p class="tx">${e(r.text)}</p>`:''}${r.shot?`<p class="tx dim">🎞️ Plan marquant : ${e(r.shot)}</p>`:''}${r.gif&&gifUrl(r.gif)?`<img class="rg" src="${e(gifUrl(r.gif))}" alt="GIF de l’avis" loading="lazy" referrerpolicy="no-referrer">`:''}${(r.tags||[]).length?`<div class="tx">${(r.tags||[]).map(x=>`<span class="badge" style="margin:0 4px 4px 0">${e(x)}</span>`).join('')}</div>`:''}
      ${r.bet!=null&&reveal&&dh&&roleOf(r.userId)!=='director'?`<div class="dim tx" style="font-size:13px">🎯 Pari ${fmt(r.bet)} · ${Math.abs(r.bet-dh.stars)<=1?'<span style="color:var(--ok)">gagné +20 XP</span>':'raté'}</div>`:''}
-     ${isDir()&&roleOf(r.userId)!=='director'?`<div class="trow">${Object.entries(TROPHIES).map(([k,[em,l]])=>`<button class="chip tro ${r.trophy===k?'on':''}" data-act="trophy" data-id="${e(r.id)}" data-v="${k}" data-tip="Décerner le trophée « ${l.toLowerCase()} » : +25 XP pour l’auteur·rice">${em} ${l}</button>`).join('')}</div>`:''}</div>`}).join(''):`<p class="dim">${showRevs?'Pas encore d’avis. Ouvrez le bal !':'🔒 Les avis des collègues apparaissent après votre note'+(lo?' et la révélation de la séance.':'.')}</p>`}`}
+     ${isDir()&&roleOf(r.userId)!=='director'?`<div class="trow">${Object.entries(TROPHIES).map(([k,[em,l]])=>`<button class="chip tro ${r.trophy===k?'on':''}" data-act="trophy" data-id="${e(r.id)}" data-v="${k}" data-tip="Décerner le trophée « ${l.toLowerCase()} » : +25 XP pour l’auteur·rice">${em} ${l}</button>`).join('')}</div>`:''}</div>`}).join('')+revMore:`<p class="dim">${showRevs?'Pas encore d’avis. Ouvrez le bal !':'🔒 Les avis des collègues apparaissent après votre note'+(lo?' et la révélation de la séance.':'.')}</p>`}`}
   </div></div>`}
 function addModal(){const p=prefill||{};
   return`<div class="modal" data-act="close"><div class="sheet" data-stop style="width:min(620px,100%)" role="dialog" aria-label="Proposer un film"><button class="x" data-act="close" aria-label="Fermer">✕</button>
@@ -453,25 +485,29 @@ function addModal(){const p=prefill||{};
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||'Drame')}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:170px"><label for="fw">Où le voir</label><input name="where" id="fw" placeholder="Netflix, Prime, cinéma, DVD…"></div></div>
     <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:170px"><label for="ftv">Chaîne de diffusion (si télé)</label><input name="tvch" id="ftv" list="tvl" placeholder="Arte, France 2, Canal+…"><datalist id="tvl">${TVCH.map(c=>`<option>${c}</option>`).join('')}</datalist></div><div class="field" style="flex:1;min-width:200px"><label for="ftvd">Date et heure de diffusion</label><input name="tvat" id="ftvd" type="datetime-local"></div></div>
+    <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:200px"><label for="fsa">Date et heure de la séance d’équipe</label><input name="seat" id="fsa" type="datetime-local"></div><div class="field" style="flex:1;min-width:170px"><label for="fsp">Lieu ou lien (salle, Teams…)</label><input name="seplace" id="fsp" placeholder="Salle Lumière, lien Teams…"></div></div>
     <div class="field"><label for="fask">Une question pour l’équipe (optionnel)</label><input name="ask" id="fask" placeholder="Et vous, que pensez-vous de la fin ?"></div>
     <div class="field"><label for="fp">Affiche (remplie automatiquement, modifiable)</label><div class="row"><input id="fp" name="posterurl" type="url" placeholder="https://…" value="${e(p.poster||'')}" style="flex:1"><img id="fpv" class="fpv" alt="Aperçu de l’affiche" ${p.poster?`src="${e(p.poster)}"`:'hidden'}></div></div>
     <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
     <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
 function remindText(){const f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured)||[...S.films].sort((a,b)=>b.added-a.added)[0];
-  return f?`Bonjour à toute l’équipe ! Le film de la semaine est « ${f.title} » (${f.year||'?'}). Votre avis en deux minutes sur le Ciné-Club Imagerie : une note, un mot, et la note d’Hervé se révèle. Il reste ${S.films.filter(x=>x.status!=='upcoming').length?cons().filter(m=>!rOf(f.id,m.id)).length:0} avis à recueillir.`:'Aucun film proposé pour le moment.'}
+  return f?`Bonjour à toute l’équipe ! Le film de la semaine est « ${f.title} » (${f.year||'?'}). ${f.seanceAt?'La séance a lieu '+seanceFull(f.seanceAt)+(f.seancePlace?' ('+f.seancePlace+')':'')+'. ':''}Votre avis en deux minutes sur le Ciné-Club Imagerie : une note, un mot, et la note d’Hervé se révèle. Il reste ${S.films.filter(x=>x.status!=='upcoming').length?cons().filter(m=>!rOf(f.id,m.id)).length:0} avis à recueillir.`:'Aucun film proposé pour le moment.'}
 function dash(){
   if(!isDir())return'';
   const rows=S.films.filter(f=>f.status!=='upcoming').map(f=>{const t=team(f.id),a=avg(t.map(r=>r.stars)),sd=t.length>1?Math.sqrt(avg(t.map(r=>(r.stars-a)**2))):0;
     return{f,a,sd,part:cons().length?t.length/cons().length*100:0,missing:cons().filter(m=>!rOf(f.id,m.id)),h:dirOf(f.id)}}).sort((x,y)=>y.f.added-x.f.added);
   const part=avg(rows.map(r=>r.part)),div=[...rows].sort((a,b)=>b.sd-a.sd)[0];
-  const opts=S.films.map(f=>`<option value="${f.id}">${e(f.title)}</option>`).join('');
+  const opts=S.films.map(f=>`<option value="${e(f.title)}"></option>`).join('');
+  const vrows=rows.filter(r=>!dQ||norm(r.f.title+' '+(r.f.director||'')).includes(norm(dQ))).sort(({recent:(x,y)=>y.f.added-x.f.added,part:(x,y)=>x.part-y.part,gap:(x,y)=>Math.abs((y.h&&y.a!=null?y.a-y.h.stars:0))-Math.abs((x.h&&x.a!=null?x.a-x.h.stars:0)),note:(x,y)=>(y.a??-1)-(x.a??-1),az:(x,y)=>x.f.title.localeCompare(y.f.title,'fr')})[dSort]||((x,y)=>y.f.added-x.f.added));
   return`<h2 style="margin-bottom:16px">Tableau de bord</h2>
    <div class="kpi"><div class="pn"><b>${S.films.length}</b><span class="dim">films proposés</span></div><div class="pn"><b>${Math.round(part||0)}%</b><span class="dim">participation moyenne</span></div><div class="pn"><b>${S.ratings.filter(r=>r.text).length}</b><span class="dim">critiques écrites</span></div><div class="pn"><b style="font-size:20px">${div&&div.sd>=2?e(div.f.title):'Aucun pour l’instant'}</b><span class="dim">le film qui divise le plus</span></div></div>
+   <div class="ctl"><input class="search" id="dq" placeholder="Chercher un film" value="${e(dQ)}" aria-label="Chercher un film"><label class="dim" for="dsort">Trier</label><select id="dsort">${[['recent','Les plus récents'],['part','Participation (faible d’abord)'],['gap','Écart avec l’équipe'],['note','Moyenne de l’équipe'],['az','Titre A à Z']].map(([k,l])=>`<option value="${k}" ${dSort===k?'selected':''}>${l}</option>`).join('')}</select><span class="dim">${vrows.length} film${vrows.length>1?'s':''}</span></div>
    <div class="pn tw"><table><tr><th>Film</th><th>Hervé</th><th>Équipe</th><th>Écart</th><th>Participation</th><th>Pas encore noté</th></tr>
-   ${rows.map(r=>`<tr data-act="open" data-id="${r.f.id}" style="cursor:pointer"><td><b>${e(r.f.title)}</b></td><td>${fmt(r.h?.stars)}</td><td>${fmt(r.a)}</td><td>${r.h&&r.a!=null?(((r.a-r.h.stars)/2>=0?'+':'')+((r.a-r.h.stars)/2).toFixed(1)).replace('.',','):'?'} ${r.sd>=2?'<span class="badge">⚡ divise</span>':''}</td><td>${Math.round(r.part)}%</td><td class="dim">${r.missing.map(m=>m.emoji+' '+e(nameOf(m.id).split(' ')[0])).join(', ')||'Tout le monde ✔'}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">Les chiffres apparaîtront avec le premier film.</td></tr>'}</table></div>
+   ${vrows.slice(0,dLimit).map(r=>`<tr data-act="open" data-id="${r.f.id}" style="cursor:pointer"><td><b>${e(r.f.title)}</b></td><td>${fmt(r.h?.stars)}</td><td>${fmt(r.a)}</td><td>${r.h&&r.a!=null?(((r.a-r.h.stars)/2>=0?'+':'')+((r.a-r.h.stars)/2).toFixed(1)).replace('.',','):'?'} ${r.sd>=2?'<span class="badge">⚡ divise</span>':''}</td><td>${Math.round(r.part)}%</td><td class="dim">${r.missing.map(m=>m.emoji+' '+e(nameOf(m.id).split(' ')[0])).join(', ')||'Tout le monde ✔'}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">Les chiffres apparaîtront avec le premier film.</td></tr>'}</table></div>
+   ${vrows.length>dLimit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="dmore">Afficher plus (${vrows.length-dLimit} restants)</button></div>`:''}
    <div class="cols" style="margin-top:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
-    <div class="pn"><h3>⚔️ Lancer un duel</h3><p class="dim" style="font-size:13px;margin-top:4px">Deux films s’affrontent, l’équipe vote depuis l’accueil.</p><form id="duelf" style="display:grid;gap:8px;margin-top:10px"><select id="da" name="a" required>${opts}</select><select id="db" name="b" required>${opts}</select><button class="btn">Lancer le duel</button></form></div>
+    <div class="pn"><h3>⚔️ Lancer un duel</h3><p class="dim" style="font-size:13px;margin-top:4px">Deux films s’affrontent, l’équipe vote depuis l’accueil.</p><form id="duelf" style="display:grid;gap:8px;margin-top:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off"><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off"><button class="btn">Lancer le duel</button></form></div>
     <div class="pn"><h3>⛳ Lancer un défi</h3><p class="dim" style="font-size:13px;margin-top:4px">Un clic suffit : le défi dure jusqu’à la fin du mois et l’équipe suit sa progression sur l’accueil.</p><div class="row" style="flex-wrap:wrap;margin-top:10px;gap:6px">${CHAL_TPL.map((t,i)=>`<button class="chip" data-act="chaltpl" data-id="${i}" data-tip="${e('Défi du mois : '+chalLabel({type:t[2],value:t[3],target:t[4]}))}">${t[0]} ${t[1]}</button>`).join('')}</div></div>
     <div class="pn"><h3>📣 Relancer l’équipe et exporter</h3><div class="row" style="flex-wrap:wrap;margin-top:10px"><button class="chip" data-act="remind" data-tip="Écrit un texte à copier dans Teams ou un e-mail pour relancer l’équipe">Préparer un message de relance</button>${S.dl?'<button class="chip" data-act="export" data-tip="Enregistre un fichier à ouvrir dans Excel : un film par ligne">Télécharger les notes (Excel)</button>':''}</div>
      ${showRemind?`<textarea id="rm" rows="5" style="margin-top:10px">${e(remindText())}</textarea><button class="btn" style="margin-top:8px" data-act="copyrm">Copier le message</button>`:''}</div></div>`}
@@ -517,7 +553,7 @@ function badgePanel(fs){
   const cnt=c=>{const t=badgeTotals(fs.filter(f=>f.cat===c));return`${c} ${t.have}/${t.total}`};
   const list=bCat==='close'?closestBadges(fs,8):fs.filter(f=>f.cat===bCat);
   return`<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">${chip('close','⏳ Plus proches')}${cats.map(c=>chip(c,cnt(c))).join('')}</div><div class="bgrid">${list.map(badgeRow).join('')}</div>`}
-function journalRows(list){return`<div class="pn">${list.map(r=>{const f=S.films.find(x=>x.id===r.filmId);return f?`<div class="rev row" style="cursor:pointer;flex-wrap:wrap" data-act="open" data-id="${f.id}"><b style="min-width:140px">${e(f.title)}</b>${stars(r.stars,null,1)}<span class="dim" style="flex:1;min-width:0">${e(r.text)}</span></div>`:''}).join('')||'<p class="dim">Rien pour l’instant. Notez un premier film !</p>'}</div>`}
+function journalRows(list,limit){const all=list;list=limit?list.slice(0,limit):list;return`<div class="pn">${list.map(r=>{const f=S.films.find(x=>x.id===r.filmId);return f?`<div class="rev row" style="cursor:pointer;flex-wrap:wrap" data-act="open" data-id="${f.id}"><b style="min-width:140px">${e(f.title)}</b>${stars(r.stars,null,1)}<span class="dim" style="flex:1;min-width:0">${e(r.text)}</span></div>`:''}).join('')||'<p class="dim">Rien pour l’instant. Notez un premier film !</p>'}</div>${limit&&all.length>limit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="jmore">Afficher plus (${all.length-limit} restants)</button></div>`:''}`}
 function profile(){
   const s=stats(S.meId,0,Infinity,true),rs=S.ratings.filter(r=>r.userId===S.meId).sort((a,b)=>b.ts-a.ts),bt=badgeTotals(s.badges);
   const likes=rs.reduce((n,r)=>n+(r.likes||[]).length,0),texts=rs.filter(r=>r.text).length;
@@ -525,8 +561,8 @@ function profile(){
   const tile=(n,l)=>`<div class="pn" style="padding:12px 14px"><b class="serif" style="font-size:26px">${n}</b><div class="dim" style="font-size:13px">${l}</div></div>`;
   let body='';
   if(pTab==='badges')body=badgePanel(s.badges);
-  else if(pTab==='cartes'&&!isDir())body=`<p class="dim" style="margin-bottom:12px">${rs.length} carte${rs.length>1?'s':''}. Plus vous notez tôt, plus la carte est rare.</p><div class="cards">${rs.map(r=>{const f=S.films.find(x=>x.id===r.filmId),k=cardOf(r);return f?`<div class="tc ${k}" data-act="open" data-id="${f.id}" style="cursor:pointer">${poster(f)}<small class="r">${RARITY[k]}</small></div>`:''}).join('')||'<p class="dim">Votre première carte vous attend.</p>'}</div>`;
-  else if(pTab==='journal')body=journalRows(rs);
+  else if(pTab==='cartes'&&!isDir())body=`<p class="dim" style="margin-bottom:12px">${rs.length} carte${rs.length>1?'s':''}. Plus vous notez tôt, plus la carte est rare.</p><div class="cards">${rs.slice(0,cLimit).map(r=>{const f=S.films.find(x=>x.id===r.filmId),k=cardOf(r);return f?`<div class="tc ${k}" data-act="open" data-id="${f.id}" style="cursor:pointer">${poster(f)}<small class="r">${RARITY[k]}</small></div>`:''}).join('')||'<p class="dim">Votre première carte vous attend.</p>'}</div>${rs.length>cLimit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="cmore">Afficher plus (${rs.length-cLimit} restantes)</button></div>`:''}`;
+  else if(pTab==='journal')body=journalRows(rs,jLimit);
   else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div><div class="emo row" style="flex-wrap:wrap"><span class="dim">Mon avatar</span>${EMOJIS.map(x=>`<button class="${emojiOf(S.meId)===x?'on':''}" data-act="avatar" data-id="${x}">${x}</button>`).join('')}</div></div>`;
   else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,'films notés')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
@@ -774,6 +810,17 @@ const toLocalInput=ts=>{if(!ts)return'';const d=new Date(ts),p=n=>String(n).padS
 function icsFor(f){const st=new Date(f.tvAt),en=new Date(f.tvAt+(f.runtime||120)*60000),z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
   return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Cine-Club Imagerie//FR','BEGIN:VEVENT','UID:'+f.id+'@cineclub','DTSTAMP:'+z(new Date()),'DTSTART:'+z(st),'DTEND:'+z(en),'SUMMARY:'+('📺 '+f.title+(f.tvCh?' ('+f.tvCh+')':'')).replace(/[,;]/g,' '),'END:VEVENT','END:VCALENDAR'].join('\r\n')}
 
+
+/* séance d'équipe : bandeau d'alerte toujours visible */
+function seanceFull(ts){const d=new Date(ts);return`${d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})} à ${String(d.getHours()).padStart(2,'0')}h${String(d.getMinutes()).padStart(2,'0')}`}
+function seanceRel(ts){const n=new Date(),d=new Date(ts),day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime(),diff=Math.round((day(d)-day(n))/DAY);
+  if(ts<Date.now())return'En cours';return diff===0?(d.getHours()>=18?'Ce soir':'Aujourd’hui'):diff===1?'Demain':`Dans ${diff} jours`}
+const nextSeance=()=>S.films.filter(f=>f.seanceAt&&f.seanceAt>Date.now()-2*3600e3).sort((a,b)=>a.seanceAt-b.seanceAt)[0];
+function seanceBanner(){const f=nextSeance();if(!f)return'';
+  return`<div class="sbar" role="status"><span>📅 <b>Prochaine séance</b> · ${seanceRel(f.seanceAt)} · <b>${e(seanceFull(f.seanceAt))}</b>${f.seancePlace?' · '+e(f.seancePlace):''} · <button class="lnk" data-act="open" data-id="${f.id}" data-tip="Ouvrir la fiche du film">${e(f.title)}</button></span>${S.dl?`<button class="chip" data-act="sics" data-id="${f.id}" data-tip="Ajoute la séance à votre agenda (Outlook, Google Agenda…)">📅 Agenda</button>`:''}</div>`}
+function icsSeance(f){const st=new Date(f.seanceAt),en=new Date(f.seanceAt+((f.runtime||110)+30)*60000),z=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+  return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Cine-Club Imagerie//FR','BEGIN:VEVENT','UID:seance-'+f.id+'@cineclub','DTSTAMP:'+z(new Date()),'DTSTART:'+z(st),'DTEND:'+z(en),'SUMMARY:'+('Séance ciné-club : '+f.title).replace(/[,;]/g,' '),...(f.seancePlace?['LOCATION:'+f.seancePlace.replace(/[,;]/g,' ')]:[]),'END:VEVENT','END:VCALENDAR'].join('\r\n')}
+
 /* GIF dans un avis */
 let dGif=null,gifOpen=false,gifRes=[],gifQ='',gifTimer=null;
 const gifKey=()=>(window.CINECLUB||{}).giphyKey||'';
@@ -790,7 +837,7 @@ function gifPicker(){return`<div class="gifp"><input id="gifq" placeholder="Cher
 
 /* tutoriel */
 const TOUR_TEAM=[
- ['🎬','Bienvenue au Ciné-Club',['Hervé propose des films, vous donnez votre avis. Le <b>film de la semaine</b> est tout en haut de l’accueil.','Il n’y a rien à installer : une note, un mot, et c’est fait.','Vous pouvez relancer cette visite à tout moment depuis l’onglet <b>Guide</b>.']],
+ ['🎬','Bienvenue au Ciné-Club',['Hervé propose des films, vous donnez votre avis. Le <b>film de la semaine</b> est tout en haut de l’accueil.','Il n’y a rien à installer : une note, un mot, et c’est fait. Le bandeau jaune en haut rappelle la date de la prochaine séance.','Vous pouvez relancer cette visite à tout moment depuis l’onglet <b>Guide</b>.']],
  ['⭐','Noter en un clic',['Cliquez sur les étoiles (les demi-étoiles marchent) ou choisissez un verdict : 👍 je le conseille, 🤷 bof, 👎 pas pour moi.','Si vous avez le temps, ajoutez un avis, un GIF, des tags ou le plan qui vous a marqué.','🔒 La note d’Hervé et les avis des collègues se révèlent <b>après</b> votre note, pour que personne ne vous influence.']],
  ['🎯','Parier sur la note d’Hervé',['Avant de noter, vous pouvez deviner la note qu’Hervé a donnée.','À une demi-étoile près, c’est gagné : <b>+20 XP</b>.']],
  ['⚔️','Duels et défis',['<b>Un duel</b> oppose deux films choisis par Hervé : cliquez sur l’affiche de votre préféré pour voter. Le gagnant est couronné 👑.','<b>Un défi du mois</b> est un petit objectif lancé par Hervé, par exemple « un documentaire » ou « 3 films ». Chaque film noté qui correspond coche une pastille. Défi relevé : <b>+40 XP</b>.']],
@@ -834,7 +881,7 @@ function guideData(){
     ['son','🔊','Effets sonores','<p>Notes, votes, roulette, révélations et niveaux ont leur petit son. Le haut-parleur en haut à droite le coupe ou le remet, sur cet appareil.</p>'],
     ['wrapped','🎁','Wrapped','<p>Dans Mon profil, le bouton « Mon Wrapped » résume votre année : films notés, genre préféré, coup de cœur, plus grand désaccord avec Hervé.</p>']]]];
   const dir=[['Proposer',[
-    ['proposer','➕','Proposer un film',GL(['Appuyez sur <b>N</b> ou sur le bouton jaune, puis tapez 3 lettres du titre : l’app remplit année, réalisation, genre et affiche.','Ajoutez si vous voulez une phrase pour l’équipe, où le voir et une question.','« Film de la semaine » le met en vedette.'])],
+    ['proposer','➕','Proposer un film',GL(['Appuyez sur <b>N</b> ou sur le bouton jaune, puis tapez 3 lettres du titre : l’app remplit année, réalisation, genre et affiche.','Ajoutez si vous voulez une phrase pour l’équipe, où le voir et une question.','« Film de la semaine » le met en vedette. Indiquez la date et l’heure de la séance : un bandeau jaune la rappelle en haut de toutes les pages.'])],
     ['annoncer','🗓️','Annoncer seulement','<p>Avec « Annoncer seulement », le film apparaît dans « Prochainement » sur l’accueil : l’équipe le voit mais ne peut pas le noter. Plus tard, ouvrez-le et cliquez sur « Mettre à l’affiche » pour ouvrir les notes.</p>'],
     ['roulette','🎡','Roulette et idées','<p>Onglet Roulette : 12 films tirés au hasard dans une base mondiale ou dans vos idées. Filtrez par genre, tournez, puis « Le proposer à l’équipe ». La liste d’idées à droite alimente la roue.</p>']]],
    ['Animer',[
@@ -861,18 +908,19 @@ function editForm(f){const v=x=>e(x??'');
    <div class="field"><label for="ef_syn">Synopsis</label><textarea id="ef_syn" rows="3">${v(f.synopsis)}</textarea></div>
    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:170px"><label for="ef_where">Où le voir</label><input id="ef_where" value="${v(f.where)}"></div><div class="field" style="flex:1;min-width:170px"><label for="ef_ask">Une question pour l’équipe</label><input id="ef_ask" value="${v(f.ask)}"></div></div>
    <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:170px"><label for="ef_tvch">Chaîne de diffusion</label><input id="ef_tvch" list="tvl3" value="${v(f.tvCh)}"></div><div class="field" style="flex:1;min-width:200px"><label for="ef_tvat">Date et heure de diffusion</label><input id="ef_tvat" type="datetime-local" value="${toLocalInput(f.tvAt)}"></div></div>
+   <div class="row" style="flex-wrap:wrap;gap:10px"><div class="field" style="flex:1;min-width:200px"><label for="ef_sat">Date et heure de la séance d’équipe</label><input id="ef_sat" type="datetime-local" value="${toLocalInput(f.seanceAt)}"></div><div class="field" style="flex:1;min-width:170px"><label for="ef_sp">Lieu ou lien (salle, Teams…)</label><input id="ef_sp" value="${v(f.seancePlace)}"></div></div>
    <div class="field"><label for="ef_poster">Affiche (adresse d’une image)</label><div class="row"><input id="ef_poster" type="url" value="${v(f.poster)}" style="flex:1"><img id="efpv" class="fpv" alt="Aperçu de l’affiche" ${f.poster?`src="${v(f.poster)}"`:'hidden'}><button type="button" class="chip" data-act="efposter" data-tip="Cherche l’affiche d’après le titre et l’année">🔎 Chercher</button></div></div>
    <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_feat" ${f.featured?'checked':''} style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_up" ${f.status==='upcoming'?'checked':''} style="width:auto"> Annoncer seulement, sans ouvrir les notes</label></div>
    <div class="row"><button class="btn" type="button" data-act="editsave" data-id="${f.id}">Enregistrer</button><button class="chip" type="button" data-act="editcancel">Annuler</button></div></form>`}
-function filmStep(d){editFilm=null;const l=[...S.films].sort((a,b)=>b.added-a.added),i=l.findIndex(x=>x.id===film);if(i<0)return;film=l[(i+d+l.length)%l.length].id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(film)}
+function filmStep(d){editFilm=null;revLimit=8;revSort='recent';const l=[...S.films].sort((a,b)=>b.added-a.added),i=l.findIndex(x=>x.id===film);if(i<0)return;film=l[(i+d+l.length)%l.length].id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(film)}
 function render(){
   if((adding&&$('#addf'))||(editFilm&&$('#editf'))){return}
-  hideTip();const a=$('#app'),focusQ=document.activeElement?.id==='q';
+  hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
   if(!S.ready){a.innerHTML='<div class="empty dim" style="padding-top:120px">Ouverture de la salle…</div>';return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,guide,badges:badgesView}[view]();
-  a.innerHTML=header()+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'');
-  if(focusQ){const i=$('#q');i.focus();i.setSelectionRange(99,99)}
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'');
+  if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
 }
 
@@ -928,7 +976,8 @@ document.addEventListener('click',async ev=>{
   else if(act==='editsave'){const g=x=>($('#'+x)?.value||'').trim(),f=S.films.find(x=>x.id===id);if(!f)return;if(!g('ef_title'))return toast('Le titre ne peut pas être vide');
     const feat=$('#ef_feat').checked,up=$('#ef_up').checked,at=$('#ef_tvat').value?new Date($('#ef_tvat').value).getTime():0;
     if(feat)S.films.filter(x=>x.featured&&x.id!==id).forEach(x=>upd('films/'+x.id,{featured:false}));
-    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,poster:g('ef_poster'),featured:feat,status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
+    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,seanceAt:$('#ef_sat').value?new Date($('#ef_sat').value).getTime():0,seancePlace:g('ef_sp'),poster:g('ef_poster'),featured:feat,status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
+  else if(act==='sics'){const f=S.films.find(x=>x.id===id);if(f&&f.seanceAt)try{await S.dl.save({filename:'seance-'+norm(f.title).replace(/ /g,'-')+'.ics',data:icsSeance(f)})}catch{}}
   else if(act==='tvedit'){tvEdit=tvEdit===id?null:id;render()}
   else if(act==='tvsave'){const ch=($('#tvc')?.value||'').trim(),at=$('#tvd')?.value?new Date($('#tvd').value).getTime():0;tvEdit=null;upd('films/'+id,{tvCh:ch,tvAt:at}).then(ok=>ok&&toast('Diffusion enregistrée 📺'))}
   else if(act==='tvclear'){tvEdit=null;upd('films/'+id,{tvCh:'',tvAt:0})}
@@ -942,9 +991,17 @@ document.addEventListener('click',async ev=>{
   else if(act==='tournext'){const n=(isDir()?TOUR_DIR:TOUR_TEAM).length;if(tour.i<n-1){tour.i++;render()}else finishTour()}
   else if(act==='tourprev'){tour.i=Math.max(0,tour.i-1);render()}
   else if(act==='tourskip')finishTour()
-  else if(act==='filter'){filter=id;render()}
+  else if(act==='filter'){filter=id;homeLimit=24;render()}
+  else if(act==='hview'){homeView=id;render()}
+  else if(act==='mtoggle'){monthState[id]=t.getAttribute('aria-expanded')!=='true';render()}
+  else if(act==='more'){homeLimit+=24;render()}
+  else if(act==='dmore'){dLimit+=15;render()}
+  else if(act==='jmore'){jLimit+=15;render()}
+  else if(act==='cmore'){cLimit+=24;render()}
+  else if(act==='rmore'){revLimit+=8;render()}
+  else if(act==='rsort'){revSort=id;revLimit=8;render()}
   else if(act==='smode'){seasonMode=id;render()}
-  else if(act==='open'){editFilm=null;film=id;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();if(isDir())enrichFilm(id)}
+  else if(act==='open'){revLimit=8;revSort='recent';editFilm=null;film=id;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();if(isDir())enrichFilm(id)}
   else if(act==='refreshinfo'){toast('Recherche des infos…');enrichFilm(id,true).then(()=>toast('Infos mises à jour'))}
   else if(act==='add'){adding=true;addNote=0;posterUrl='';prefill=null;render();$('#ft')?.focus()}
   else if(act==='logout'){sb.auth.signOut()}
@@ -992,6 +1049,9 @@ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(
   $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
   if(!m.poster){(m.qid?wdPoster(m.qid).catch(()=>''):Promise.resolve('')).then(u=>u||wikiPoster(m.title,m.year)).then(u=>setFormPoster(u,false))}});
 document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}
+  if(ev.target.id==='hsort'){homeSort=ev.target.value;homeLimit=24;render()}
+  if(ev.target.id==='hdec'){decSel=ev.target.value;homeLimit=24;render()}
+  if(ev.target.id==='dsort'){dSort=ev.target.value;dLimit=15;render()}
   const m={rfyf:'from',rfyt:'to',rfdir:'dir',rfact:'act'}[ev.target.id];if(m){R.f[m]=ev.target.value.trim();scheduleBuild()}});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
@@ -1007,16 +1067,17 @@ document.addEventListener('submit',async ev=>{
   if(f.id==='addf'){const id='f'+uid(),up=!!d.up;
     if(d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
-    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,ask:(d.ask||'').trim(),poster,qid:d.qid||'',featured:!!d.feat,status:up?'upcoming':'live',added:Date.now()})];
+    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,seanceAt:d.seat?new Date(d.seat).getTime():0,seancePlace:(d.seplace||'').trim(),ask:(d.ask||'').trim(),poster,qid:d.qid||'',featured:!!d.feat,status:up?'upcoming':'live',added:Date.now()})];
     if(addNote&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote})));
     const fromIdea=prefill&&prefill.from==='idea'?prefill.id:null;if(fromIdea)ops.push(del('ideas/'+fromIdea));
     adding=false;prefill=null;render();Promise.all(ops).then(()=>{SFX.win();toast(up?'Film annoncé dans Prochainement 🗓️':'Film publié pour l’équipe 🎬');enrichFilm(id)})}
-  else if(f.id==='duelf'){if(d.a===d.b)return toast('Choisissez deux films différents');S.duels.filter(x=>x.open).forEach(x=>upd('duels/'+x.id,{open:false}));put('duels/'+uid(),{a:d.a,b:d.b,open:true,created:Date.now()}).then(ok=>ok&&(SFX.ding(),toast('Duel lancé ⚔️')))}
+  else if(f.id==='duelf'){const fa=S.films.find(x=>norm(x.title)===norm(d.a)),fb=S.films.find(x=>norm(x.title)===norm(d.b));if(!fa||!fb)return toast('Choisissez deux films de la liste (tapez le début du titre)');if(fa.id===fb.id)return toast('Choisissez deux films différents');S.duels.filter(x=>x.open).forEach(x=>upd('duels/'+x.id,{open:false}));put('duels/'+uid(),{a:fa.id,b:fb.id,open:true,created:Date.now()}).then(ok=>ok&&(SFX.ding(),toast('Duel lancé ⚔️')))}
   else if(f.id==='chalf'){put('challenges/'+uid(),{title:d.title.trim(),type:d.type,value:(d.value||'').trim(),target:Math.max(1,+d.target||1),month:monthKey(Date.now())}).then(ok=>ok&&toast('Défi lancé ⛳'))}
   else if(f.id==='ideaf'){put('ideas/'+uid(),{title:d.title.trim(),added:Date.now()}).then(ok=>{if(ok){const i=$('#idt');if(i){i.value='';i.focus()}}})}
 });
 document.addEventListener('input',ev=>{
-  if(ev.target.id==='q'){q=ev.target.value;render()}
+  if(ev.target.id==='q'){q=ev.target.value;homeLimit=24;render()}
+  if(ev.target.id==='dq'){dQ=ev.target.value;dLimit=15;render()}
   if(ev.target.id==='txt')dTxt=ev.target.value;
   if(ev.target.id==='gif')dGif=ev.target.value;
   if(ev.target.id==='gifq'){gifQ=ev.target.value;clearTimeout(gifTimer);gifTimer=setTimeout(()=>gifSearch(gifQ.trim()),450)}
