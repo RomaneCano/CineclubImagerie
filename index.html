@@ -127,6 +127,8 @@ nav button{padding:9px 16px}
 #tip{position:fixed;z-index:300;max-width:260px;background:var(--panel2);color:var(--tx);border:1px solid var(--acc);padding:7px 11px;border-radius:10px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px #000a;pointer-events:none;display:none}
 .fnav{position:absolute;left:20px;top:16px;display:flex;gap:6px}.sheet{padding-top:58px}
 .sug button{align-items:center}.sug button img,.sug .ph{width:44px;height:64px;flex:none;border-radius:6px;object-fit:cover;background:var(--panel2)}.sug .ph{display:grid;place-items:center;font-size:20px}
+.rg{display:block;max-width:min(320px,100%);max-height:240px;border-radius:12px;margin:8px 0 0 40px;background:var(--panel2)}
+.gifp{margin-top:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px}.gifg{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;max-height:260px;overflow:auto;margin-top:8px}.gifg button{padding:0;border-radius:8px;overflow:hidden;background:var(--panel2)}.gifg img{width:100%;height:90px;object-fit:cover;display:block}
 </style>
 </head>
 <body>
@@ -269,6 +271,7 @@ function badgeFams(id,xp,lvl){
    ['Notes et avis','📚','Romancier·ère',[1,5,15,40],rs.filter(r=>(r.text||'').length>=200).length,k=>`Écrivez ${plur(k,'avis')} de plus de 200 caractères`],
    ['Notes et avis','🎞️','Œil de cadreur·se',[2,5,15,40],rs.filter(r=>r.shot).length,k=>`Remplissez « Le plan qui m’a marqué » sur ${k} films`],
    ['Notes et avis','⚡','Verdict express',[5,20,60,150],rs.filter(r=>r.verdict).length,k=>`Utilisez le verdict rapide ${k} fois`],
+   ['Notes et avis','🖼️','Fan de GIF',[1,5,15,40],rs.filter(r=>r.gif).length,k=>`Illustrez ${plur(k,'avis')} avec un GIF`],
    ['Notes et avis','🏷️','Palette d’émotions',[3,6,10],uniq(rs.flatMap(r=>r.tags||[])),k=>`Utilisez ${k} tags d’ambiance différents`],
    ['Curiosité','🌍','Éclectique',[3,5,7],uniq(Object.keys(gc)),k=>`Notez des films de ${k} genres différents`],
    ['Curiosité','⏳','Voyage dans le temps',[2,4,6,8],new Set(years.map(y=>Math.floor(y/10))).size,k=>`Notez des films de ${k} décennies différentes`],
@@ -319,7 +322,8 @@ function badgesView(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotal
 function stars(v,id,small){let h='';for(let i=1;i<=5;i++){const c=v>=i*2?'f':v===i*2-1?'h':'';h+=`<span class="st ${c}" data-i="${i}">★</span>`}
   return`<span class="stars ${small?'sm':''}" ${id?`data-stars="${id}" data-tip="${id.startsWith('bet')?'Devinez la note d’Hervé : +20 XP si vous tombez à une demi-étoile près':id.startsWith('addnote')?'Votre propre note (facultatif)':'Cliquez sur une étoile. La moitié gauche d’une étoile donne une demi-note'}"`:''} role="img" aria-label="${fmt(v)} sur 5">${h}</span>`}
 function poster(f,cls=''){const [a,b]=GRAD[hash(f.title)%GRAD.length];
-  const bg=f.poster?`background-image:linear-gradient(transparent 50%,#000c),url('${e(f.poster)}')`:`background:linear-gradient(160deg,${a},${b})`;
+  const cu=u=>String(u).trim().replace(/'/g,'%27').replace(/\(/g,'%28').replace(/\)/g,'%29').replace(/"/g,'%22').replace(/\s/g,'%20');
+  const bg=f.poster?`background:linear-gradient(transparent 50%,#000c),url('${e(cu(f.poster))}') center/cover no-repeat,linear-gradient(160deg,${a},${b})`:`background:linear-gradient(160deg,${a},${b})`;
   return`<div class="poster ${cls}" style="${bg}"><b>${e(f.title)}</b><small>${e(f.year)}${f.director?' · '+e(f.director):''}</small></div>`}
 const watching=f=>S.watch.some(x=>x.id===f+'_'+S.meId);
 function card(f){const mine=rOf(f.id,S.meId),up=f.status==='upcoming',t=liveOpen(f.id)&&!isDir()?null:avg(team(f.id).map(r=>r.stars));
@@ -397,9 +401,9 @@ function filmModal(){
   const f=S.films.find(x=>x.id===film);if(!f)return'';
   const mine=rOf(f.id,S.meId),dh=dirOf(f.id),lo=liveOpen(f.id),up=f.status==='upcoming',hideTeam=lo&&!isDir();
   const reveal=isDir()||(mine&&!lo),gate=!isDir()&&!mine&&!up;
-  const revs=S.ratings.filter(r=>r.filmId===f.id&&(r.text||r.shot||isDir()||mine)&&(isDir()||!lo)).sort((a,b)=>b.ts-a.ts);
+  const revs=S.ratings.filter(r=>r.filmId===f.id&&(r.text||r.shot||r.gif||isDir()||mine)&&(isDir()||!lo)).sort((a,b)=>b.ts-a.ts);
   const showRevs=isDir()||(mine&&!lo),t=avg(team(f.id).map(r=>r.stars));
-  const tagsSel=mine?.tags||[],txt=dTxt??mine?.text??'',shot=dShot??mine?.shot??'';
+  const tagsSel=mine?.tags||[],txt=dTxt??mine?.text??'',shot=dShot??mine?.shot??'',gif=dGif??mine?.gif??'';
   const isLiveF=S.live&&S.live.filmId===f.id;
   return`<div class="modal" data-act="close"><div class="sheet" data-stop role="dialog" aria-label="${e(f.title)}"><button class="x" data-act="close" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="fnav"><button class="chip" data-act="fprev" data-tip="Film précédent (touche ←)" aria-label="Film précédent">←</button><button class="chip" data-act="fnext" data-tip="Film suivant (touche →)" aria-label="Film suivant">→</button></div>
    <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,f.genre].filter(Boolean).map(e).join(' · ')}</div>
@@ -421,13 +425,14 @@ function filmModal(){
      <div class="row" style="margin-bottom:12px;flex-wrap:wrap"><b>Ma note</b>${stars(mine?.stars||0,'quick:'+f.id)}<span class="dim">${mine?'Note enregistrée, modifiable à tout moment.':'1 clic et c’est noté.'}</span></div>
      <div class="row" style="flex-wrap:wrap;margin-bottom:12px;gap:6px">${TAGS.map(tg=>`<button class="chip ${tagsSel.includes(tg)?'on':''}" data-act="tag" data-id="${tg}">${tg}</button>`).join('')}</div>
      <div class="field" style="margin-bottom:10px"><label for="shot">🎞️ Le plan qui m’a marqué (+10 XP)</label><input id="shot" value="${e(shot)}" placeholder="Ex : le miroir à la fin, vers 1 h 20"></div>
+     <div class="field" style="margin-bottom:10px"><label for="gif">🖼️ Un GIF pour illustrer votre avis (facultatif)</label><div class="row" style="flex-wrap:wrap"><input id="gif" value="${e(gif)}" placeholder="Collez l’adresse d’un GIF (lien giphy.com ou image en https)" style="flex:1;min-width:200px">${gifKey()?'<button class="chip" type="button" data-act="gifpick" data-tip="Chercher un GIF dans GIPHY">🔍 Chercher</button>':''}${gif?'<button class="chip" type="button" data-act="gifclear">Retirer</button>':''}</div>${gifUrl(gif)?`<img class="rg" style="margin-left:0" src="${e(gifUrl(gif))}" alt="Aperçu du GIF" referrerpolicy="no-referrer">`:(gif?'<span class="dim" style="font-size:12px">Adresse non reconnue : elle doit commencer par https://</span>':'')}${gifOpen?gifPicker():''}</div>
      <textarea id="txt" rows="3" placeholder="Un mot, une phrase, un pavé… (+15 XP)" aria-label="Mon avis">${e(txt)}</textarea>
      <div class="row" style="margin-top:10px;justify-content:space-between;flex-wrap:wrap">${(()=>{const nx=mine?S.films.filter(x=>x.status!=='upcoming'&&x.id!==f.id&&!rOf(x.id,S.meId)).sort((a,b)=>b.added-a.added)[0]:null;return nx?`<button class="chip" data-act="open" data-id="${nx.id}" data-tip="Passer directement au prochain film que vous n’avez pas noté">Film suivant à noter : ${e(nx.title)} →</button>`:'<span></span>'})()}<button class="btn" data-act="publish" data-id="${f.id}">Publier</button></div></div>`}
    ${up?'':`
    ${f.tmdb&&f.tmdb.reviews&&f.tmdb.reviews.length&&reveal?`<h3 style="margin:24px 0 4px">Ce qu’en dit le public</h3><p class="dim" style="font-size:12px">Avis publics issus de TMDB, souvent rédigés en anglais.</p>${f.tmdb.reviews.map(r=>`<div class="rev"><b>${e(r.a)}</b>${r.r!=null?` <span class="dim">${r.r} sur 10</span>`:''}<p class="tx" style="margin-left:0">${e(r.t)}${r.t.length>=500?'…':''}</p></div>`).join('')}`:''}
    <h3 style="margin:24px 0 4px">Les avis de l’équipe</h3>
    ${showRevs&&revs.length?revs.map(r=>{const liked=(r.likes||[]).includes(S.meId),tr=r.trophy?TROPHIES[r.trophy]:null;return`<div class="rev"><div class="row" style="flex-wrap:wrap"><span class="av">${emojiOf(r.userId)}</span><b>${e(nameOf(r.userId))}</b>${roleOf(r.userId)==='director'?'<span class="badge">Hervé</span>':''}${stars(r.stars,null,1)}${r.verdict?`<span title="${VERDICTS[r.verdict][1]}">${VERDICTS[r.verdict][0]}</span>`:''}${tr?`<span class="badge">${tr[0]} ${tr[1]}</span>`:''}<span class="sp"></span><button class="chip ${liked?'on':''}" data-act="like" data-id="${e(r.id)}" aria-label="J’aime" data-tip="J’aime cet avis">❤ ${(r.likes||[]).length||''}</button></div>
-     ${r.text?`<p class="tx">${e(r.text)}</p>`:''}${r.shot?`<p class="tx dim">🎞️ Plan marquant : ${e(r.shot)}</p>`:''}${(r.tags||[]).length?`<div class="tx">${(r.tags||[]).map(x=>`<span class="badge" style="margin:0 4px 4px 0">${e(x)}</span>`).join('')}</div>`:''}
+     ${r.text?`<p class="tx">${e(r.text)}</p>`:''}${r.shot?`<p class="tx dim">🎞️ Plan marquant : ${e(r.shot)}</p>`:''}${r.gif&&gifUrl(r.gif)?`<img class="rg" src="${e(gifUrl(r.gif))}" alt="GIF de l’avis" loading="lazy" referrerpolicy="no-referrer">`:''}${(r.tags||[]).length?`<div class="tx">${(r.tags||[]).map(x=>`<span class="badge" style="margin:0 4px 4px 0">${e(x)}</span>`).join('')}</div>`:''}
      ${r.bet!=null&&reveal&&dh&&roleOf(r.userId)!=='director'?`<div class="dim tx" style="font-size:13px">🎯 Pari ${fmt(r.bet)} · ${Math.abs(r.bet-dh.stars)<=1?'<span style="color:var(--ok)">gagné +20 XP</span>':'raté'}</div>`:''}
      ${isDir()&&roleOf(r.userId)!=='director'?`<div class="trow">${Object.entries(TROPHIES).map(([k,[em,l]])=>`<button class="chip tro ${r.trophy===k?'on':''}" data-act="trophy" data-id="${e(r.id)}" data-v="${k}" data-tip="Décerner le trophée « ${l.toLowerCase()} » : +25 XP pour l’auteur·rice">${em} ${l}</button>`).join('')}</div>`:''}</div>`}).join(''):`<p class="dim">${showRevs?'Pas encore d’avis. Ouvrez le bal !':'🔒 Les avis des collègues apparaissent après votre note'+(lo?' et la révélation de la séance.':'.')}</p>`}`}
   </div></div>`}
@@ -614,6 +619,7 @@ async function fetchDetails(f){
       const dr=(d.credits?.crew||[]).find(c=>c.job==='Director');if(dr&&!f.director)patch.director=dr.name;
       patch.tmdb={id,rating:d.vote_average||0,votes:d.vote_count||0,
         reviews:(d.reviews?.results||[]).slice(0,3).map(r=>({a:r.author||'Anonyme',r:r.author_details?.rating??null,t:String(r.content||'').replace(/\s+/g,' ').slice(0,500)}))}}}catch{}}
+  if(!patch.poster&&!f.poster){const u=await wikiPoster(f.title,f.year||patch.year);if(u)patch.poster=u}
   patch.enriched=Date.now();return patch}
 async function enrichFilm(id,force){
   const f=S.films.find(x=>x.id===id);if(!f||!isDir())return;if(!force&&(f.enriched||triedEnrich.has(id)))return;triedEnrich.add(id);
@@ -621,6 +627,19 @@ async function enrichFilm(id,force){
   // ne pas écraser ce qu'Hervé a saisi lui-même
   if(f.poster&&!force)delete p.poster;if(f.director&&!force)delete p.director;if(f.year&&!force)delete p.year;
   await upd('films/'+id,p)}
+async function wikiPoster(title,year){
+  try{const j=await wdGet('https://fr.wikipedia.org/w/api.php?action=query&generator=search&gsrnamespace=0&gsrlimit=6&gsrsearch='+encodeURIComponent(`${title} film${year?' '+year:''}`)+'&prop=pageimages&piprop=thumbnail&pithumbsize=400&format=json&origin=*',10000);
+    const pages=Object.values(j.query?.pages||{}).sort((a,b)=>a.index-b.index).filter(p=>p.thumbnail),n=norm(title);
+    const best=pages.find(p=>norm(p.title).startsWith(n)&&(!year||/film/i.test(p.title)||p.title.includes(String(year))))||pages.find(p=>norm(p.title).startsWith(n))||pages.find(p=>norm(p.title).includes(n));
+    return best?.thumbnail.source||''}catch{return''}}
+let posterCache={};try{posterCache=JSON.parse(localStorage.getItem('cineclub-posters')||'{}')}catch{}
+const posterTried=new Set();
+async function fillPosters(){
+  const todo=S.films.filter(f=>!f.poster&&!posterTried.has(f.id)).slice(0,12);
+  for(const f of todo){posterTried.add(f.id);
+    if(isDir()){await enrichFilm(f.id,true);
+      const g=S.films.find(x=>x.id===f.id);if(g&&!g.poster){const u=await wikiPoster(g.title,g.year);if(u)await upd('films/'+f.id,{poster:u})}}
+    else{const u=await wikiPoster(f.title,f.year);if(u){posterCache[f.id]=u;try{localStorage.setItem('cineclub-posters',JSON.stringify(posterCache))}catch{}derive();render()}}}}
 async function buildPool(){
   R.result=null;R.err='';
   if(R.src!=='wd'){buildLocal();R.loading=false;return render()}
@@ -664,10 +683,25 @@ function rouletteView(){
     <div style="margin-top:10px">${S.ideas.map(i=>`<div class="lb" style="grid-template-columns:1fr auto auto"><span><b>${e(i.title)}</b><span class="dim"> ${e(i.year||'')}${i.director?' · '+e(i.director):''}</span></span><button class="chip" data-act="ipropose" data-id="${i.id}">Proposer</button><button class="chip" data-act="idel" data-id="${i.id}" aria-label="Retirer">✕</button></div>`).join('')||'<p class="dim">Aucune idée pour l’instant.</p>'}</div></div></div>`}
 
 
+
+/* GIF dans un avis */
+let dGif=null,gifOpen=false,gifRes=[],gifQ='',gifTimer=null;
+const gifKey=()=>(window.CINECLUB||{}).giphyKey||'';
+function gifUrl(u){u=String(u||'').trim();if(!/^https:\/\/[^\s]{4,400}$/i.test(u))return'';
+  const m=u.match(/^https:\/\/(?:www\.)?giphy\.com\/(?:gifs|embed)\/(?:[^/?#]*-)?([A-Za-z0-9]+)(?:[/?#].*)?$/i);
+  return m?`https://media.giphy.com/media/${m[1]}/giphy.gif`:u}
+function keepDrafts(){dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;dGif=$('#gif')?.value??dGif}
+async function gifSearch(q){
+  const k=gifKey();if(!k)return;
+  try{const j=await wdGet(`https://api.giphy.com/v1/gifs/${q?'search':'trending'}?api_key=${encodeURIComponent(k)}&limit=12&rating=pg-13&lang=fr${q?'&q='+encodeURIComponent(q):''}`,10000);
+    gifRes=(j.data||[]).map(g=>({u:g.images?.fixed_height?.url||g.images?.original?.url,t:g.images?.fixed_height_small?.url||g.images?.fixed_height?.url,a:g.title||'GIF'})).filter(x=>x.u&&x.t)}catch{gifRes=[]}
+  render();const i=$('#gifq');if(i){i.focus();i.setSelectionRange(99,99)}}
+function gifPicker(){return`<div class="gifp"><input id="gifq" placeholder="Chercher un GIF (ex : applaudissements)" value="${e(gifQ)}" aria-label="Chercher un GIF"><div class="gifg">${gifRes.map(g=>`<button type="button" data-act="gifsel" data-u="${e(g.u)}"><img src="${e(g.t)}" alt="${e(g.a)}" loading="lazy" referrerpolicy="no-referrer"></button>`).join('')||'<p class="dim" style="font-size:13px;padding:8px">Aucun GIF pour le moment.</p>'}</div><p class="dim" style="font-size:11px;margin-top:4px">Powered by GIPHY</p></div>`}
+
 /* tutoriel */
 const TOUR_TEAM=[
  ['🎬','Bienvenue au Ciné-Club',['Hervé propose des films, vous donnez votre avis. Le <b>film de la semaine</b> est tout en haut de l’accueil.','Il n’y a rien à installer : une note, un mot, et c’est fait.','Vous pouvez relancer cette visite à tout moment depuis l’onglet <b>Guide</b>.']],
- ['⭐','Noter en un clic',['Cliquez sur les étoiles (les demi-étoiles marchent) ou choisissez un verdict : 👍 je le conseille, 🤷 bof, 👎 pas pour moi.','Si vous avez le temps, ajoutez un avis, des tags ou le plan qui vous a marqué.','🔒 La note d’Hervé et les avis des collègues se révèlent <b>après</b> votre note, pour que personne ne vous influence.']],
+ ['⭐','Noter en un clic',['Cliquez sur les étoiles (les demi-étoiles marchent) ou choisissez un verdict : 👍 je le conseille, 🤷 bof, 👎 pas pour moi.','Si vous avez le temps, ajoutez un avis, un GIF, des tags ou le plan qui vous a marqué.','🔒 La note d’Hervé et les avis des collègues se révèlent <b>après</b> votre note, pour que personne ne vous influence.']],
  ['🎯','Parier sur la note d’Hervé',['Avant de noter, vous pouvez deviner la note qu’Hervé a donnée.','À une demi-étoile près, c’est gagné : <b>+20 XP</b>.']],
  ['⚔️','Duels et défis',['<b>Un duel</b> oppose deux films choisis par Hervé : cliquez sur l’affiche de votre préféré pour voter. Le gagnant est couronné 👑.','<b>Un défi du mois</b> est un petit objectif lancé par Hervé, par exemple « un documentaire » ou « 3 films ». Chaque film noté qui correspond coche une pastille. Défi relevé : <b>+40 XP</b>.']],
  ['🔴','Séances en direct',['Parfois, Hervé lance une séance en direct : tout le monde note, mais les résultats restent masqués.','Quand Hervé les révèle, la note d’Hervé, la moyenne et les avis s’affichent d’un coup pour tout le monde.']],
@@ -692,7 +726,7 @@ const GL=(items)=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
 function guideData(){
   const team=[['Démarrer',[
     ['principe','🎬','Le principe','<p>Hervé propose un film. Vous le regardez, puis vous donnez votre avis. L’app compte vos points. Le film de la semaine est en haut de l’accueil, les autres films sont en dessous.</p>'],
-    ['noter','⭐','Noter un film',GL(['<b>Étoiles</b> : un clic suffit. Cliquez sur la moitié gauche d’une étoile pour une demi-note.','<b>Verdict rapide</b> : 👍 je le conseille, 🤷 bof, 👎 pas pour moi. Une note en est déduite.','<b>Facultatif</b> : tags d’ambiance, avis écrit, plan marquant.','🔒 La note d’Hervé et les avis des collègues apparaissent après votre note.'])],
+    ['noter','⭐','Noter un film',GL(['<b>Étoiles</b> : un clic suffit. Cliquez sur la moitié gauche d’une étoile pour une demi-note.','<b>Verdict rapide</b> : 👍 je le conseille, 🤷 bof, 👎 pas pour moi. Une note en est déduite.','<b>Facultatif</b> : tags d’ambiance, avis écrit, plan marquant, GIF (collez une adresse d’image, ou cherchez dans GIPHY si la recherche est activée).','🔒 La note d’Hervé et les avis des collègues apparaissent après votre note.'])],
     ['pari','🎯','Parier sur la note d’Hervé','<p>Avant de noter, devinez la note d’Hervé avec les étoiles « Pari ». Si vous tombez à une demi-étoile près, vous gagnez 20 XP.</p>'],
     ['direct','🔴','Séance en direct','<p>Hervé lance une séance sur un film. Tant qu’elle est ouverte, les résultats sont cachés. Notez, puis attendez : Hervé les révèle et tout le monde voit en même temps sa note, la moyenne et les avis.</p>']]],
    ['Jouer',[
@@ -775,7 +809,7 @@ document.addEventListener('click',async ev=>{
   if(act==='mute'){menuOpen=false;muted=!muted;try{localStorage.setItem('cineclub-mute',muted?'1':'0')}catch{}render();if(!muted)SFX.ding();return}
   if(t.classList.contains('modal')&&ev.target!==t)return;
   if(act==='watch'){SFX.pop();const k=id+'_'+S.meId;watching(id)?del('watch/'+k):put('watch/'+k,{filmId:id,userId:S.meId});return}
-  if(act==='close'){film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(act==='close'){film=null;adding=false;dTxt=dShot=dGif=null;gifOpen=false;prefill=null;render()}
   else if(act==='atab'){authTab=id;authMsg='';render()}
   else if(act==='nav'){view=id;film=null;menuOpen=false;render()}
   else if(act==='gtab'){gTab=id;gOpen=null;S._gInit=0;render()}
@@ -786,13 +820,16 @@ document.addEventListener('click',async ev=>{
   else if(act==='savename'){const v=($('#myname')?.value||'').trim();if(v.length<2)return toast('Le nom doit faire au moins 2 caractères');upd('members/'+S.meId,{name:v}).then(ok=>ok&&toast('Nom enregistré'))}
   else if(act==='fprev')filmStep(-1)
   else if(act==='fnext')filmStep(1)
+  else if(act==='gifpick'){keepDrafts();gifOpen=!gifOpen;render();if(gifOpen&&!gifRes.length)gifSearch(gifQ)}
+  else if(act==='gifsel'){keepDrafts();dGif=t.dataset.u;gifOpen=false;render()}
+  else if(act==='gifclear'){keepDrafts();dGif='';render()}
   else if(act==='tourstart'){tour={i:0};render()}
   else if(act==='tournext'){const n=(isDir()?TOUR_DIR:TOUR_TEAM).length;if(tour.i<n-1){tour.i++;render()}else finishTour()}
   else if(act==='tourprev'){tour.i=Math.max(0,tour.i-1);render()}
   else if(act==='tourskip')finishTour()
   else if(act==='filter'){filter=id;render()}
   else if(act==='smode'){seasonMode=id;render()}
-  else if(act==='open'){film=id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(id)}
+  else if(act==='open'){film=id;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();if(isDir())enrichFilm(id)}
   else if(act==='refreshinfo'){toast('Recherche des infos…');enrichFilm(id,true).then(()=>toast('Infos mises à jour'))}
   else if(act==='add'){adding=true;addNote=0;posterUrl='';prefill=null;render();$('#ft')?.focus()}
   else if(act==='logout'){sb.auth.signOut()}
@@ -808,7 +845,7 @@ document.addEventListener('click',async ev=>{
     S.ratings.filter(r=>r.filmId===id).forEach(r=>del('ratings/'+r.id));del('films/'+id);if(liveFilm()===id)del('config/live');film=null;render()}
   else if(act==='like'){const r=S.ratings.find(x=>x.id===id);if(!r)return;if(r.userId===S.meId)return toast('On ne se like pas soi-même 😉');SFX.pop();const k='likes/'+id+'_'+S.meId;(r.likes||[]).includes(S.meId)?del(k):put(k,{ratingId:id,userId:S.meId})}
   else if(act==='tag'){const r=rOf(film,S.meId);if(!r)return toast('Notez d’abord le film');SFX.pop();const tg=r.tags||[];dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;upd('ratings/'+r.id,{tags:tg.includes(id)?tg.filter(x=>x!==id):[...tg,id]})}
-  else if(act==='publish'){const r=rOf(id,S.meId);if(!r)return toast('Notez d’abord le film');const text=$('#txt').value.trim(),shot=$('#shot').value.trim();dTxt=dShot=null;upd('ratings/'+r.id,{text,shot}).then(ok=>ok&&(SFX.ding(),toast(text||shot?'Avis publié ✔ +XP':'Enregistré')))}
+  else if(act==='publish'){const r=rOf(id,S.meId);if(!r)return toast('Notez d’abord le film');const text=$('#txt').value.trim(),shot=$('#shot').value.trim(),raw=($('#gif')?.value||'').trim(),gif=gifUrl(raw);if(raw&&!gif)return toast('Adresse du GIF invalide : elle doit commencer par https://');dTxt=dShot=dGif=null;gifOpen=false;upd('ratings/'+r.id,{text,shot,gif}).then(ok=>ok&&(SFX.ding(),toast(text||shot||gif?'Avis publié ✔ +XP':'Enregistré')))}
   else if(act==='trophy'){const r=S.ratings.find(x=>x.id===id);if(!r)return;S.ratings.filter(x=>x.filmId===r.filmId&&x.trophy===v&&x.id!==id).forEach(x=>del('trophies/'+x.id));(r.trophy===v?del('trophies/'+id):put('trophies/'+id,{filmId:r.filmId,kind:v})).then(ok=>ok&&r.trophy!==v&&(SFX.trophy(),toast('Trophée décerné 🏅 +25 XP')))}
   else if(act==='share')shareCard(id)
   else if(act==='vote'){const d=S.duels.find(x=>x.id===id);if(!d||!d.open)return;SFX.vote();put('dvotes/'+id+'_'+S.meId,{duelId:id,userId:S.meId,pick:v})}
@@ -828,6 +865,7 @@ document.addEventListener('click',async ev=>{
 let acT=null;
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(!b)return;const m=JSON.parse(b.dataset.s);
   $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';if(m.poster)$('#fp').value=m.poster;$('#sug').innerHTML='';$('#fpitch').focus()});
+document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(ev.key==='Escape'){if(tour){finishTour();return}menuOpen=false;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
@@ -852,6 +890,8 @@ document.addEventListener('submit',async ev=>{
 document.addEventListener('input',ev=>{
   if(ev.target.id==='q'){q=ev.target.value;render()}
   if(ev.target.id==='txt')dTxt=ev.target.value;
+  if(ev.target.id==='gif')dGif=ev.target.value;
+  if(ev.target.id==='gifq'){gifQ=ev.target.value;clearTimeout(gifTimer);gifTimer=setTimeout(()=>gifSearch(gifQ.trim()),450)}
   if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim(),z=$('#sug');if(!z)return;
     const show=(r,wait)=>{z.innerHTML=r.map(m=>`<button type="button" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}</span></span></button>`).join('')+(wait?'<p class="dim" style="font-size:13px">Recherche dans la base mondiale…</p>':!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat. Saisissez le titre à la main : les infos seront cherchées après la publication.</p>':'')};
     if(v.length<2){z.innerHTML='';return}
@@ -877,7 +917,7 @@ function derive(){
   S.cfg={directorId:profiles.find(p=>p.role==='director')?.id};
   S.members=profiles.map(p=>({id:p.id,emoji:cache.members.get(p.id)?.emoji||EMOJIS[hash(p.id)%EMOJIS.length],role:p.role,joined:cache.members.get(p.id)?.joined}));
   const lk={};arr('likes').forEach(l=>(lk[l.ratingId]=lk[l.ratingId]||[]).push(l.userId));
-  S.films=arr('films');S.ideas=arr('ideas');S.duels=arr('duels');S.dvotes=arr('dvotes');S.chals=arr('challenges');S.watch=arr('watch');
+  S.films=arr('films').map(f=>(!f.poster&&posterCache[f.id])?{...f,poster:posterCache[f.id]}:f);S.ideas=arr('ideas');S.duels=arr('duels');S.dvotes=arr('dvotes');S.chals=arr('challenges');S.watch=arr('watch');
   S.ratings=arr('ratings').map(r=>({...r,likes:lk[r.id]||[],trophy:cache.trophies.get(r.id)?.kind||null}));
   const lv=cache.config.get('live')?{...cache.config.get('live')}:null;
   if(lastLive&&lastLive.state==='open'&&lv&&lv.state==='revealed'){SFX.reveal();toast('Les résultats de la séance sont révélés 🎬')}
@@ -924,8 +964,8 @@ async function enter(user){
   S.meId=user.id;S.db=adapter;S.dl=saver;S.ready=false;render();
   try{await loadAll()}catch{S.db=null;authMsg='Connexion au serveur impossible.';S.ready=true;return render()}
   if(!cache.members.has(S.meId))put('members/'+S.meId,{emoji:EMOJIS[hash(S.meId)%EMOJIS.length]});
-  S.ready=true;render();try{if(!localStorage.getItem(tourKey())){tour={i:0};render()}}catch{}clearInterval(pollT);
-  pollT=setInterval(async()=>{if(document.hidden||adding||tour||view==='guide'||dTxt||dShot||S.db===null||/INPUT|TEXTAREA/.test(document.activeElement?.tagName||''))return;try{await loadAll();render()}catch{}},8000)}
+  S.ready=true;render();fillPosters();try{if(!localStorage.getItem(tourKey())){tour={i:0};render()}}catch{}clearInterval(pollT);
+  pollT=setInterval(async()=>{if(document.hidden||adding||tour||view==='guide'||dTxt||dShot||dGif||S.db===null||/INPUT|TEXTAREA/.test(document.activeElement?.tagName||''))return;try{await loadAll();render();fillPosters()}catch{}},8000)}
 (async function(){
   const cf=window.CINECLUB||{};
   if(!cf.url||!cf.anonKey||/VOTRE/.test(cf.url)){S.ready=true;S.setup=true;return render()}

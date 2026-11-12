@@ -5,5 +5,8 @@ window.CINECLUB = {
   anonKey: "sb_publishable_SUnMnrsPHT-u_VMIlOKIww_Ieo5mUED",
   // Optionnel : clé API TMDB (gratuite, themoviedb.org/settings/api) pour ajouter synopsis en français,
   // note du public, distribution et avis publics. Laisser vide pour n'utiliser que Wikipédia et Wikidata.
-  tmdbKey: ""
+  tmdbKey: "",
+  // Optionnel : clé API GIPHY (gratuite, developers.giphy.com) pour chercher des GIF dans un avis.
+  // Sans clé, on peut quand même coller l'adresse d'un GIF.
+  giphyKey: ""
 };

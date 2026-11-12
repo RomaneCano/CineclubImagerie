@@ -32,3 +32,8 @@ Si Wikidata ne répond pas, la roulette retombe sur un catalogue local de 281 fi
 À la proposition d'un film, l'app complète automatiquement la fiche (affiche, année, durée, réalisation, distribution, synopsis, lien Wikipédia) depuis Wikidata et Wikipédia (CC0 / CC BY-SA), sans clé.
 Pour ajouter la note du public, des avis publics et un synopsis plus complet en français, créez une clé API gratuite sur https://www.themoviedb.org/settings/api et collez-la dans `tmdbKey` (config.js). Les données TMDB sont affichées avec leur mention de source.
 Hervé peut relancer la recherche avec « Actualiser les infos » dans la fiche du film.
+
+## GIF dans un avis
+
+Dans un avis, on peut coller l'adresse d'un GIF (lien giphy.com ou image en https), sans configuration.
+Pour activer la recherche de GIF dans l'app, créez une clé gratuite sur https://developers.giphy.com et collez-la dans `giphyKey` (config.js).
