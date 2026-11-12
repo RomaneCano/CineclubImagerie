@@ -109,9 +109,9 @@ nav button{white-space:nowrap;flex:none}
 .sp{display:none}
 .search{flex:0 0 200px;max-width:none}
 .me{flex:none}
-@media(max-width:1100px){header{flex-wrap:wrap;row-gap:6px;min-height:0}.sp{display:block;flex:1}nav{order:9;flex:1 1 100%;margin:0;flex-wrap:wrap;overflow:visible}}
+@media(max-width:1240px){header{flex-wrap:wrap;row-gap:6px;min-height:0}.sp{display:block;flex:1}nav{order:9;flex:1 1 100%;margin:0;flex-wrap:wrap;overflow:visible}}
 @media(max-width:760px){.me>div{display:none}.me{padding-right:8px}.logo{font-size:17px}}
-nav button{padding:9px 16px}
+nav button{padding:8px 11px;font-size:13.5px}
 .search{flex:0 1 260px;min-width:0}
 .gwrap{max-width:760px;margin:0 auto}.gh{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:24px 0 8px}
 .gl{padding:0;overflow:hidden}.gi{border-bottom:1px solid var(--line)}.gi:last-child{border:0}
@@ -186,6 +186,39 @@ body{font-size:14px}
 .abtn{padding:9px 12px;font-size:13px}.abtn .ai{font-size:17px}.actbar{padding:10px}.hero{padding:22px;gap:24px}.hero h2{font-size:30px}
 .kpi .pn b{font-size:24px}.pn{padding:14px}
 .icgrid{display:flex;flex-wrap:wrap;gap:6px}.avb{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:grid;place-items:center;font-size:18px;color:var(--tx)}.avb:hover{border-color:var(--acc)}.avb.on{border-color:var(--acc);color:var(--acc);box-shadow:0 0 0 2px #ffcc0033}
+.av{overflow:hidden;position:relative}.ini{display:inline-block;width:1.7em;height:1.7em;border-radius:50%;overflow:hidden;vertical-align:middle;line-height:0;font-style:normal;background:var(--panel2)}.ini svg{width:100%;height:100%;display:block}.av .ini{width:100%;height:100%}
+.avbtn{border:0;padding:0;cursor:pointer;overflow:visible}.avbtn .ini{border-radius:50%}.avbtn .avedit{position:absolute;right:-3px;bottom:-3px;width:20px;height:20px;border-radius:50%;background:var(--acc);color:#1a1500;display:grid;place-items:center;font-size:11px}.avbtn:hover .avedit{transform:scale(1.15)}
+.avbig{width:150px;height:150px;border-radius:50%;overflow:hidden;box-shadow:0 8px 24px #0008;border:3px solid var(--line);margin:0 auto}.avbig svg{width:100%;height:100%;display:block}
+.avgrid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}.avm{border-radius:50%;overflow:hidden;border:2px solid var(--line);padding:0;line-height:0;aspect-ratio:1}.avm:hover{border-color:var(--mut)}.avm.on{border-color:var(--acc);box-shadow:0 0 0 3px #ffcc0033}.avm svg{width:100%;height:100%;display:block}
+.swgrid{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}.swt{width:36px;height:36px;border-radius:50%;border:2px solid var(--line)}.swt.on{border-color:var(--tx);box-shadow:0 0 0 3px var(--acc)}
+.podium .pav .ini{width:46px;height:46px}
+.wmodal{padding:12px}.wstory{position:relative;width:min(420px,100%);height:min(620px,92vh);border-radius:20px;overflow:hidden;background:#0b0a12;color:#fff;display:flex;flex-direction:column;box-shadow:0 30px 80px #000c;border:1px solid var(--line)}
+.wstory .x{color:#fff;top:22px}.wprog{display:flex;gap:4px;padding:12px 16px 0;position:relative;z-index:4}.wprog i{flex:1;height:3px;border-radius:2px;background:#ffffff33;overflow:hidden}.wprog i.done{background:#fff}.wprog i.cur{background:#fff}
+.ws{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:24px 28px;background:linear-gradient(150deg,var(--g1),var(--g2));background-size:160% 160%;animation:bgm 7s ease-in-out infinite alternate;position:relative;overflow:hidden}
+.ws>*:not(.confetti){animation:wIn .6s cubic-bezier(.2,.8,.2,1) both}.ws>*:nth-child(1){animation-delay:.05s}.ws>*:nth-child(2){animation-delay:.2s}.ws>*:nth-child(3){animation-delay:.35s}.ws>*:nth-child(4){animation-delay:.5s}.ws>*:nth-child(5){animation-delay:.65s}.ws>*:nth-child(6){animation-delay:.8s}.ws>*:nth-child(7){animation-delay:.95s}
+.wk{font-size:12px;letter-spacing:.2em;text-transform:uppercase;opacity:.85}.wh{font-size:28px;line-height:1.12;font-weight:800;letter-spacing:-.02em}.wbig{font-size:84px;font-weight:800;line-height:1;letter-spacing:-.04em;color:#fff;text-shadow:0 8px 30px #0004}.wbig small{font-size:.35em;opacity:.85}
+.wd{opacity:.9;line-height:1.5;font-size:15px}.wicon{font-size:72px;color:#fff;animation:wspin 1s cubic-bezier(.2,.8,.2,1) both,wbob 2.4s 1s ease-in-out infinite}.wicon .ic{width:1em;height:1em;stroke-width:1.4}
+.wrow{display:grid;grid-template-columns:96px 1fr 30px;gap:10px;align-items:center;font-size:14px}.wrow b{text-align:right}.wbar{height:14px;border-radius:7px;background:#ffffff22;overflow:hidden}.wbar i{display:block;height:100%;width:0;border-radius:7px;background:#fff;animation:wfill 1s .6s ease forwards}
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}.wgrid>div{background:#00000026;border:1px solid #ffffff30;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px}.wgrid b{font-size:30px;font-weight:800;line-height:1.1}.wgrid span{font-size:12px;opacity:.8}
+.wrow2{display:flex;gap:14px;align-items:center}.wpost{width:92px;flex:none}.wpost .poster{box-shadow:0 8px 20px #0008;padding:8px}.wpost .poster b{font-size:12px}.wpost .poster small{display:none}
+.wq{border-left:3px solid #fff;padding:4px 0 4px 12px;font-style:italic;opacity:.95}.wq span{display:block;font-style:normal;font-size:12px;opacity:.7;margin-top:4px}
+.wnav{display:flex;gap:10px;align-items:center;justify-content:flex-end;padding:12px 16px;background:#0b0a12;border-top:1px solid #ffffff14;position:relative;z-index:4}.wb{width:40px;height:40px;border-radius:50%;border:1px solid #ffffff33;display:grid;place-items:center;margin-right:auto}.wb:disabled{opacity:.3}
+@keyframes wIn{from{opacity:0;transform:translateY(20px) scale(.97)}}@keyframes wfill{to{width:var(--w)}}@keyframes bgm{to{background-position:100% 100%}}@keyframes wspin{from{opacity:0;transform:rotate(-30deg) scale(.3)}}@keyframes wbob{50%{transform:translateY(-6px)}}
+@media(prefers-reduced-motion:reduce){.wbar i{width:var(--w)!important}.ws>*{opacity:1!important}}
+
+/* couleurs : les icônes et les pastilles ressortent */
+.ic.i-star{color:#ffcc00}.ic.i-lock{color:#9aa3b8}.ic.i-target{color:#ff6b81}.ic.i-live{color:#ff4d6a}.ic.i-up{color:#4cd6a0}.ic.i-down{color:#ff6b81}.ic.i-meh,.ic.i-smile,.ic.i-clap,.ic.i-bookmark,.ic.i-zap,.ic.i-crown,.ic.i-trophy,.ic.i-wheel{color:#ffcc00}.ic.i-popcorn,.ic.i-award{color:#ffb020}.ic.i-film,.ic.i-tv,.ic.i-camera,.ic.i-user,.ic.i-users,.ic.i-book,.ic.i-pen,.ic.i-search,.ic.i-filepen,.ic.i-sliders,.ic.i-chart,.ic.i-clock,.ic.i-msg{color:#6ea8ff}
+.ic.i-pin,.ic.i-flag,.ic.i-logout,.ic.i-trash,.ic.i-rocket{color:#ff6b81}.ic.i-cal,.ic.i-vol,.ic.i-globe,.ic.i-eye,.ic.i-dice,.ic.i-refresh,.ic.i-plus,.ic.i-check{color:#4cd6a0}.ic.i-image,.ic.i-sparkles,.ic.i-layers,.ic.i-library,.ic.i-tag,.ic.i-video{color:#c06cff}
+.ic.i-swords,.ic.i-flame,.ic.i-ticket,.ic.i-hourglass,.ic.i-sunrise,.ic.i-sofa,.ic.i-megaphone{color:#ff8a3d}.ic.i-palette,.ic.i-cake,.ic.i-gift{color:#ff6bd6}.ic.i-moon{color:#b9a7ff}.ic.i-heart{color:#ff4d6a}.ic.i-landmark{color:#c9a36a}.ic.i-mute{color:#9aa3b8}
+.btn:not(.ghost) .ic,.abtn.pri .ic,.cnt .ic,.wb .ic,.avedit .ic,.wstory .ic,.ws .ic,.mi-out .ic{color:inherit}.ic.i-medal.gold{color:#ffcc00}.ic.i-medal.silver{color:#d6dbe6}.ic.i-medal.bronze{color:#e0995f}
+nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{opacity:.9}
+.tico{width:92px;height:92px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:44px;background:radial-gradient(circle at 30% 25%,#ffffff22,#ffffff08);border:1px solid var(--line);box-shadow:0 10px 30px #0006}.tico .ic{width:1em;height:1em;stroke-width:1.5}
+.bico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:hsl(var(--h) 70% 45% / .25);box-shadow:inset 0 0 0 1px hsl(var(--h) 70% 60% / .45)}.bico.lk{filter:grayscale(1);opacity:.55;background:#ffffff0d;box-shadow:none}
+.kpi>.pn{border-top:3px solid var(--acc)}.kpi>.pn:nth-child(2){border-top-color:#6ea8ff}.kpi>.pn:nth-child(3){border-top-color:#ff6bd6}.kpi>.pn:nth-child(4){border-top-color:#4cd6a0}
+.ws::before,.ws::after{content:'';position:absolute;border-radius:50%;background:#fff;opacity:.16;pointer-events:none;animation:wfloat 9s ease-in-out infinite alternate}.ws::before{width:230px;height:230px;top:-70px;right:-70px}.ws::after{width:170px;height:170px;left:-50px;bottom:-40px;animation-delay:-4s}
+@keyframes wfloat{to{transform:translate(-18px,22px) scale(1.1)}}
+.tile2{background:linear-gradient(135deg,var(--panel2),var(--panel))}.tile2:hover{box-shadow:0 6px 20px #0006}.tem .ic{width:1.1em;height:1.1em}
+.hero{background:linear-gradient(135deg,#2a2550,var(--panel2) 55%,#3b2140);border-color:#ffffff1f}
 </style>
 </head>
 <body>
@@ -266,7 +299,7 @@ const IC={
  check:'<polyline points="20 6 9 17 4 12"/>',
  shuffle:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>'};
 const EMO2IC={'⭐':'star','🌟':'star','🔒':'lock','🎯':'target','🔴':'live','👍':'up','👎':'down','🤷':'meh','😂':'smile','🎬':'clap','🍿':'popcorn','🎞':'film','📼':'film','📍':'pin','🗓':'cal','📅':'cal','📆':'cal','📺':'tv','🖼':'image','🔖':'bookmark','📸':'camera','🔊':'vol','🔇':'mute','🚪':'logout','👤':'user','👥':'users','🏅':'award','🏆':'trophy','📖':'book','⚔':'swords','⛳':'flag','👑':'crown','🥇':'medal gold','🥈':'medal silver','🥉':'medal bronze','🔥':'flame','🕯':'flame','✨':'sparkles','🆕':'sparkles','🌈':'sparkles','🔮':'sparkles','💎':'sparkles','🧠':'sparkles','🃏':'layers','🌍':'globe','🎟':'ticket','✍':'pen','✏':'pen','🧶':'pen','📚':'library','⚡':'zap','😈':'zap','🏷':'tag','⏳':'hourglass','🏛':'landmark','🎭':'ticket','🚀':'rocket','🕵':'eye','🔎':'search','🔍':'search','🔭':'search','🎨':'palette','📽':'video','🎥':'video','🎂':'cake','🌙':'moon','🌅':'sunrise','🛋':'sofa','❤':'heart','🤝':'users','🙌':'users','☮':'users','🎲':'dice','🌴':'award','📝':'filepen','🎡':'wheel','🎚':'sliders','🔄':'refresh','🗑':'trash','⏹':'square','🎉':'sparkles','➕':'plus','＋':'plus','📣':'megaphone','📊':'chart','🕒':'clock','🎁':'gift','💬':'msg','▦':'grid','☰':'list','⧉':'copy'};
-function icon(name,cls=''){const [n,c2]=String(name).split(' ');return`<svg class="ic ${c2||''} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.star}</svg>`}
+function icon(name,cls=''){const [n,c2]=String(name).split(' ');return`<svg class="ic i-${n} ${c2||''} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.star}</svg>`}
 const ICRE=new RegExp('('+Object.keys(EMO2IC).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\uFE0F?','gu');
 const STRIPRE=/[\u{1F000}-\u{1FAFF}]️?/gu;
 const ALLRE=new RegExp(ICRE.source+'|'+STRIPRE.source,'gu');
@@ -311,7 +344,7 @@ const member=id=>S.members.find(m=>m.id===id);
 const isDir=()=>!!S.meId&&S.cfg.directorId===S.meId;
 const roleOf=id=>S.cfg.directorId===id?'director':'consultant';
 const nameOf=id=>S.names[id]?.name||(id===S.meId?'Moi':'Collègue');
-const emojiOf=id=>member(id)?.emoji||'👤';
+const emojiOf=id=>member(id)?.emoji||avatarOf(id,nameOf(id));
 const rOf=(f,u)=>S.ratings.find(r=>r.filmId===f&&r.userId===u);
 const dirOf=f=>S.cfg.directorId?rOf(f,S.cfg.directorId):null;
 const team=f=>S.ratings.filter(r=>r.filmId===f&&r.userId!==S.cfg.directorId);
@@ -469,7 +502,7 @@ function badgeFams(id,xp,lvl){
 function famInfo(f){let k=0;f.tiers.forEach(t=>{if(f.cur>=t)k++});const done=k>=f.tiers.length,nx=f.tiers[Math.min(k,f.tiers.length-1)];return{k,done,nx,cur:Math.min(f.cur,nx)}}
 const badgeTotals=fs=>({have:fs.reduce((n,f)=>n+famInfo(f).k,0),total:fs.reduce((n,f)=>n+f.tiers.length,0)});
 function badgeRow(f){const i=famInfo(f);
-  return`<div class="pn" style="padding:12px 14px;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;${i.k?'':'opacity:.85'}"><span style="font-size:26px;${i.k?'':'filter:grayscale(1)'}">${f.emoji}</span><div style="min-width:0"><b>${e(f.name)}</b>${i.k?` <span class="badge" style="margin-left:6px">${TIERN[i.k-1]}</span>`:''}<div class="dim" style="font-size:13px">${i.done?'Palier maximum atteint':`Palier ${i.k+1} sur ${f.tiers.length} : ${e(f.desc(i.nx))}`}</div>${i.done?'':`<div class="prog"><i style="width:${i.cur/i.nx*100}%"></i></div>`}</div><span class="badge" style="${i.done?'border-color:var(--ok);color:var(--ok)':''}">${i.done?'✔ Maxi':`${i.cur} sur ${i.nx}`}</span></div>`}
+  return`<div class="pn" style="padding:12px 14px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;${i.k?'':'opacity:.9'}"><span class="bico ${i.k?'':'lk'}" style="--h:${hash(f.name)%360}">${f.emoji}</span><div style="min-width:0"><b>${e(f.name)}</b>${i.k?` <span class="badge" style="margin-left:6px">${TIERN[i.k-1]}</span>`:''}<div class="dim" style="font-size:13px">${i.done?'Palier maximum atteint':`Palier ${i.k+1} sur ${f.tiers.length} : ${e(f.desc(i.nx))}`}</div>${i.done?'':`<div class="prog"><i style="width:${i.cur/i.nx*100}%"></i></div>`}</div><span class="badge" style="${i.done?'border-color:var(--ok);color:var(--ok)':''}">${i.done?'✔ Maxi':`${i.cur} sur ${i.nx}`}</span></div>`}
 function closestBadges(fs,n){return fs.map(f=>[f,famInfo(f)]).filter(x=>!x[1].done).sort((a,b)=>b[1].cur/b[1].nx-a[1].cur/a[1].nx||a[1].nx-b[1].nx).slice(0,n).map(x=>x[0])}
 function badgeRows(fs){return[...new Set(fs.map(f=>f.cat))].map(c=>`<div class="gh">${c}</div><div style="display:grid;gap:8px">${fs.filter(f=>f.cat===c).map(badgeRow).join('')}</div>`).join('')}
 function badgeSummary(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
@@ -495,18 +528,20 @@ function verdictRow(fid,mine){return`<div class="vd">${Object.entries(VERDICTS).
 const LOGO_MARK=`<svg viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-8 32 32)" stroke="#0f0e14" stroke-width="2.5" stroke-linejoin="round"><rect x="9" y="26" width="46" height="27" rx="4" fill="#ffcc00"/><path d="M9 20 L55 13 L56.5 24 L10.5 31 Z" fill="#f3f1ea"/><path d="M17 29 L25 19 M29 27.5 L37 17.5 M41 26 L49 16" stroke="#0f0e14" stroke-width="4.5"/><circle cx="32" cy="40" r="7" fill="#0f0e14" stroke="none"/><path d="M30 36.5 L36.5 40 L30 43.5 Z" fill="#ffcc00" stroke="none"/></g></svg>`;
 const logoHtml=(lg)=>`<span class="brand${lg?' lg':''}" role="img" aria-label="Ciné-Club Imagerie">${LOGO_MARK}<span class="bt"><b>CINÉ-CLUB</b><i>IMAGERIE</i></span></span>`;
 let menuOpen=false;
+const NAVICON={home:'clap',dash:'chart',animer:'flag',team:'users',palmares:'trophy',roulette:'wheel',profile:'user',guide:'book'};
 const NAVTIP={home:'Les films proposés par Hervé',dash:'Notes, participation et statistiques de chaque film',animer:'Lancer un défi du mois ou un duel entre deux films',team:'Classement, palmes et défis du mois',palmares:'Les mieux notés, les plus détestés, les plus commentés et les reviewers du mois',roulette:'Tirer un film au hasard quand on manque d’idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
 function header(){const s=stats(S.meId),nav=[['home','Séances']];if(isDir())nav.push(['dash','Tableau de bord']);if(isDir())nav.push(['animer','Animer']);nav.push(['team','Équipe']);nav.push(['palmares','Palmarès']);if(isDir())nav.push(['roulette','Roulette']);nav.push(['profile','Mon profil']);nav.push(['guide','Guide']);
-  return`<header><div class="logo">${logoHtml()}</div><nav>${nav.map(([k,l])=>`<button class="${view===k?'on':''}" data-act="nav" data-id="${k}" data-tip="${e(NAVTIP[k])}">${l}</button>`).join('')}</nav>
+  return`<header><div class="logo">${logoHtml()}</div><nav>${nav.map(([k,l])=>`<button class="${view===k?'on':''}" data-act="nav" data-id="${k}" data-tip="${e(NAVTIP[k])}">${icon(NAVICON[k]||'star')}${l}</button>`).join('')}</nav>
   <div class="sp"></div>
   <div class="mewrap"><button class="me" data-act="menu" aria-haspopup="true" aria-expanded="${menuOpen}" data-tip="Mon profil et mes réglages"><span class="av">${emojiOf(S.meId)}</span><div style="line-height:1.15;text-align:left"><div style="font-size:13px;font-weight:600">${e(nameOf(S.meId).split(' ')[0])}${s.streak?` 🔥${s.streak}`:''}</div><div class="xp"><i style="width:${s.pct}%"></i></div></div><span class="dim" aria-hidden="true">▾</span></button>${menuOpen?profileMenu(s):''}</div></header>`}
 function profileMenu(s){return`<div class="menu" role="menu"><div class="row" style="gap:12px;margin-bottom:12px"><span class="av" style="width:48px;height:48px;font-size:26px">${emojiOf(S.meId)}</span><div style="min-width:0"><b>${e(nameOf(S.meId))}</b><div class="dim" style="font-size:13px">${s.name}</div></div></div>
   <div class="xp" style="width:100%;height:8px"><i style="width:${s.pct}%"></i></div><div class="dim" style="font-size:12px;margin:6px 0 12px">${s.xp} XP${s.next?` · encore ${s.next[0]-s.xp} pour devenir ${s.next[1]}`:' · niveau maximum'}${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''} d’affilée`:''}</div>
-  <button class="mi" role="menuitem" data-act="nav" data-id="profile"><span class="ico">👤</span>Mon profil</button><button class="mi" role="menuitem" data-act="nav" data-id="badges"><span class="ico">🏅</span>Mes badges</button><button class="mi" role="menuitem" data-act="nav" data-id="palmares"><span class="ico">🏆</span>Palmarès et podium</button><button class="mi" role="menuitem" data-act="nav" data-id="guide"><span class="ico">📖</span>Guide</button><button class="mi" role="menuitem" data-act="mute"><span class="ico">${muted?'🔇':'🔊'}</span>${muted?'Activer le son':'Couper le son'}</button><button class="mi mi-out" role="menuitem" data-act="logout"><span class="ico">🚪</span>Se déconnecter</button></div>`}
+  <button class="mi" role="menuitem" data-act="nav" data-id="profile"><span class="ico">👤</span>Mon profil</button><button class="mi" role="menuitem" data-act="goavatar"><span class="ico">✏️</span>Créer mon avatar</button><button class="mi" role="menuitem" data-act="nav" data-id="badges"><span class="ico">🏅</span>Mes badges</button><button class="mi" role="menuitem" data-act="nav" data-id="palmares"><span class="ico">🏆</span>Palmarès et podium</button><button class="mi" role="menuitem" data-act="nav" data-id="guide"><span class="ico">📖</span>Guide</button><button class="mi" role="menuitem" data-act="mute"><span class="ico">${muted?'🔇':'🔊'}</span>${muted?'Activer le son':'Couper le son'}</button><button class="mi mi-out" role="menuitem" data-act="logout"><span class="ico">🚪</span>Se déconnecter</button></div>`}
 function banners(films){
   let h='';
   if(!S.cfg.directorId)h+=`<div class="banner"><span><b>Hervé n’a pas encore créé son compte.</b> Il doit s’inscrire avec le code réservé au directeur. Les séances démarreront ensuite.</span></div>`;
   if(isDir()&&films.length&&!S.chals.some(c=>chStatus(c)!=='ended'))h+=`<div class="banner"><span>⛳ <b>Aucun défi en cours.</b> Un clic suffit pour en lancer un.</span><button class="btn" data-act="nav" data-id="animer">Lancer un défi</button></div>`;
+  if(S.meId&&!(cache.members.get(S.meId)?.av))h+=`<div class="banner"><span><b>Créez votre avatar.</b> Coiffure, visage, accessoires : composez votre petit personnage.</span><button class="btn" data-act="goavatar">Créer mon avatar</button></div>`;
   const tvf=films.filter(f=>f.tvAt&&f.tvAt>Date.now()-2*3600e3&&f.tvAt<Date.now()+36*3600e3).sort((a,b)=>a.tvAt-b.tvAt)[0];
   if(tvf)h+=`<div class="banner"><span>📺 <b>${e(tvWhen(tvf.tvAt))}${tvf.tvCh?' sur '+e(tvf.tvCh):''}</b> : ${e(tvf.title)}</span><button class="btn" data-act="open" data-id="${tvf.id}">Voir le film</button></div>`;
   const lf=films.find(f=>f.id===liveFilm());
@@ -638,6 +673,99 @@ function animer(){
     body=`<div style="max-width:760px">${dv}<div class="pn"><h3 style="margin-bottom:10px">Lancer un duel</h3><form id="duelf" class="row" style="flex-wrap:wrap;gap:10px"><datalist id="dls">${opts}</datalist><input id="da" name="a" list="dls" placeholder="Premier film (tapez pour chercher)" required autocomplete="off" style="flex:1;min-width:200px"><b class="vs">VS</b><input id="db" name="b" list="dls" placeholder="Second film" required autocomplete="off" style="flex:1;min-width:200px"><button class="btn">Lancer le duel</button></form><p class="dim" style="font-size:12px;margin-top:8px">Deux films s’affrontent, l’équipe vote depuis l’accueil. Un nouveau duel ferme l’ancien.</p></div></div>`}
   return`<div class="gwrap" style="max-width:1040px"><h2>Animer l’équipe</h2><p class="dim">Lancez ou programmez un défi, ou opposez deux films dans un duel.</p>${tabs}${body}</div>`}
 
+
+/* Wrapped : l'année racontée en diapositives animées */
+let wrap=null;
+const WDAYS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+const WBG=[['#ff3d81','#ff8a3d'],['#3d6bff','#7a1fff'],['#00b894','#3d6bff'],['#ff8a3d','#ff3d81'],['#7a1fff','#ff3d81'],['#00a8e8','#00c9a7'],['#ffb020','#ff3d81'],['#5b3dff','#00b4d8']];
+function confettiHtml(n=40){const col=['#ffcc00','#4cd6a0','#3d6bff','#ff6b81','#c06cff','#ff8a3d'];return`<div class="confetti" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i class="cf" style="--x:${(i*37)%100}%;--d:${(2.4+(i%7)*.35).toFixed(2)}s;--w:${(i%6)*.15}s;--c:${col[i%col.length]}"></i>`).join('')}</div>`}
+function wrapData(){
+  const yr=new Date().getFullYear(),y0=new Date(yr,0,1).getTime(),y1=new Date(yr+1,0,1).getTime(),id=S.meId,dirId=S.cfg.directorId;
+  const Fm=r=>S.films.find(f=>f.id===r.filmId);
+  const rs=S.ratings.filter(r=>r.userId===id&&r.ts>=y0&&r.ts<y1&&Fm(r));
+  const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]);
+  const cnt=(arr)=>{const o={};arr.forEach(k=>{if(k!=null&&k!=='')o[k]=(o[k]||0)+1});return o};
+  const mins=rs.reduce((n,r)=>n+(Fm(r).runtime||110),0);
+  const byStars=[1,2,3,4,5].map(k=>rs.filter(r=>Math.ceil(r.stars/2)===k).length);
+  const avgS=avg(rs.map(r=>r.stars));
+  const gen=top(cnt(rs.map(r=>Fm(r).genre))),dec=top(cnt(rs.map(r=>+Fm(r).year>1800?Math.floor(+Fm(r).year/10)*10:null)));
+  const sorted=[...rs].sort((a,b)=>b.stars-a.stars||b.ts-a.ts),best=sorted[0],worst=[...rs].sort((a,b)=>a.stars-b.stars||b.ts-a.ts)[0];
+  const dh=r=>dirId&&r.userId!==dirId?rOf(r.filmId,dirId):null;
+  const withH=rs.filter(r=>dh(r)),agree=withH.filter(r=>Math.abs(dh(r).stars-r.stars)<=2).length;
+  const dis=[...withH].sort((a,b)=>Math.abs(dh(b).stars-b.stars)-Math.abs(dh(a).stars-a.stars))[0];
+  const texts=rs.filter(r=>r.text),longest=[...texts].sort((a,b)=>b.text.length-a.text.length)[0],likes=rs.reduce((n,r)=>n+(r.likes||[]).length,0),liked=[...texts].sort((a,b)=>(b.likes||[]).length-(a.likes||[]).length)[0];
+  const months=top(cnt(rs.map(r=>monthKey(r.ts)))),days=top(cnt(rs.map(r=>new Date(r.ts).getDay())));
+  const hrs=cnt(rs.map(r=>{const h=new Date(r.ts).getHours();return h<5?'night':h<12?'morning':h<18?'afternoon':'evening'})),chrono=top(hrs)[0];
+  const st=stats(id,0,Infinity,true),bt=badgeTotals(st.badges);
+  const rank=[...cons().map(m=>({id:m.id,xp:stats(m.id).xp}))].sort((a,b)=>b.xp-a.xp).findIndex(x=>x.id===id)+1;
+  const cards=rs.map(cardOf),done=S.chals.filter(c=>chalDone(c,id)).length,tro=rs.filter(r=>r.trophy).length;
+  const contra=withH.filter(r=>Math.abs(dh(r).stars-r.stars)>=6).length;
+  const g5=new Set(rs.map(r=>Fm(r).genre)).size;
+  let pers;
+  if(contra>=3)pers=['Le·la Contrariant·e','Hervé dit blanc, vous dites noir. Et vous avez souvent de bonnes raisons.','zap'];
+  else if(rs.length>=5&&avgS<=5.6)pers=['Le·la Critique impitoyable','Cinq étoiles ne se méritent pas, elles se conquièrent.','eye'];
+  else if(avgS>=8.4)pers=['L’enthousiaste','Chaque film a ses qualités, et vous êtes le premier à les voir.','heart'];
+  else if(texts.length>=rs.length*.7&&rs.length>=4)pers=['La plume','Une note ne suffit jamais : il vous faut des mots.','pen'];
+  else if(st.streak>=4||bestStreak(id)>=6)pers=['Le·la Fidèle de la salle','Pluie, grève ou examens : vous êtes toujours à la séance.','flame'];
+  else if(g5>=5)pers=['L’éclectique','Du documentaire au thriller, rien ne vous arrête.','globe'];
+  else pers=['Le·la Cinéphile tranquille','Un bon film, un bon avis, et la vie continue.','popcorn'];
+  return{yr,rs,n:rs.length,mins,byStars,avgS,gen,dec,best,worst,Fm,dh,withH,agree,dis,texts,longest,likes,liked,months,days,chrono,st,bt,rank,nTeam:cons().length,cards,done,tro,pers,g5,bestS:bestStreak(id)}}
+function wrapSlides(){
+  const D=wrapData(),SL=[],W=(k,inner,extra='')=>SL.push({k,inner,extra});
+  const mini=f=>`<div class="wpost">${poster(f)}</div>`;
+  const hh=h=>{const j=Math.round(h*10)/10;return String(j).replace('.',',')};
+  if(isDir()){
+    const yr=D.yr,y0=new Date(yr,0,1).getTime(),y1=new Date(yr+1,0,1).getTime(),fs=S.films.filter(f=>f.added>=y0&&f.added<y1&&f.status!=='upcoming');
+    const per=fs.map(f=>{const t=team(f.id),a=avg(t.map(r=>r.stars)),sd=t.length>1?Math.sqrt(avg(t.map(r=>(r.stars-a)**2))):0;return{f,t,a,sd}});
+    const ranked=per.filter(x=>x.t.length>=1&&x.a!=null).sort((a,b)=>b.a-a.a),top1=ranked[0],div1=[...per].sort((a,b)=>b.sd-a.sd)[0];
+    const part=cons().length&&per.length?Math.round(avg(per.map(x=>Math.min(1,x.t.length/cons().length)))*100):0;
+    const all=S.ratings.filter(r=>r.userId!==S.cfg.directorId&&r.ts>=y0&&r.ts<y1),mins=fs.reduce((n,f)=>n+(f.runtime||110),0);
+    const gen=Object.entries(fs.reduce((o,f)=>(o[f.genre]=(o[f.genre]||0)+1,o),{})).sort((a,b)=>b[1]-a[1]);
+    W('intro',`<div class="wk">Votre année de programmation</div><div class="wbig">${yr}</div><h2 class="wh">Le bilan de vos séances</h2><p class="wd">Prêt·e pour le récap ?</p>`);
+    W('films',`<div class="wk">Vous avez proposé</div><div class="wbig"><b class="cnt-up" data-to="${fs.length}">0</b></div><h2 class="wh">film${fs.length>1?'s':''}</h2><p class="wd">${fs.length?`Soit environ ${hh(mins/60)} h de cinéma à partager, ${(mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.`:'La saison commence : proposez un premier film.'}</p>`);
+    if(gen.length)W('genres',`<div class="wk">Vos goûts</div><h2 class="wh">Vous programmez surtout du ${e(gen[0][0].toLowerCase())}</h2>${gen.slice(0,4).map(([g,n])=>`<div class="wrow"><span>${e(g)}</span><div class="wbar"><i style="--w:${Math.round(n/gen[0][1]*100)}%"></i></div><b>${n}</b></div>`).join('')}`);
+    if(top1)W('best',`<div class="wk">Le favori de l’équipe</div><div class="wrow2">${mini(top1.f)}<div><h2 class="wh" style="font-size:24px">${e(top1.f.title)}</h2><p class="wd">${fmt(top1.a)} sur 5 en moyenne, ${plur(top1.t.length,'avis')}.</p>${div1&&div1.sd>=1.5&&div1.f.id!==top1.f.id?`<p class="wd" style="margin-top:10px">Le plus divisif : <b>${e(div1.f.title)}</b>.</p>`:''}</div></div>`);
+    W('part',`<div class="wk">Participation</div><div class="wbig"><b class="cnt-up" data-to="${part}" data-suf=" %">0</b></div><h2 class="wh">de l’équipe répond à chaque film</h2><p class="wd">${plur(all.length,'note')} recueillie${all.length>1?'s':''}, dont ${all.filter(r=>r.text).length} avis écrits.</p>`);
+    W('anim',`<div class="wk">Animation</div><h2 class="wh">Vous avez fait vivre le ciné-club</h2><div class="wgrid"><div><b class="cnt-up" data-to="${S.duels.length}">0</b><span>duels</span></div><div><b class="cnt-up" data-to="${S.chals.length}">0</b><span>défis</span></div><div><b class="cnt-up" data-to="${S.ratings.filter(r=>r.trophy).length}">0</b><span>trophées</span></div></div>`);
+    const pers=part>=80?['Le·la Rassembleur·se','Quand vous proposez, toute l’équipe suit.','users']:fs.length>=20?['Le·la Programmateur·rice infatigable','Un film après l’autre, sans jamais lâcher.','flame']:new Set(fs.map(f=>f.genre)).size>=5?['Le·la Programmateur·rice éclectique','Tous les genres passent par votre salle.','globe']:per.filter(x=>x.sd>=2).length>=3?['Le·la Provocateur·rice','Vos films ne laissent personne indifférent.','zap']:['Le·la Curateur·rice','Un œil sûr, des choix qui comptent.','clap'];
+    W('pers',`<div class="wk">Votre profil de programmateur·rice</div><div class="wicon">${icon(pers[2])}</div><h2 class="wh">${e(pers[0])}</h2><p class="wd">${e(pers[1])}</p>`,confettiHtml(46));
+    W('recap',`<div class="wk">En un coup d’œil</div><h2 class="wh">${yr}, votre année</h2><div class="wgrid"><div><b>${fs.length}</b><span>films</span></div><div><b>${part} %</b><span>participation</span></div><div><b>${all.length}</b><span>notes</span></div><div><b>${S.duels.length+S.chals.length}</b><span>duels et défis</span></div></div><p class="wd">${e(pers[0])}</p>`,confettiHtml(30));
+  }else if(!D.n){
+    W('intro',`<div class="wk">Votre année ciné</div><div class="wbig">${D.yr}</div><h2 class="wh">Votre année commence</h2><p class="wd">Notez un premier film : votre Wrapped se remplira tout seul.</p>`);
+  }else{
+    const f=D.Fm,peak=D.chrono&&D.chrono[0],ch={night:['Noctambule','Vous notez quand les autres dorment.','moon'],morning:['Lève-tôt','Un café, un film, une note : vous êtes matinal·e.','sunrise'],afternoon:['De l’après-midi','Vos avis tombent en plein après-midi.','clock'],evening:['Du soir','Vos notes arrivent le soir, après la séance.','sofa']}[peak||'evening'];
+    W('intro',`<div class="wk">Votre année ciné</div><div class="wbig">${D.yr}</div><h2 class="wh">${e(nameOf(S.meId).split(' ')[0])}, c’est l’heure du récap</h2><p class="wd">Appuyez sur Suivant pour découvrir votre année.</p>`);
+    W('films',`<div class="wk">Vous avez noté</div><div class="wbig"><b class="cnt-up" data-to="${D.n}">0</b></div><h2 class="wh">film${D.n>1?'s':''}</h2><p class="wd">Environ ${hh(D.mins/60)} h de cinéma, soit ${(D.mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.</p>`);
+    if(D.gen.length)W('genres',`<div class="wk">Votre genre favori</div><h2 class="wh">Vous êtes plutôt ${e(D.gen[0][0].toLowerCase())}</h2>${D.gen.slice(0,4).map(([g,n])=>`<div class="wrow"><span>${e(g)}</span><div class="wbar"><i style="--w:${Math.round(n/D.gen[0][1]*100)}%"></i></div><b>${n}</b></div>`).join('')}`);
+    if(D.dec.length)W('dec',`<div class="wk">Votre époque</div><div class="wbig" style="font-size:64px">${D.dec[0][0]}</div><h2 class="wh">Les années ${D.dec[0][0]} vous parlent</h2><p class="wd">${plur(D.dec[0][1],'film')} de cette décennie sur ${plur(D.n,'film')} notés.</p>`);
+    W('notes',`<div class="wk">Votre façon de noter</div><div class="wbig" style="font-size:72px"><b class="cnt-up" data-to="${(D.avgS/2).toFixed(1)}" data-dec="1">0</b><small>/5</small></div>${D.byStars.map((n,i)=>`<div class="wrow"><span>${i+1} ${icon('star')}</span><div class="wbar"><i style="--w:${Math.round(n/Math.max(...D.byStars,1)*100)}%"></i></div><b>${n}</b></div>`).join('')}<p class="wd">${D.avgS>=7.6?'Vous êtes plutôt indulgent·e.':D.avgS<=5.4?'Vous êtes plutôt exigeant·e.':'Vous êtes équilibré·e.'}</p>`);
+    if(D.best){const bf=f(D.best),wf=D.worst&&D.worst!==D.best?f(D.worst):null;W('fav',`<div class="wk">Votre coup de cœur</div><div class="wrow2">${mini(bf)}<div><h2 class="wh" style="font-size:24px">${e(bf.title)}</h2><p class="wd">${fmt(D.best.stars)} sur 5</p></div></div>${wf?`<div class="wk" style="margin-top:6px">Votre bête noire</div><div class="wrow2">${mini(wf)}<div><h2 class="wh" style="font-size:20px">${e(wf.title)}</h2><p class="wd">${fmt(D.worst.stars)} sur 5</p></div></div>`:''}`)}
+    if(D.withH.length)W('herve',`<div class="wk">Face à Hervé</div><div class="wbig"><b class="cnt-up" data-to="${Math.round(D.agree/D.withH.length*100)}" data-suf=" %">0</b></div><h2 class="wh">d’accord avec lui, à une étoile près</h2>${D.dis&&Math.abs(D.dh(D.dis).stars-D.dis.stars)>=2?`<p class="wd">Votre plus grand désaccord : <b>${e(f(D.dis).title)}</b>. Vous : ${fmt(D.dis.stars)}. Lui : ${fmt(D.dh(D.dis).stars)}.</p>`:'<p class="wd">Vous êtes souvent sur la même longueur d’onde.</p>'}`);
+    W('plume',`<div class="wk">Votre plume</div><div class="wgrid"><div><b class="cnt-up" data-to="${D.texts.length}">0</b><span>avis écrits</span></div><div><b class="cnt-up" data-to="${D.likes}">0</b><span>likes reçus</span></div></div>${D.longest?`<p class="wd">Votre plus long avis : ${D.longest.text.length} caractères sur <b>${e(f(D.longest).title)}</b>.</p>`:''}${D.liked&&(D.liked.likes||[]).length?`<blockquote class="wq">« ${e(D.liked.text.slice(0,140))}${D.liked.text.length>140?'…':''} »<span>${plur(D.liked.likes.length,'like')}</span></blockquote>`:''}`);
+    W('rythme',`<div class="wk">Votre rythme</div><div class="wicon">${icon(ch[2])}</div><h2 class="wh">${ch[0]}</h2><p class="wd">${ch[1]}</p><div class="wgrid"><div><b class="cnt-up" data-to="${D.bestS}">0</b><span>semaines d’affilée (record)</span></div><div><b>${D.days[0]?WDAYS[D.days[0][0]]:'?'}</b><span>jour préféré</span></div>${D.months[0]?`<div><b style="text-transform:capitalize">${monthLabel(D.months[0][0]).split(' ')[0]}</b><span>mois le plus actif</span></div>`:''}</div>`);
+    W('niveau',`<div class="wk">Votre progression</div><div class="wbig"><b class="cnt-up" data-to="${D.st.xp}">0</b><small> XP</small></div><h2 class="wh">${e(D.st.name)}</h2><div class="wgrid"><div><b>${D.rank}<small>/${D.nTeam}</small></b><span>au classement</span></div><div><b>${D.bt.have}</b><span>badges débloqués</span></div><div><b>${D.cards.filter(c=>c==='legendary'||c==='rare').length}</b><span>cartes rares</span></div></div>`);
+    W('pers',`<div class="wk">Votre profil cinéma</div><div class="wicon">${icon(D.pers[2])}</div><h2 class="wh">${e(D.pers[0])}</h2><p class="wd">${e(D.pers[1])}</p>`,confettiHtml(46));
+    W('recap',`<div class="wk">En un coup d’œil</div><h2 class="wh">${D.yr}, votre année</h2><div class="wgrid"><div><b>${D.n}</b><span>films</span></div><div><b>${(D.avgS/2).toFixed(1).replace('.',',')}</b><span>note moyenne</span></div><div><b>${D.texts.length}</b><span>avis</span></div><div><b>${D.st.xp}</b><span>XP</span></div></div><p class="wd">${e(D.pers[0])}</p>`,confettiHtml(30));
+  }
+  return SL}
+function wrapModal(){const SL=wrapSlides(),i=Math.min(wrap.i,SL.length-1),sl=SL[i],last=i===SL.length-1,g=WBG[i%WBG.length];
+  return`<div class="modal wmodal" data-act="wrapclose"><div class="wstory" data-stop role="dialog" aria-label="Mon Wrapped"><div class="wprog">${SL.map((_,k)=>`<i class="${k<i?'done':k===i?'cur':''}"></i>`).join('')}</div><button class="x" data-act="wrapclose" aria-label="Fermer" style="z-index:5">✕</button>
+   <div class="ws" key="${i}" style="--g1:${g[0]};--g2:${g[1]}">${sl.inner}${sl.extra}</div>
+   <div class="wnav"><button class="wb" data-act="wrapprev" ${i===0?'disabled':''} aria-label="Précédent">${icon('check').replace('<polyline points="20 6 9 17 4 12"/>','<polyline points="15 18 9 12 15 6"/>')}</button>${last?`<button class="btn" data-act="wrapshare">${icon('camera')} Enregistrer ma carte</button><button class="btn ghost" data-act="wrapclose">Terminer</button>`:`<button class="btn" data-act="wrapnext">Suivant ${icon('check').replace('<polyline points="20 6 9 17 4 12"/>','<polyline points="9 18 15 12 9 6"/>')}</button>`}</div></div></div>`}
+function animateCounters(){const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  document.querySelectorAll('.cnt-up').forEach(el=>{const to=parseFloat(el.dataset.to)||0,dec=+el.dataset.dec||0,suf=el.dataset.suf||'',fmtv=v=>(dec?v.toFixed(dec).replace('.',','):String(Math.round(v)))+suf;
+    if(rm||to===0){el.textContent=fmtv(to);return}const t0=performance.now(),D=1300;const step=t=>{const k=Math.min(1,(t-t0)/D),v=to*(1-Math.pow(1-k,3));el.textContent=fmtv(v);if(k<1&&document.body.contains(el))requestAnimationFrame(step)};requestAnimationFrame(step)})}
+async function wrapShareCard(){
+  const SL=wrapSlides();if(!S.dl)return;const D=isDir()?null:wrapData();
+  const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#2b2d6e');g.addColorStop(1,'#7a1f5c');x.fillStyle=g;x.fillRect(0,0,1080,1350);
+  x.fillStyle='#ffcc00';x.font='700 36px Inter,sans-serif';x.fillText('CINÉ-CLUB IMAGERIE',80,120);
+  x.fillStyle='#fff';x.font='800 120px Inter,sans-serif';x.fillText(String(new Date().getFullYear()),80,290);
+  x.font='600 44px Inter,sans-serif';x.fillText(nameOf(S.meId),80,360);
+  const lines=D?[[D.n,'films notés'],[(D.avgS/2).toFixed(1).replace('.',','),'note moyenne'],[D.texts.length,'avis écrits'],[D.st.xp,'XP · '+D.st.name]]:[[S.films.length,'films proposés'],[S.duels.length,'duels'],[S.chals.length,'défis'],[S.ratings.filter(r=>r.trophy).length,'trophées']];
+  lines.forEach(([v,l],i)=>{x.fillStyle='#ffcc00';x.font='800 96px Inter,sans-serif';x.fillText(String(v),80,520+i*170);x.fillStyle='#ffffffcc';x.font='500 40px Inter,sans-serif';x.fillText(l,80,566+i*170)});
+  x.fillStyle='#fff';x.font='700 56px Inter,sans-serif';x.fillText((D?D.pers[0]:'').replace('·',''),80,1250);
+  const blob=await new Promise(r=>c.toBlob(r,'image/png'));try{await S.dl.save({filename:'wrapped-'+new Date().getFullYear()+'.png',data:blob})}catch{}}
 function home(){
   const films=[...S.films].sort((a,b)=>b.added-a.added),liveF=films.filter(f=>f.status!=='upcoming'),up=films.filter(f=>f.status==='upcoming');
   const feat=films.find(f=>f.featured)||liveF[0],genres=[...new Set(liveF.map(f=>f.genre))];
@@ -771,6 +899,51 @@ function wrapped(){
    <div class="pn"><b style="font-size:24px">${dis&&Math.abs(dis.r.stars-dis.h.stars)>=2?e(S.films.find(f=>f.id===dis.r.filmId)?.title||'?'):'?'}</b>votre plus grand désaccord avec Hervé</div>
    <div class="pn"><b style="font-size:24px">${topT?e(topT[0]):'?'}</b>votre tag fétiche</div>
    <div class="pn"><b style="font-size:20px">${bestRev?e(bestRev.text.slice(0,70)):'?'}</b>votre avis le plus aimé (${bestRev?(bestRev.likes||[]).length:0} ❤)</div></div>`}
+
+/* créateur d'avatar : un petit personnage à composer */
+const AV={skin:['#f6d5b8','#eec39b','#d9a273','#b87b4b','#8d5a35','#5e3a22'],hair:['none','short','buzz','long','bob','curly','ponytail','bun'],hairColor:['#2b1d12','#5a3a1e','#a0622d','#d8a64a','#c9c9c9','#b8412f','#3a6ea5','#8f4fd1'],eyes:['dots','happy','wide','sleepy'],mouth:['smile','grin','neutral','open'],acc:['none','glasses','sunglasses','headphones','cap'],shirt:['#3d6bff','#e05d5d','#2fb5a0','#d9b43a','#a05ce0','#2b2f3a','#e8873a','#7a8699'],bg:['#ffd9a8','#cfe3ff','#d4f0dc','#f8d0e0','#e3d4ff','#ffe9a8','#d0e8e8','#e5e5ea']};
+const AVLAB={hair:{none:'Chauve',short:'Courts',buzz:'Rasés',long:'Longs',bob:'Carré',curly:'Bouclés',ponytail:'Queue de cheval',bun:'Chignon'},eyes:{dots:'Ronds',happy:'Rieurs',wide:'Grands',sleepy:'Endormis'},mouth:{smile:'Sourire',grin:'Grand sourire',neutral:'Neutre',open:'Bouche ouverte'},acc:{none:'Aucun',glasses:'Lunettes',sunglasses:'Lunettes de soleil',headphones:'Casque',cap:'Casquette'}};
+function avDefault(id){const h=hash(id||'x'),pick=(a,o)=>a[(h>>o)%a.length];return{skin:pick(AV.skin,1),hair:pick(AV.hair,3),hairColor:pick(AV.hairColor,5),eyes:pick(AV.eyes,7),mouth:pick(AV.mouth,9),acc:'none',shirt:pick(AV.shirt,11),bg:pick(AV.bg,13)}}
+function avatarSvg(c){
+  const hc=c.hairColor,H=c.hair,ink='#2a2118';
+  const front='M19 27C18 14 27 10 33 10C42 10 47 16 45 27C42 21 38 19 32 19C26 19 22 21 19 27Z';
+  let back='',fr='';
+  if(H==='long')back=`<path d="M17 28C15 50 21 54 25 54H39C43 54 49 50 47 28Z" fill="${hc}"/>`;
+  if(H==='bob')back=`<path d="M17 27C16 40 19 43 22 43H42C45 43 48 40 47 27Z" fill="${hc}"/>`;
+  if(H==='ponytail')back=`<ellipse cx="49" cy="33" rx="4.5" ry="9" fill="${hc}"/>`;
+  if(H==='bun')back=`<circle cx="32" cy="9" r="6" fill="${hc}"/>`;
+  if(['short','long','bob','ponytail','bun'].includes(H))fr=`<path d="${front}" fill="${hc}"/>`;
+  if(H==='buzz')fr=`<path d="M19.5 25C20 14 28 12 32 12C40 12 45 15 44.5 25C42 20 38 18 32 18C26 18 22 20 19.5 25Z" fill="${hc}" opacity=".85"/>`;
+  if(H==='curly')fr=`<g fill="${hc}"><circle cx="22" cy="18" r="6"/><circle cx="32" cy="14" r="7"/><circle cx="42" cy="18" r="6"/><circle cx="19.5" cy="26" r="4"/><circle cx="44.5" cy="26" r="4"/></g>`;
+  const eyes={dots:`<circle cx="26" cy="29" r="1.9" fill="${ink}"/><circle cx="38" cy="29" r="1.9" fill="${ink}"/>`,
+    happy:`<g fill="none" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"><path d="M23.8 30Q26 26.8 28.2 30"/><path d="M35.8 30Q38 26.8 40.2 30"/></g>`,
+    wide:`<ellipse cx="26" cy="29" rx="2.8" ry="3.1" fill="#fff" stroke="${ink}" stroke-width=".8"/><ellipse cx="38" cy="29" rx="2.8" ry="3.1" fill="#fff" stroke="${ink}" stroke-width=".8"/><circle cx="26" cy="29.4" r="1.4" fill="${ink}"/><circle cx="38" cy="29.4" r="1.4" fill="${ink}"/>`,
+    sleepy:`<g stroke="${ink}" stroke-width="1.8" stroke-linecap="round"><path d="M23.8 29.5H28.2"/><path d="M35.8 29.5H40.2"/></g>`}[c.eyes]||'';
+  const mouth={smile:`<path d="M27 37Q32 42 37 37" fill="none" stroke="#7a2b2b" stroke-width="1.8" stroke-linecap="round"/>`,
+    grin:`<path d="M26.5 36Q32 45 37.5 36Z" fill="#fff" stroke="#7a2b2b" stroke-width="1.4" stroke-linejoin="round"/>`,
+    neutral:`<path d="M28 38.5H36" stroke="#7a2b2b" stroke-width="1.8" stroke-linecap="round"/>`,
+    open:`<ellipse cx="32" cy="39" rx="3.2" ry="2.4" fill="#7a2b2b"/>`}[c.mouth]||'';
+  const acc={glasses:`<g fill="none" stroke="#2a2a2a" stroke-width="1.6"><circle cx="26" cy="29" r="5"/><circle cx="38" cy="29" r="5"/><path d="M31 29H33"/></g>`,
+    sunglasses:`<g fill="#1b1b1b"><rect x="20.5" y="25.5" width="11" height="7" rx="3"/><rect x="32.5" y="25.5" width="11" height="7" rx="3"/><rect x="31" y="27.5" width="2" height="1.6"/></g>`,
+    headphones:`<path d="M17 29C17 9 47 9 47 29" fill="none" stroke="#2f3340" stroke-width="3"/><rect x="14.5" y="26" width="6" height="11" rx="3" fill="#2f3340"/><rect x="43.5" y="26" width="6" height="11" rx="3" fill="#2f3340"/>`,
+    cap:`<path d="M18.5 23C18.5 8 45.5 8 45.5 23Z" fill="#e05d5d"/><rect x="13" y="22" width="24" height="4" rx="2" fill="#c24444"/>`}[c.acc]||'';
+  return`<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${c.bg}"/>${back}<path d="M6 64C6 52 18 46 32 46C46 46 58 52 58 64Z" fill="${c.shirt}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="${c.skin}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="#000" opacity=".08"/><circle cx="19" cy="30" r="2.6" fill="${c.skin}"/><circle cx="45" cy="30" r="2.6" fill="${c.skin}"/><ellipse cx="32" cy="29" rx="13" ry="15" fill="${c.skin}"/><circle cx="23" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/><circle cx="41" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/>${eyes}${mouth}${fr}${acc}</svg>`}
+function avatarOf(id,name,av){return`<i class="ini">${avatarSvg({...avDefault(id),...(av&&av.skin?av:{})})}</i>`}
+let avPart='face',avSub='';
+function avCfg(){return{...avDefault(S.meId),...(cache.members.get(S.meId)?.av||{})}}
+function avatarTab(){
+  const cfg=avCfg(),mini=(k,v)=>`<button class="avm ${cfg[k]===v?'on':''}" data-act="avset" data-k="${k}" data-v="${v}" data-tip="${e((AVLAB[k]||{})[v]||'Choisir')}">${avatarSvg({...cfg,[k]:v})}</button>`,sw=(k,v)=>`<button class="swt ${cfg[k]===v?'on':''}" style="background:${v}" data-act="avset" data-k="${k}" data-v="${v}" aria-label="Choisir cette couleur"></button>`;
+  const parts=[['face','Visage'],['hair','Cheveux'],['expr','Yeux et bouche'],['acc','Accessoire'],['style','Tenue et fond']],subs={hair:[['style','Style'],['color','Couleur']],expr:[['eyes','Yeux'],['mouth','Bouche']],style:[['shirt','Tenue'],['bg','Fond']]};
+  const sub=avSub&&(subs[avPart]||[]).some(x=>x[0]===avSub)?avSub:(subs[avPart]||[[ '' ]])[0][0];
+  let grid='';
+  if(avPart==='face')grid=`<div class="dim fl">Teint de peau</div><div class="swgrid">${AV.skin.map(v=>sw('skin',v)).join('')}</div>`;
+  else if(avPart==='hair')grid=sub==='color'?`<div class="dim fl">Couleur des cheveux</div><div class="swgrid">${AV.hairColor.map(v=>sw('hairColor',v)).join('')}</div>`:`<div class="avgrid2">${AV.hair.map(v=>mini('hair',v)).join('')}</div>`;
+  else if(avPart==='expr')grid=sub==='mouth'?`<div class="avgrid2">${AV.mouth.map(v=>mini('mouth',v)).join('')}</div>`:`<div class="avgrid2">${AV.eyes.map(v=>mini('eyes',v)).join('')}</div>`;
+  else if(avPart==='acc')grid=`<div class="avgrid2">${AV.acc.map(v=>mini('acc',v)).join('')}</div>`;
+  else grid=sub==='bg'?`<div class="dim fl">Couleur du fond</div><div class="swgrid">${AV.bg.map(v=>sw('bg',v)).join('')}</div>`:`<div class="dim fl">Couleur de la tenue</div><div class="swgrid">${AV.shirt.map(v=>sw('shirt',v)).join('')}</div>`;
+  return`<div class="pn"><div class="row" style="gap:18px;align-items:flex-start;flex-wrap:wrap"><div style="text-align:center"><div class="avbig">${avatarSvg(cfg)}</div><div class="row" style="justify-content:center;margin-top:10px;gap:6px"><button class="chip" data-act="avrand" data-tip="Tire un personnage au hasard">${icon('dice')} Au hasard</button><button class="chip" data-act="avreset" data-tip="Revenir au personnage généré automatiquement">Réinitialiser</button></div></div>
+   <div style="flex:1;min-width:260px"><div class="tabs">${parts.map(([k,l])=>`<button class="tab ${avPart===k?'on':''}" data-act="avpart" data-id="${k}">${l}</button>`).join('')}</div>${(subs[avPart]||[]).length?`<div class="subtabs" style="margin-bottom:12px">${subs[avPart].map(([k,l])=>`<button class="stab ${sub===k?'on':''}" data-act="avsub" data-id="${k}">${l}</button>`).join('')}</div>`:''}${grid}</div></div>
+   <p class="dim" style="font-size:12px;margin-top:12px">Votre personnage s’affiche à côté de votre nom dans le classement, les avis et les podiums. Chaque changement est enregistré tout de suite.</p></div>`}
 let pTab='apercu',bCat='close';
 function badgePanel(fs){
   const cats=[...new Set(fs.map(f=>f.cat))];if(bCat!=='close'&&!cats.includes(bCat))bCat='close';
@@ -782,17 +955,18 @@ function journalRows(list,limit){const all=list;list=limit?list.slice(0,limit):l
 function profile(){
   const s=stats(S.meId,0,Infinity,true),rs=S.ratings.filter(r=>r.userId===S.meId).sort((a,b)=>b.ts-a.ts),bt=badgeTotals(s.badges);
   const likes=rs.reduce((n,r)=>n+(r.likes||[]).length,0),texts=rs.filter(r=>r.text).length;
-  const tabs=[['apercu','Aperçu'],['badges',`Badges (${bt.have})`],...(isDir()?[]:[['cartes',`Cartes (${rs.length})`]]),['journal','Journal'],['reglages','Réglages']];
+  const tabs=[['apercu','Aperçu'],['badges',`Badges (${bt.have})`],...(isDir()?[]:[['cartes',`Cartes (${rs.length})`]]),['journal','Journal'],['avatar','Avatar'],['reglages','Réglages']];
   const tile=(n,l)=>`<div class="pn" style="padding:12px 14px"><b class="serif" style="font-size:26px">${n}</b><div class="dim" style="font-size:13px">${l}</div></div>`;
   let body='';
   if(pTab==='badges')body=badgePanel(s.badges);
   else if(pTab==='cartes'&&!isDir())body=`<p class="dim" style="margin-bottom:12px">${rs.length} carte${rs.length>1?'s':''}. Plus vous notez tôt, plus la carte est rare.</p><div class="cards">${rs.slice(0,cLimit).map(r=>{const f=S.films.find(x=>x.id===r.filmId),k=cardOf(r);return f?`<div class="tc ${k}" data-act="open" data-id="${f.id}" style="cursor:pointer">${poster(f)}<small class="r">${RARITY[k]}</small></div>`:''}).join('')||'<p class="dim">Votre première carte vous attend.</p>'}</div>${rs.length>cLimit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="cmore">Afficher plus (${rs.length-cLimit} restantes)</button></div>`:''}`;
   else if(pTab==='journal')body=journalRows(rs,jLimit);
-  else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div><div class="emo row" style="flex-wrap:wrap"><span class="dim">Mon avatar</span>${EMOJIS.map(x=>`<button class="${emojiOf(S.meId)===x?'on':''}" data-act="avatar" data-id="${x}">${x}</button>`).join('')}</div></div>`;
+  else if(pTab==='avatar')body=avatarTab();
+  else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div></div>`;
   else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,'films notés')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
     <div class="sect"><h3>Derniers avis</h3><button class="chip" data-act="ptab" data-id="journal">Tout le journal</button></div>${journalRows(rs.slice(0,3))}`;
-  return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><span class="av" style="width:56px;height:56px;font-size:28px">${emojiOf(S.meId)}</span><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="nav" data-id="wrapped" data-tip="Le résumé de votre année de cinéma">Mon Wrapped</button></div>
+  return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><button class="av avbtn" style="width:56px;height:56px;font-size:28px" data-act="goavatar" data-tip="Créer ou modifier mon avatar">${emojiOf(S.meId)}<span class="avedit">${icon('pen')}</span></button><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="wrapopen" data-tip="Votre année de cinéma racontée en diapositives animées">${icon('sparkles')} Mon Wrapped</button></div>
    <div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:16px">${tabs.map(([k,l])=>`<button class="tab ${pTab===k?'on':''}" data-act="ptab" data-id="${k}">${l}</button>`).join('')}</div>${body}`}
 
 /* roulette */
@@ -1156,7 +1330,7 @@ let tour=null;
 const tourKey=()=>'cineclub-tour-'+S.meId;
 function finishTour(){tour=null;try{localStorage.setItem(tourKey(),'1')}catch{}render()}
 function tourModal(){const sl=isDir()?TOUR_DIR:TOUR_TEAM,i=Math.min(tour.i,sl.length-1),[em,t,b]=sl[i];
-  return`<div class="modal" data-act="tourskip"><div class="sheet" data-stop style="width:min(560px,100%);text-align:center" role="dialog" aria-label="Visite guidée"><div style="font-size:54px">${em}</div><h2 style="margin:6px 0 12px">${t}</h2>
+  return`<div class="modal" data-act="tourskip"><div class="sheet" data-stop style="width:min(560px,100%);text-align:center" role="dialog" aria-label="Visite guidée"><div class="tico">${em}</div><h2 style="margin:6px 0 12px">${t}</h2>
    <ul style="text-align:left;display:grid;gap:10px;padding-left:20px;color:#dcd9e6">${b.map(x=>`<li>${x}</li>`).join('')}</ul>
    <div class="dots">${sl.map((_,k)=>`<span class="${k===i?'on':''}"></span>`).join('')}</div>
    <div class="row" style="justify-content:space-between;margin-top:18px"><button class="chip" data-act="tourskip">Passer</button><div class="row">${i>0?'<button class="btn ghost" data-act="tourprev">Précédent</button>':''}<button class="btn" data-act="tournext">${i<sl.length-1?'Suivant':'C’est parti !'}</button></div></div></div></div>`}
@@ -1222,9 +1396,10 @@ function render(){
   if(!S.ready){a.innerHTML='<div class="empty dim" style="padding-top:120px">Ouverture de la salle…</div>';return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
+  if(wrap)animateCounters();
 }
 
 /* actions */
@@ -1282,6 +1457,17 @@ document.addEventListener('click',async ev=>{
   else if(act==='chsave'){saveChForm()}
   else if(act==='chq'){readChForm();const s0=new Date(chForm.d.start+'T00:00:00').getTime()||dayStart(Date.now());chForm.d.end=ymd(id==='month'?monthEnd(s0):s0+(+id-1)*DAY);$('#chf')?.remove();render()}
   else if(act==='savename'){const v=($('#myname')?.value||'').trim();if(v.length<2)return toast('Le nom doit faire au moins 2 caractères');upd('members/'+S.meId,{name:v}).then(ok=>ok&&toast('Nom enregistré'))}
+  else if(act==='goavatar'){view='profile';pTab='avatar';film=null;menuOpen=false;render()}
+  else if(act==='avpart'){avPart=id;avSub='';render()}
+  else if(act==='avsub'){avSub=id;render()}
+  else if(act==='avset'){const cfg=avCfg();upd('members/'+S.meId,{av:{...cfg,[t.dataset.k]:t.dataset.v}})}
+  else if(act==='avrand'){const r=a=>a[Math.floor(Math.random()*a.length)];upd('members/'+S.meId,{av:{skin:r(AV.skin),hair:r(AV.hair),hairColor:r(AV.hairColor),eyes:r(AV.eyes),mouth:r(AV.mouth),acc:r(AV.acc),shirt:r(AV.shirt),bg:r(AV.bg)}})}
+  else if(act==='avreset'){upd('members/'+S.meId,{av:null})}
+  else if(act==='wrapopen'){wrap={i:0};SFX.win();render()}
+  else if(act==='wrapclose'){wrap=null;render()}
+  else if(act==='wrapnext'){wrap.i++;SFX.pop();render()}
+  else if(act==='wrapprev'){wrap.i=Math.max(0,wrap.i-1);render()}
+  else if(act==='wrapshare'){wrapShareCard()}
   else if(act==='ptab'){pTab=id;render()}
   else if(act==='bcat'){bCat=id;render()}
   else if(act==='editfilm'){editFilm=editFilm===id?null:id;render()}
@@ -1379,7 +1565,8 @@ document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();re
   const m={rfyf:'from',rfyt:'to',rfdir:'dir',rfact:'act'}[ev.target.id];if(m){R.f[m]=ev.target.value.trim();scheduleBuild()}});
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
-  if(ev.key==='Escape'){if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(wrap&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();wrap.i=Math.max(0,wrap.i+(ev.key==='ArrowRight'?1:-1));render();return}
+  if(ev.key==='Escape'){if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
@@ -1432,7 +1619,7 @@ function derive(){
   const arr=c=>[...cache[c]].map(([id,d])=>({id,...d}));
   S.names=Object.fromEntries(profiles.map(p=>[p.id,{name:(cache.members.get(p.id)?.name||p.name)}]));
   S.cfg={directorId:profiles.find(p=>p.role==='director')?.id};
-  S.members=profiles.map(p=>({id:p.id,emoji:cache.members.get(p.id)?.emoji||EMOJIS[hash(p.id)%EMOJIS.length],role:p.role,joined:cache.members.get(p.id)?.joined}));
+  S.members=profiles.map(p=>({id:p.id,emoji:avatarOf(p.id,cache.members.get(p.id)?.name||p.name,cache.members.get(p.id)?.av),role:p.role,joined:cache.members.get(p.id)?.joined}));
   const lk={};arr('likes').forEach(l=>(lk[l.ratingId]=lk[l.ratingId]||[]).push(l.userId));
   S.films=arr('films').map(f=>(!f.poster&&posterCache[f.id])?{...f,poster:posterCache[f.id]}:f);S.ideas=arr('ideas');S.duels=arr('duels');S.dvotes=arr('dvotes');S.chals=arr('challenges');S.watch=arr('watch');
   S.ratings=arr('ratings').map(r=>({...r,likes:lk[r.id]||[],trophy:cache.trophies.get(r.id)?.kind||null}));
@@ -1495,7 +1682,7 @@ let pollT=null;
 async function enter(user){
   S.meId=user.id;S.db=adapter;S.dl=saver;S.ready=false;render();
   try{await loadAll()}catch{S.db=null;authMsg='Connexion au serveur impossible.';S.ready=true;return render()}
-  if(!cache.members.has(S.meId))put('members/'+S.meId,{emoji:EMOJIS[hash(S.meId)%EMOJIS.length]});
+  if(!cache.members.has(S.meId))put('members/'+S.meId,{joined:Date.now()});
   S.ready=true;render();fillPosters();setTimeout(maybePodium,900);try{if(!localStorage.getItem(tourKey())){tour={i:0};render()}}catch{}clearInterval(pollT);
   pollT=setInterval(async()=>{if(document.hidden||adding||tour||view==='guide'||dTxt||dShot||dGif||S.db===null||/INPUT|TEXTAREA/.test(document.activeElement?.tagName||''))return;try{await loadAll();render();fillPosters()}catch{}},8000)}
 (async function(){
