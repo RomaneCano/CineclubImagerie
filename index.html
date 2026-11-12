@@ -126,6 +126,7 @@ nav button{padding:9px 16px}
 .mi{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px}.mi:hover{background:var(--panel2)}
 #tip{position:fixed;z-index:300;max-width:260px;background:var(--panel2);color:var(--tx);border:1px solid var(--acc);padding:7px 11px;border-radius:10px;font-size:13px;line-height:1.4;box-shadow:0 8px 24px #000a;pointer-events:none;display:none}
 .fnav{position:absolute;left:20px;top:16px;display:flex;gap:6px}.sheet{padding-top:58px}
+.sug button{align-items:center}.sug button img,.sug .ph{width:44px;height:64px;flex:none;border-radius:6px;object-fit:cover;background:var(--panel2)}.sug .ph{display:grid;place-items:center;font-size:20px}
 </style>
 </head>
 <body>
@@ -434,7 +435,7 @@ function addModal(){const p=prefill||{};
   return`<div class="modal" data-act="close"><div class="sheet" data-stop style="width:min(620px,100%)" role="dialog" aria-label="Proposer un film"><button class="x" data-act="close" aria-label="Fermer">✕</button>
    <h2>Proposer un film</h2><p class="dim">Un titre, un mot pour l’équipe. Entrée pour publier.</p>
    <form id="addf" style="display:grid;gap:12px;margin-top:16px">
-    <div class="field"><label for="ft">Titre</label><input type="hidden" name="qid" id="fq" value="${e(p.qid||'')}"><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"><span class="dim" style="font-size:12px">Tapez 3 lettres : la base mondiale Wikidata propose les films et remplit les champs.</span></div>
+    <div class="field"><label for="ft">Titre</label><input type="hidden" name="qid" id="fq" value="${e(p.qid||'')}"><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"><span class="dim" style="font-size:12px">Tapez le titre : des propositions avec affiche apparaissent, un clic remplit les champs.</span></div>
     <div id="sug" class="sug"></div>
     <div class="field"><label for="fpitch">Pourquoi je vous le propose</label><textarea name="pitch" id="fpitch" rows="2"></textarea></div>
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||'Drame')}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
@@ -524,7 +525,9 @@ const qidOf=u=>u.slice(u.lastIndexOf('/')+1);
 const LBL='SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }';
 function wdRows(j){const m=new Map();
   (j.results?.bindings||[]).forEach(b=>{const id=qidOf(b.f.value),t=b.fLabel?.value||'';if(!t||/^Q\d+$/.test(t))return;
-    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',from:'wd'};
+    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',sl:0,wiki:'',from:'wd'};
+    if(b.sl)o.sl=Math.max(o.sl,+b.sl.value||0);
+    if(b.art&&!o.wiki)o.wiki=decodeURIComponent(qidOf(b.art.value)).replace(/_/g,' ');
     if(b.year&&(!o.year||+b.year.value<+o.year))o.year=b.year.value;
     if(b.dLabel&&!o.director&&!/^Q\d+$/.test(b.dLabel.value))o.director=b.dLabel.value;
     if(b.gq){const g=WDQ[qidOf(b.gq.value)];if(g)o.genre=g}
@@ -548,14 +551,31 @@ async function wdPool(genre,y0){
 async function wdPoster(qid){
   const j=await sparql(`SELECT ?pf ?im WHERE { OPTIONAL { wd:${qid} wdt:P3383 ?pf } OPTIONAL { wd:${qid} wdt:P18 ?im } } LIMIT 1`);
   const b=j.results?.bindings?.[0];const u=b?.pf?.value||b?.im?.value;return u?u.replace(/^http:/,'https:')+'?width=400':''}
+const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+function localSearch(q){const n=norm(q);if(n.length<2)return[];
+  return CAT.filter(c=>norm(c[0]).includes(n)).sort((a,b)=>(norm(a[0]).startsWith(n)?0:1)-(norm(b[0]).startsWith(n)?0:1)).slice(0,5).map(([title,year,director,genre])=>({qid:'',title,year:String(year),director,genre,poster:'',sl:0,wiki:'',from:'cat'}))}
+function mergeResults(list,q){const n=norm(q),map=new Map();
+  list.forEach(x=>{const k=norm(x.title)+'|'+(x.year||'');const o=map.get(k);
+    if(!o)map.set(k,{...x});else{if(!o.qid&&x.qid)o.qid=x.qid;if(!o.poster&&x.poster)o.poster=x.poster;if(!o.director&&x.director)o.director=x.director;if(!o.wiki&&x.wiki)o.wiki=x.wiki;o.sl=Math.max(o.sl||0,x.sl||0)}});
+  const arr=[...map.values()],dated=new Set(arr.filter(x=>x.year).map(x=>norm(x.title)));
+  const rank=x=>{const t=norm(x.title);return t===n?0:t.startsWith(n)?1:t.includes(n)?2:3};
+  return arr.filter(x=>x.year||!dated.has(norm(x.title))).sort((a,b)=>rank(a)-rank(b)||(b.sl||0)-(a.sl||0)).slice(0,8)}
+async function wikiThumbs(items){
+  const todo=items.filter(x=>!x.poster&&x.wiki);if(!todo.length)return;
+  try{const j=await wdGet('https://fr.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1&format=json&origin=*&titles='+encodeURIComponent(todo.map(x=>x.wiki).join('|')),10000);
+    const img=new Map(),al=new Map();Object.values(j.query?.pages||{}).forEach(p=>p.thumbnail&&img.set(p.title,p.thumbnail.source));
+    [...(j.query?.normalized||[]),...(j.query?.redirects||[])].forEach(r=>al.set(r.from,r.to));
+    todo.forEach(x=>{let n=x.wiki;n=al.get(n)||n;n=al.get(n)||n;const u=img.get(n);if(u)x.poster=u})}catch{}}
 async function wdSearch(text){
-  const u=c=>'https://www.wikidata.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent('haswbstatement:P31='+c+' '+text)+'&srlimit=6&format=json&origin=*';
-  const rs=await Promise.all(['Q11424','Q202866','Q93204'].map(c=>wdGet(u(c),10000).catch(()=>null)));
-  const ids=[...new Set(rs.flatMap(r=>(r?.query?.search||[]).map(x=>x.title)))].filter(x=>/^Q\d+$/.test(x)).slice(0,8);
+  const api=l=>'https://www.wikidata.org/w/api.php?action=wbsearchentities&search='+encodeURIComponent(text)+'&language='+l+'&uselang='+l+'&type=item&limit=30&format=json&origin=*';
+  const rs=await Promise.all(['fr','en'].map(l=>wdGet(api(l),10000).catch(()=>null)));
+  const ids=[...new Set(rs.flatMap(r=>(r?.search||[]).map(x=>x.id)))].filter(x=>/^Q\d+$/.test(x)).slice(0,50);
   if(!ids.length)return[];
-  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
-    OPTIONAL { ?f wdt:P577 ?date } BIND(YEAR(?date) AS ?year) OPTIONAL { ?f wdt:P57 ?d } OPTIONAL { ?f wdt:P136 ?gq } OPTIONAL { ?f wdt:P3383 ?pf } ${LBL} }`;
-  return wdRows(await sparql(q)).sort((a,b)=>ids.indexOf(a.qid)-ids.indexOf(b.qid))}
+  const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf ?sl ?art WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
+    ?f wdt:P31/wdt:P279* wd:Q11424 . FILTER NOT EXISTS { ?f wdt:P31 wd:Q24862 } FILTER NOT EXISTS { ?f wdt:P31/wdt:P279* wd:Q5398426 }
+    ?f wikibase:sitelinks ?sl . OPTIONAL { ?f wdt:P577 ?date } BIND(YEAR(?date) AS ?year) OPTIONAL { ?f wdt:P57 ?d } OPTIONAL { ?f wdt:P136 ?gq } OPTIONAL { ?f wdt:P3383 ?pf }
+    OPTIONAL { ?art schema:about ?f ; schema:isPartOf <https://fr.wikipedia.org/> } ${LBL} } LIMIT 600`;
+  const res=mergeResults(wdRows(await sparql(q,15000)),text);await wikiThumbs(res);return res}
 
 /* fiche film : Wikidata + Wikipédia (+ TMDB si une clé est fournie dans config.js) */
 const tmdbKey=()=>(window.CINECLUB||{}).tmdbKey||'';
@@ -563,7 +583,7 @@ const hm=m=>m>=60?`${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')}`:`${m} 
 const triedEnrich=new Set();
 async function fetchDetails(f){
   const patch={};let qid=f.qid;
-  if(!qid){try{const r=await wdSearch(f.title);const m=(f.year?r.find(x=>String(x.year)===String(f.year)):null)||r[0];
+  if(!qid){try{const r=(await wdSearch(f.title)).filter(x=>x.qid);const m=(f.year?r.find(x=>String(x.year)===String(f.year)):null)||r[0];
     if(m){qid=m.qid;if(!f.director&&m.director)patch.director=m.director;if(!f.year&&m.year)patch.year=m.year;if(m.poster)patch.poster=m.poster}}catch{}}
   let wikiName='',imdb='',cast=[],country='',dur=0,pf='';
   if(qid){patch.qid=qid;
@@ -832,8 +852,11 @@ document.addEventListener('submit',async ev=>{
 document.addEventListener('input',ev=>{
   if(ev.target.id==='q'){q=ev.target.value;render()}
   if(ev.target.id==='txt')dTxt=ev.target.value;
-  if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim();if(v.length<3){const z=$('#sug');if(z)z.innerHTML='';return}
-    acT=setTimeout(async()=>{try{const r=await wdSearch(v);if($('#ft')?.value.trim()!==v)return;$('#sug').innerHTML=r.map(m=>`<button type="button" data-s='${e(JSON.stringify(m))}'>🎞️ <span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span></span></button>`).join('')}catch{}},400)}
+  if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim(),z=$('#sug');if(!z)return;
+    const show=(r,wait)=>{z.innerHTML=r.map(m=>`<button type="button" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}</span></span></button>`).join('')+(wait?'<p class="dim" style="font-size:13px">Recherche dans la base mondiale…</p>':!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat. Saisissez le titre à la main : les infos seront cherchées après la publication.</p>':'')};
+    if(v.length<2){z.innerHTML='';return}
+    show(localSearch(v),v.length>=3);if(v.length<3)return;
+    acT=setTimeout(async()=>{try{const r=await wdSearch(v);if($('#ft')?.value.trim()!==v)return;show(mergeResults([...localSearch(v),...r],v),false)}catch{if($('#ft')?.value.trim()===v)show(localSearch(v),false)}},350)}
   if(ev.target.id==='shot')dShot=ev.target.value;
 });
 
