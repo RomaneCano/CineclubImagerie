@@ -213,12 +213,13 @@ body{font-size:14px}
 .btn:not(.ghost) .ic,.abtn.pri .ic,.cnt .ic,.wb .ic,.avedit .ic,.wstory .ic,.ws .ic,.mi-out .ic{color:inherit}.ic.i-medal.gold{color:#ffcc00}.ic.i-medal.silver{color:#d6dbe6}.ic.i-medal.bronze{color:#e0995f}
 nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{opacity:.9}
 .tico{width:92px;height:92px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:44px;background:radial-gradient(circle at 30% 25%,#ffffff22,#ffffff08);border:1px solid var(--line);box-shadow:0 10px 30px #0006}.tico .ic{width:1em;height:1em;stroke-width:1.5}
-.bico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:hsl(var(--h) 70% 45% / .25);box-shadow:inset 0 0 0 1px hsl(var(--h) 70% 60% / .45)}.bico.lk{filter:grayscale(1);opacity:.55;background:#ffffff0d;box-shadow:none}
+.bico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:24px;background:hsl(var(--h) 70% 45% / .25);box-shadow:inset 0 0 0 1px hsl(var(--h) 70% 60% / .45)}.bico.lk{opacity:.85}
 .kpi>.pn{border-top:3px solid var(--acc)}.kpi>.pn:nth-child(2){border-top-color:#6ea8ff}.kpi>.pn:nth-child(3){border-top-color:#ff6bd6}.kpi>.pn:nth-child(4){border-top-color:#4cd6a0}
 .ws::before,.ws::after{content:'';position:absolute;border-radius:50%;background:#fff;opacity:.16;pointer-events:none;animation:wfloat 9s ease-in-out infinite alternate}.ws::before{width:230px;height:230px;top:-70px;right:-70px}.ws::after{width:170px;height:170px;left:-50px;bottom:-40px;animation-delay:-4s}
 @keyframes wfloat{to{transform:translate(-18px,22px) scale(1.1)}}
 .tile2{background:linear-gradient(135deg,var(--panel2),var(--panel))}.tile2:hover{box-shadow:0 6px 20px #0006}.tem .ic{width:1.1em;height:1.1em}
 .hero{background:linear-gradient(135deg,#2a2550,var(--panel2) 55%,#3b2140);border-color:#ffffff1f}
+.brow{border-left:3px solid hsl(var(--h) 70% 55%)}.brow .prog i{background:linear-gradient(90deg,hsl(var(--h) 80% 55%),hsl(calc(var(--h) + 40) 85% 62%))}.brow .badge{border-color:hsl(var(--h) 60% 50% / .6)}
 </style>
 </head>
 <body>
@@ -502,7 +503,7 @@ function badgeFams(id,xp,lvl){
 function famInfo(f){let k=0;f.tiers.forEach(t=>{if(f.cur>=t)k++});const done=k>=f.tiers.length,nx=f.tiers[Math.min(k,f.tiers.length-1)];return{k,done,nx,cur:Math.min(f.cur,nx)}}
 const badgeTotals=fs=>({have:fs.reduce((n,f)=>n+famInfo(f).k,0),total:fs.reduce((n,f)=>n+f.tiers.length,0)});
 function badgeRow(f){const i=famInfo(f);
-  return`<div class="pn" style="padding:12px 14px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;${i.k?'':'opacity:.9'}"><span class="bico ${i.k?'':'lk'}" style="--h:${hash(f.name)%360}">${f.emoji}</span><div style="min-width:0"><b>${e(f.name)}</b>${i.k?` <span class="badge" style="margin-left:6px">${TIERN[i.k-1]}</span>`:''}<div class="dim" style="font-size:13px">${i.done?'Palier maximum atteint':`Palier ${i.k+1} sur ${f.tiers.length} : ${e(f.desc(i.nx))}`}</div>${i.done?'':`<div class="prog"><i style="width:${i.cur/i.nx*100}%"></i></div>`}</div><span class="badge" style="${i.done?'border-color:var(--ok);color:var(--ok)':''}">${i.done?'✔ Maxi':`${i.cur} sur ${i.nx}`}</span></div>`}
+  return`<div class="pn brow" style="--h:${hash(f.name)%360};padding:12px 14px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center"><span class="bico ${i.k?'':'lk'}" style="--h:${hash(f.name)%360}">${f.emoji}</span><div style="min-width:0"><b>${e(f.name)}</b>${i.k?` <span class="badge" style="margin-left:6px">${TIERN[i.k-1]}</span>`:''}<div class="dim" style="font-size:13px">${i.done?'Palier maximum atteint':`Palier ${i.k+1} sur ${f.tiers.length} : ${e(f.desc(i.nx))}`}</div>${i.done?'':`<div class="prog"><i style="width:${i.cur/i.nx*100}%"></i></div>`}</div><span class="badge" style="${i.done?'border-color:var(--ok);color:var(--ok)':''}">${i.done?'✔ Maxi':`${i.cur} sur ${i.nx}`}</span></div>`}
 function closestBadges(fs,n){return fs.map(f=>[f,famInfo(f)]).filter(x=>!x[1].done).sort((a,b)=>b[1].cur/b[1].nx-a[1].cur/a[1].nx||a[1].nx-b[1].nx).slice(0,n).map(x=>x[0])}
 function badgeRows(fs){return[...new Set(fs.map(f=>f.cat))].map(c=>`<div class="gh">${c}</div><div style="display:grid;gap:8px">${fs.filter(f=>f.cat===c).map(badgeRow).join('')}</div>`).join('')}
 function badgeSummary(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
