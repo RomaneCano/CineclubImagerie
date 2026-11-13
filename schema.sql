@@ -79,6 +79,8 @@ create policy docs_insert on public.docs for insert to authenticated with check 
   or (coll = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
       and coalesce(data->>'featured','false') <> 'true')
+  or (coll = 'films' and id like 'e\_%' and owner = auth.uid()
+      and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_update on public.docs for update to authenticated using (
   public.is_director()
@@ -92,6 +94,8 @@ create policy docs_update on public.docs for update to authenticated using (
       and coalesce(data->>'elected','false') <> 'true')
   or (coll = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
+      and coalesce(data->>'featured','false') <> 'true')
+  or (coll = 'films' and id like 'e\_%' and owner = auth.uid()
       and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_delete on public.docs for delete to authenticated using (
