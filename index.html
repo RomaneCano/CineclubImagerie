@@ -855,7 +855,7 @@ function filmModal(){
      <div class="row" style="margin-bottom:12px;flex-wrap:wrap"><b>Ma note</b>${stars(mine?.stars||0,'quick:'+f.id)}<span class="dim">${mine?'Note enregistrée, modifiable à tout moment.':'1 clic et c’est noté.'}</span></div>
      <div class="row" style="flex-wrap:wrap;margin-bottom:12px;gap:6px">${TAGS.map(tg=>`<button class="chip ${tagsSel.includes(tg)?'on':''}" data-act="tag" data-id="${tg}">${tg}</button>`).join('')}</div>
      <div class="field" style="margin-bottom:10px"><label for="shot">🎞️ Le plan qui m’a marqué (+10 XP)</label><input id="shot" value="${e(shot)}" placeholder="Ex : le miroir à la fin, vers 1 h 20"></div>
-     <div class="field" style="margin-bottom:10px"><label for="gif">🖼️ Un GIF pour illustrer votre avis (facultatif)</label><div class="row" style="flex-wrap:wrap"><input id="gif" value="${e(gif)}" placeholder="Collez l’adresse d’un GIF (lien giphy.com ou image en https)" style="flex:1;min-width:200px">${gifKey()?'<button class="chip" type="button" data-act="gifpick" data-tip="Chercher un GIF dans GIPHY">🔍 Chercher</button>':''}${gif?'<button class="chip" type="button" data-act="gifclear">Retirer</button>':''}</div>${gifUrl(gif)?`<img class="rg" style="margin-left:0" src="${e(gifUrl(gif))}" alt="Aperçu du GIF" referrerpolicy="no-referrer">`:(gif?'<span class="dim" style="font-size:12px">Adresse non reconnue : elle doit commencer par https://</span>':'')}${gifOpen?gifPicker():''}</div>
+     <div class="field" style="margin-bottom:10px"><label for="gif">🖼️ Un GIF pour illustrer votre avis (facultatif)</label><div class="row" style="flex-wrap:wrap"><input id="gif" value="${e(gif)}" placeholder="Collez l’adresse d’un GIF (lien giphy.com ou image en https)" style="flex:1;min-width:200px"><button class="chip" type="button" data-act="gifpick" data-tip="Chercher un GIF animé">🔍 Chercher un GIF</button>${gif?'<button class="chip" type="button" data-act="gifclear">Retirer</button>':''}</div>${gifUrl(gif)?`<img class="rg" style="margin-left:0" src="${e(gifUrl(gif))}" alt="Aperçu du GIF" referrerpolicy="no-referrer">`:(gif?'<span class="dim" style="font-size:12px">Adresse non reconnue : elle doit commencer par https://</span>':'')}${gifOpen?gifPicker():''}</div>
      <textarea id="txt" rows="3" placeholder="Un mot, une phrase, un pavé… (+15 XP)" aria-label="Mon avis">${e(txt)}</textarea>
      <div class="row" style="margin-top:10px;justify-content:space-between;flex-wrap:wrap">${(()=>{const nx=mine?S.films.filter(x=>x.status!=='upcoming'&&x.id!==f.id&&!rOf(x.id,S.meId)).sort((a,b)=>b.added-a.added)[0]:null;return nx?`<button class="chip" data-act="open" data-id="${nx.id}" data-tip="Passer directement au prochain film que vous n’avez pas noté">Film suivant à noter : ${e(nx.title)} →</button>`:'<span></span>'})()}<button class="btn" data-act="publish" data-id="${f.id}">Publier</button></div></div>`}
    ${up?'':`
@@ -1462,12 +1462,17 @@ function gifUrl(u){u=String(u||'').trim();if(!/^https:\/\/[^\s]{4,400}$/i.test(u
   const m=u.match(/^https:\/\/(?:www\.)?giphy\.com\/(?:gifs|embed)\/(?:[^/?#]*-)?([A-Za-z0-9]+)(?:[/?#].*)?$/i);
   return m?`https://media.giphy.com/media/${m[1]}/giphy.gif`:u}
 function keepDrafts(){dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;dGif=$('#gif')?.value??dGif}
+const GIFQ={'Applaudissements':'applause','Rire':'laughing','Surprise':'surprised','Peur':'scared','Larmes':'crying','Danse':'dancing','Pop-corn':'popcorn','Cinéma':'cinema'};
 async function gifSearch(q){
-  const k=gifKey();if(!k)return;
+  const k=gifKey();
+  if(!k){const qq=(GIFQ[q]||q||'applause').trim();
+    try{const j=await wdGet('https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=24&gsrsearch='+encodeURIComponent(qq+' filemime:image/gif')+'&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=320',10000);
+      gifRes=Object.values(j.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0)).map(p=>{const i=(p.imageinfo||[])[0];return i&&i.mime==='image/gif'&&i.size<4e6?{u:i.thumburl||i.url,t:i.thumburl||i.url,a:String(p.title||'GIF').replace(/^File:|\.gif$/gi,'')}:null}).filter(Boolean).slice(0,12)}catch{gifRes=[]}
+    render();const i=$('#gifq');if(i){i.focus();i.setSelectionRange(99,99)}return}
   try{const j=await wdGet(`https://api.giphy.com/v1/gifs/${q?'search':'trending'}?api_key=${encodeURIComponent(k)}&limit=12&rating=pg-13&lang=fr${q?'&q='+encodeURIComponent(q):''}`,10000);
     gifRes=(j.data||[]).map(g=>({u:g.images?.fixed_height?.url||g.images?.original?.url,t:g.images?.fixed_height_small?.url||g.images?.fixed_height?.url,a:g.title||'GIF'})).filter(x=>x.u&&x.t)}catch{gifRes=[]}
   render();const i=$('#gifq');if(i){i.focus();i.setSelectionRange(99,99)}}
-function gifPicker(){return`<div class="gifp"><input id="gifq" placeholder="Chercher un GIF (ex : applaudissements)" value="${e(gifQ)}" aria-label="Chercher un GIF"><div class="gifg">${gifRes.map(g=>`<button type="button" data-act="gifsel" data-u="${e(g.u)}"><img src="${e(g.t)}" alt="${e(g.a)}" loading="lazy" referrerpolicy="no-referrer"></button>`).join('')||'<p class="dim" style="font-size:13px;padding:8px">Aucun GIF pour le moment.</p>'}</div><p class="dim" style="font-size:11px;margin-top:4px">Powered by GIPHY</p></div>`}
+function gifPicker(){return`<div class="gifp"><div class="row" style="gap:6px;flex-wrap:wrap;margin-bottom:8px">${Object.keys(GIFQ).map(k=>`<button type="button" class="chip ${gifQ===k?'on':''}" data-act="gifq" data-q="${e(k)}">${k}</button>`).join('')}</div><input id="gifq" placeholder="Chercher un GIF (ex : applaudissements)" value="${e(gifQ)}" aria-label="Chercher un GIF"><div class="gifg">${gifRes.map(g=>`<button type="button" data-act="gifsel" data-u="${e(g.u)}"><img src="${e(g.t)}" alt="${e(g.a)}" loading="lazy" referrerpolicy="no-referrer"></button>`).join('')||'<p class="dim" style="font-size:13px;padding:8px">Aucun GIF pour le moment.</p>'}</div><p class="dim" style="font-size:11px;margin-top:4px">Powered by GIPHY</p></div>`}
 
 /* tutoriel */
 const TOUR_TEAM=[
@@ -1646,7 +1651,8 @@ document.addEventListener('click',async ev=>{
   else if(act==='ics'){const f=S.films.find(x=>x.id===id);if(f&&f.tvAt)try{await S.dl.save({filename:'diffusion-'+norm(f.title).replace(/ /g,'-')+'.ics',data:icsFor(f)})}catch{}}
   else if(act==='fprev')filmStep(-1)
   else if(act==='fnext')filmStep(1)
-  else if(act==='gifpick'){keepDrafts();gifOpen=!gifOpen;render();if(gifOpen&&!gifRes.length)gifSearch(gifQ)}
+  else if(act==='gifpick'){keepDrafts();gifOpen=!gifOpen;render();if(gifOpen&&!gifRes.length){if(!gifQ&&!gifKey())gifQ='Applaudissements';gifSearch(gifQ)}}
+  else if(act==='gifq'){keepDrafts();gifQ=t.dataset.q;gifSearch(gifQ)}
   else if(act==='gifsel'){keepDrafts();dGif=t.dataset.u;gifOpen=false;render()}
   else if(act==='gifclear'){keepDrafts();dGif='';render()}
   else if(act==='tourstart'){tour={i:0};render()}
