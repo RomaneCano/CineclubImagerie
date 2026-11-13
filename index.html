@@ -246,6 +246,16 @@ nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{op
 .nomc.won{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
 @media(max-width:1500px){nav button{padding:8px 10px;font-size:13.5px}nav{gap:2px;margin-left:8px}}
 @media(max-width:1340px){nav button{padding:8px 7px;font-size:13px}}
+.subtabs.wrapt{display:flex;flex-wrap:wrap!important;overflow:visible}.row:has(>.stab),.row:has(>.tab),.subtabs,.tabs{scrollbar-width:none}.row:has(>.stab)::-webkit-scrollbar,.tabs::-webkit-scrollbar{display:none}
+.bwall{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}.bch{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--panel2)}.bch b{font-size:13px}.bch .bico{width:30px;height:30px;font-size:15px;flex:none}.bch .badge{margin:0}
+.lb[data-act]:hover{background:#ffffff08;border-radius:12px}
+.lvlup{position:fixed;inset:0;z-index:90;display:grid;place-items:center;background:radial-gradient(circle at 50% 45%,#2b1d6bdd,#0a0912ee);animation:lvFade .4s ease both;cursor:pointer;overflow:hidden}.lvlup.out{animation:lvOut .7s ease forwards}
+.lvrays{position:absolute;width:160vmax;height:160vmax;left:50%;top:50%;margin:-80vmax 0 0 -80vmax;background:repeating-conic-gradient(from 0deg,#ffcc0033 0 8deg,transparent 8deg 24deg);animation:lvSpin 24s linear infinite;mask-image:radial-gradient(circle,#000 8%,transparent 55%);-webkit-mask-image:radial-gradient(circle,#000 8%,transparent 55%)}
+.lvbox{position:relative;z-index:2;text-align:center;color:#fff;padding:28px;animation:lvPop .9s cubic-bezier(.2,1.4,.3,1) both}.lvk{letter-spacing:.3em;font-size:13px;color:#ffcc00;font-weight:700}
+.lvico{width:120px;height:120px;margin:16px auto;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 26%,#fff3b0,#ffcc00 55%,#e29a00);color:#1a1500;box-shadow:0 0 0 10px #ffcc0033,0 0 80px #ffcc00aa;animation:lvGlow 1.6s ease-in-out infinite alternate}.lvico .ic{width:60px;height:60px;color:#1a1500}
+.lvbox h2{font-size:clamp(28px,6vw,46px);margin:0 0 8px;text-shadow:0 4px 30px #000a}.lvbox p{opacity:.85;margin:0 0 18px}
+@keyframes lvFade{from{opacity:0}to{opacity:1}}@keyframes lvOut{to{opacity:0;transform:scale(1.04)}}@keyframes lvSpin{to{transform:rotate(360deg)}}@keyframes lvPop{0%{transform:scale(.3) translateY(40px);opacity:0}100%{transform:none;opacity:1}}@keyframes lvGlow{to{transform:scale(1.07);box-shadow:0 0 0 16px #ffcc0022,0 0 120px #ffcc00cc}}
+@media(prefers-reduced-motion:reduce){.lvlup,.lvrays,.lvbox,.lvico{animation:none!important}}
 </style>
 </head>
 <body>
@@ -325,7 +335,7 @@ const IC={
  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
  check:'<polyline points="20 6 9 17 4 12"/>',
  shuffle:'<polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/>'};
-const EMO2IC={'⭐':'star','🌟':'star','🔒':'lock','🎯':'target','🔴':'live','👍':'up','👎':'down','🤷':'meh','😂':'smile','🎬':'clap','🍿':'popcorn','🎞':'film','📼':'film','📍':'pin','🗓':'cal','📅':'cal','📆':'cal','📺':'tv','🖼':'image','🔖':'bookmark','📸':'camera','🔊':'vol','🔇':'mute','🚪':'logout','👤':'user','👥':'users','🏅':'award','🏆':'trophy','📖':'book','⚔':'swords','⛳':'flag','👑':'crown','🥇':'medal gold','🥈':'medal silver','🥉':'medal bronze','🔥':'flame','🕯':'flame','✨':'sparkles','🆕':'sparkles','🌈':'sparkles','🔮':'sparkles','💎':'sparkles','🧠':'sparkles','🃏':'layers','🌍':'globe','🎟':'ticket','✍':'pen','✏':'pen','🧶':'pen','📚':'library','⚡':'zap','😈':'zap','🏷':'tag','⏳':'hourglass','🏛':'landmark','🎭':'ticket','🚀':'rocket','🕵':'eye','🔎':'search','🔍':'search','🔭':'search','🎨':'palette','📽':'video','🎥':'video','🎂':'cake','🌙':'moon','🌅':'sunrise','🛋':'sofa','❤':'heart','🤝':'users','🙌':'users','☮':'users','🎲':'dice','🌴':'award','📝':'filepen','🎡':'wheel','🎚':'sliders','🔄':'refresh','🗑':'trash','⏹':'square','🎉':'sparkles','➕':'plus','＋':'plus','📣':'megaphone','📊':'chart','🕒':'clock','🎁':'gift','💬':'msg','▦':'grid','☰':'list','⧉':'copy'};
+const EMO2IC={'🏃':'zap','⭐':'star','🌟':'star','🔒':'lock','🎯':'target','🔴':'live','👍':'up','👎':'down','🤷':'meh','😂':'smile','🎬':'clap','🍿':'popcorn','🎞':'film','📼':'film','📍':'pin','🗓':'cal','📅':'cal','📆':'cal','📺':'tv','🖼':'image','🔖':'bookmark','📸':'camera','🔊':'vol','🔇':'mute','🚪':'logout','👤':'user','👥':'users','🏅':'award','🏆':'trophy','📖':'book','⚔':'swords','⛳':'flag','👑':'crown','🥇':'medal gold','🥈':'medal silver','🥉':'medal bronze','🔥':'flame','🕯':'flame','✨':'sparkles','🆕':'sparkles','🌈':'sparkles','🔮':'sparkles','💎':'sparkles','🧠':'sparkles','🃏':'layers','🌍':'globe','🎟':'ticket','✍':'pen','✏':'pen','🧶':'pen','📚':'library','⚡':'zap','😈':'zap','🏷':'tag','⏳':'hourglass','🏛':'landmark','🎭':'ticket','🚀':'rocket','🕵':'eye','🔎':'search','🔍':'search','🔭':'search','🎨':'palette','📽':'video','🎥':'video','🎂':'cake','🌙':'moon','🌅':'sunrise','🛋':'sofa','❤':'heart','🤝':'users','🙌':'users','☮':'users','🎲':'dice','🌴':'award','📝':'filepen','🎡':'wheel','🎚':'sliders','🔄':'refresh','🗑':'trash','⏹':'square','🎉':'sparkles','➕':'plus','＋':'plus','📣':'megaphone','📊':'chart','🕒':'clock','🎁':'gift','💬':'msg','▦':'grid','☰':'list','⧉':'copy'};
 function icon(name,cls=''){const [n,c2]=String(name).split(' ');return`<svg class="ic i-${n} ${c2||''} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]||IC.star}</svg>`}
 const ICRE=new RegExp('('+Object.keys(EMO2IC).sort((a,b)=>b.length-a.length).map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')\\uFE0F?','gu');
 const STRIPRE=/[\u{1F000}-\u{1FAFF}]️?/gu;
@@ -383,6 +393,14 @@ const curWeek=()=>weekOf(Date.now());
 const weekNoms=w=>S.noms.filter(n=>n.week===w);
 const nomVotes=id=>S.nvotes.filter(v=>v.nomId===id);
 const weekLabel=w=>{const f=d=>d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});return`du ${f(new Date((w*7-3)*DAY))} au ${f(new Date((w*7+3)*DAY))}`};
+let memV=null;
+function memberModal(){const id=memV,m=S.members.find(x=>x.id===id);if(!m)return'';const st=stats(id,0,Infinity,true),got=earnedBadges(st.badges),bt=badgeTotals(st.badges),g=cache.members.get(id)?.g||'';
+  const rank=[...cons().map(x=>({id:x.id,xp:stats(x.id).xp}))].sort((a,b)=>b.xp-a.xp).findIndex(x=>x.id===id)+1;
+  const av=avatarSvg({...avDefault(id),...((cache.members.get(id)?.av&&cache.members.get(id).av.skin)?cache.members.get(id).av:{})});
+  return`<div class="modal" data-act="memclose"><div class="sheet" data-stop style="width:min(680px,100%)" role="dialog" aria-label="Profil de ${e(nameOf(id))}"><button class="x" data-act="memclose" aria-label="Fermer">✕</button>
+   <div class="row" style="gap:16px;align-items:center;flex-wrap:nowrap"><div class="avbig" style="width:84px;height:84px;flex:none">${av}</div><div style="min-width:0;flex:1"><h2 style="margin:0">${e(nameOf(id))}</h2><div class="dim">${e(gxo(st.name,g))} · ${st.xp} XP${rank&&id!==S.cfg.directorId?` · ${rank}${rank===1?'er':'e'} au classement`:''}</div><div class="xp" style="width:100%;height:8px;margin-top:8px"><i style="width:${Math.round(st.pct)}%"></i></div></div></div>
+   <div class="kpi" style="margin:14px 0"><div class="pn"><b>${got.length}</b><span class="dim">badge${got.length>1?'s':''} obtenu${got.length>1?'s':''}</span></div><div class="pn"><b>${bt.have}</b><span class="dim">paliers débloqués</span></div><div class="pn"><b>${st.count}</b><span class="dim">film${st.count>1?'s':''} noté${st.count>1?'s':''}</span></div></div>
+   <h3 style="margin:0 0 8px">Ses badges</h3>${got.length?`<div class="bwall">${got.map(badgeChip).join('')}</div>`:'<p class="dim">Aucun badge pour le moment.</p>'}</div></div>`}
 let dPick=null,dEdit=null,dStars=0,dDate='',dText='',dFilter='';
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function carnetView(){
@@ -590,7 +608,7 @@ function badgeRow(f){const i=famInfo(f);
 function closestBadges(fs,n){return fs.map(f=>[f,famInfo(f)]).filter(x=>!x[1].done).sort((a,b)=>b[1].cur/b[1].nx-a[1].cur/a[1].nx||a[1].nx-b[1].nx).slice(0,n).map(x=>x[0])}
 function badgeRows(fs){return[...new Set(fs.map(f=>f.cat))].map(c=>`<div class="gh">${c}</div><div style="display:grid;gap:8px">${fs.filter(f=>f.cat===c).map(badgeRow).join('')}</div>`).join('')}
 function badgeSummary(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
-  return`<p class="dim" style="font-size:13px;margin:4px 0 12px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Voici les plus proches :</p><div style="display:grid;gap:8px">${closestBadges(fs,4).map(badgeRow).join('')}</div><button class="btn ghost" style="margin-top:12px" data-act="nav" data-id="badges">Voir tous mes badges</button>`}
+  const got=earnedBadges(fs);return`${got.length?`<div class="bwall">${got.slice(0,14).map(badgeChip).join('')}${got.length>14?`<span class="dim" style="align-self:center">+${got.length-14}</span>`:''}</div>`:''}<p class="dim" style="font-size:13px;margin:4px 0 12px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Voici les plus proches :</p><div style="display:grid;gap:8px">${closestBadges(fs,4).map(badgeRow).join('')}</div><button class="btn ghost" style="margin-top:12px" data-act="nav" data-id="badges">Voir tous mes badges</button>`}
 function badgesView(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
   return`<div class="gwrap" style="max-width:1000px"><div class="row" style="flex-wrap:wrap;margin-bottom:6px"><h2 style="flex:1">Mes badges</h2><button class="btn ghost" data-act="nav" data-id="profile">Retour à mon profil</button></div><p class="dim" style="margin-bottom:14px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Chaque badge a plusieurs paliers (Bronze, Argent, Or…) : certains se gagnent en quelques jours, d’autres en plusieurs mois.</p>${badgePanel(fs)}</div>`}
 
@@ -976,7 +994,7 @@ function teamView(){
   const pal=palmes(),duels=S.duels.filter(d=>!d.open&&d.winner).sort((a,b)=>b.created-a.created).slice(0,3);
   const adm=S.isOwner?`<div class="pn" style="margin-top:20px"><h3>Désigner Hervé</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">Seul le propriétaire voit ce bloc. La personne doit avoir ouvert le ciné-club une fois.</p><div class="row" style="flex-wrap:wrap">${S.members.map(m=>`<button class="chip ${S.cfg.directorId===m.id?'on':''}" data-act="setdir" data-id="${m.id}">${m.emoji} ${e(nameOf(m.id))}</button>`).join('')}</div></div>`:'';
   return`<h2 style="margin-bottom:16px">L’équipe</h2><div class="cols"><div class="pn"><h3 style="margin-bottom:12px">Classement</h3><div class="subtabs" style="margin-bottom:8px"><button class="stab ${seasonMode==='season'?'on':''}" data-act="smode" data-id="season" data-tip="Le trimestre en cours : le classement repart de zéro tous les 3 mois" title="Le trimestre en cours : le classement repart de zéro tous les 3 mois">Trimestre ${cur.label}</button><button class="stab ${seasonMode==='all'?'on':''}" data-act="smode" data-id="all" data-tip="Le cumul depuis le début du ciné-club">Depuis le début</button></div>
-   ${rank.map((r,i)=>`<div class="lb"><b class="serif" style="font-size:20px">${['🥇','🥈','🥉'][i]||i+1}</b><div><b>${r.m.emoji} ${e(nameOf(r.m.id))}${r.m.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${gxo(r.all.name,cache.members.get(r.m.id)?.g||'')} · ${r.all.count} ${r.all.count>1?'films notés':'film noté'}${r.all.streak?` · 🔥 ${r.all.streak} sem.`:''}</div></div><b>${r.s.xp} XP</b></div>`).join('')||'<p class="dim">Personne pour l’instant.</p>'}
+   ${rank.map((r,i)=>`<div class="lb" data-act="viewmember" data-id="${r.m.id}" data-tip="Voir son profil et ses badges" style="cursor:pointer" tabindex="0"><b class="serif" style="font-size:20px">${['🥇','🥈','🥉'][i]||i+1}</b><div><b>${r.m.emoji} ${e(nameOf(r.m.id))}${r.m.id===S.meId?' (moi)':''}</b><div class="dim" style="font-size:13px">${gxo(r.all.name,cache.members.get(r.m.id)?.g||'')} · ${r.all.count} ${r.all.count>1?'films notés':'film noté'}${r.all.streak?` · 🔥 ${r.all.streak} sem.`:''}</div></div><b>${r.s.xp} XP</b></div>`).join('')||'<p class="dim">Personne pour l’instant.</p>'}
    ${pal.length?`<h3 style="margin:18px 0 6px">🌴 Palmes de la saison</h3>${pal.map(p=>`<div class="lb" style="grid-template-columns:1fr auto"><span><b>${p.label}</b> · ${emojiOf(p.id)} ${e(nameOf(p.id))}</span><span class="dim">${p.xp} XP</span></div>`).join('')}`:''}</div>
    <div class="pn"><h3>Badges à décrocher</h3>${badgeSummary()}
    <p class="dim" style="font-size:13px;margin-top:12px">Barème : note +10 · critique +15 · plan marquant +10 · pari gagné +20 · proposition à l’élection +10 · film élu +50 · trophée du juge +25 · défi +40 · semaine active +5 · like reçu +2.</p>
@@ -1087,13 +1105,15 @@ function avatarTab(){
   return`<div class="pn"><div class="row" style="gap:18px;align-items:flex-start;flex-wrap:wrap"><div style="text-align:center"><div class="avbig">${avatarSvg(cfg)}</div><div class="row" style="justify-content:center;margin-top:10px;gap:6px"><button class="chip" data-act="avrand" data-tip="Tire un personnage au hasard">${icon('dice')} Au hasard</button><button class="chip" data-act="avreset" data-tip="Revenir au personnage généré automatiquement">Réinitialiser</button></div></div>
    <div style="flex:1;min-width:260px"><div class="tabs">${parts.map(([k,l])=>`<button class="tab ${avPart===k?'on':''}" data-act="avpart" data-id="${k}">${l}</button>`).join('')}</div>${(subs[avPart]||[]).length?`<div class="subtabs" style="margin-bottom:12px">${subs[avPart].map(([k,l])=>`<button class="stab ${sub===k?'on':''}" data-act="avsub" data-id="${k}">${l}</button>`).join('')}</div>`:''}${grid}</div></div>
    <p class="dim" style="font-size:12px;margin-top:12px">Votre personnage s’affiche à côté de votre nom dans le classement, les avis et les podiums. Chaque changement est enregistré tout de suite.</p></div>`}
-let pTab='apercu',bCat='close';
+let pTab='apercu',bCat='mine';
+function badgeChip(f){const i=famInfo(f);return`<div class="bch" style="--h:${hash(f.name)%360}" data-tip="${e(f.name+' : '+(i.done?'palier maximum':'palier '+i.k+' sur '+f.tiers.length))}"><span class="bico" style="--h:${hash(f.name)%360}">${f.emoji}</span><b>${e(f.name)}</b><span class="badge">${TIERN[i.k-1]||''}</span></div>`}
+const earnedBadges=fs=>fs.filter(f=>famInfo(f).k>0).sort((a,b)=>famInfo(b).k-famInfo(a).k||a.name.localeCompare(b.name,'fr'));
 function badgePanel(fs){
-  const cats=[...new Set(fs.map(f=>f.cat))];if(bCat!=='close'&&!cats.includes(bCat))bCat='close';
+  const cats=[...new Set(fs.map(f=>f.cat))],mine=earnedBadges(fs);if(bCat==='mine'&&!mine.length)bCat='close';if(bCat!=='close'&&bCat!=='mine'&&!cats.includes(bCat))bCat='close';
   const chip=(id,label)=>`<button class="stab ${bCat===id?'on':''}" data-act="bcat" data-id="${e(id)}">${label}</button>`;
   const cnt=c=>{const t=badgeTotals(fs.filter(f=>f.cat===c));return`${c} ${t.have}/${t.total}`};
-  const list=bCat==='close'?closestBadges(fs,8):fs.filter(f=>f.cat===bCat);
-  return`<div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:12px">${chip('close','⏳ Plus proches')}${cats.map(c=>chip(c,cnt(c))).join('')}</div><div class="bgrid">${list.map(badgeRow).join('')}</div>`}
+  const list=bCat==='mine'?mine:bCat==='close'?closestBadges(fs,8):fs.filter(f=>f.cat===bCat);
+  return`<div class="subtabs wrapt" style="margin-bottom:12px">${chip('mine','🏅 Obtenus ('+mine.length+')')}${chip('close','⏳ Plus proches')}${cats.map(c=>chip(c,cnt(c))).join('')}</div>${bCat==='mine'&&!mine.length?'<p class="dim">Pas encore de badge : notez un film pour décrocher le premier.</p>':''}<div class="bgrid">${list.map(badgeRow).join('')}</div>`}
 function journalRows(list,limit){const all=list;list=limit?list.slice(0,limit):list;return`<div class="pn">${list.map(r=>{const f=S.films.find(x=>x.id===r.filmId);return f?`<div class="rev row" style="cursor:pointer;flex-wrap:wrap" data-act="open" data-id="${f.id}"><b style="min-width:140px">${e(f.title)}</b>${stars(r.stars,null,1)}<span class="dim" style="flex:1;min-width:0">${e(r.text)}</span></div>`:''}).join('')||'<p class="dim">Rien pour l’instant. Notez un premier film !</p>'}</div>${limit&&all.length>limit?`<div style="text-align:center;margin-top:12px"><button class="btn ghost" data-act="jmore">Afficher plus (${all.length-limit} restants)</button></div>`:''}`}
 function profile(){
   const s=stats(S.meId,0,Infinity,true),rs=S.ratings.filter(r=>r.userId===S.meId).sort((a,b)=>b.ts-a.ts),bt=badgeTotals(s.badges);
@@ -1109,6 +1129,7 @@ function profile(){
   else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div>
    <div class="row" style="flex-wrap:wrap;gap:8px"><span class="dim">Vous êtes</span>${[['f','Une femme'],['m','Un homme'],['','Ne pas préciser']].map(([k,l])=>`<button class="chip ${(myG()||'')===k?'on':''}" data-act="setgender" data-id="${k||'x'}">${l}</button>`).join('')}</div></div>`;
   else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,rs.length>1?'films notés':'film noté')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
+    ${earnedBadges(s.badges).length?`<div class="sect"><h3>Mes badges</h3><button class="chip" data-act="ptab" data-id="badges">Tout voir</button></div><div class="bwall">${earnedBadges(s.badges).slice(0,14).map(badgeChip).join('')}</div>`:''}
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
     <div class="sect"><h3>Derniers avis</h3><button class="chip" data-act="ptab" data-id="journal">Tout le journal</button></div>${journalRows(rs.slice(0,3))}`;
   return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><button class="av avbtn" style="width:56px;height:56px;font-size:28px" data-act="goavatar" data-tip="Créer ou modifier mon avatar">${emojiOf(S.meId)}<span class="avedit">${icon('pen')}</span></button><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="wrapopen" data-tip="Votre année de cinéma racontée en diapositives animées">${icon('sparkles')} Mon Wrapped</button></div>
@@ -1681,7 +1702,7 @@ function render(){
   if(!S.ready){a.innerHTML=`<div class="empty dim" style="padding-top:120px">${reelHtml('Ouverture de la salle…')}</div>`;return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,election:electionView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(memV?memberModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
   if(wrap)animateCounters();
@@ -1745,6 +1766,9 @@ document.addEventListener('click',async ev=>{
   else if(act==='goavatar'){view='profile';pTab='avatar';film=null;menuOpen=false;render()}
   else if(act==='avpart'){avPart=id;avSub='';render()}
   else if(act==='avsub'){avSub=id;render()}
+  else if(act==='viewmember'){memV=id;render()}
+  else if(act==='memclose'){memV=null;render()}
+  else if(act==='lvclose'){document.querySelector('.lvlup')?.remove()}
   else if(act==='dclear'){dPick=null;render()}
   else if(act==='dcancel'){dEdit=null;dPick=null;dStars=0;dDate='';dText='';render()}
   else if(act==='dedit'){const d=S.diary.find(x=>x.id===id);if(!d)return;dEdit=id;dPick=null;dStars=d.stars||0;dDate=new Date(d.seen).toISOString().slice(0,10);dText=d.text||'';render()}
@@ -1890,7 +1914,7 @@ document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();re
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(wrap&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();wrap.i=Math.max(0,wrap.i+(ev.key==='ArrowRight'?1:-1));render();return}
-  if(ev.key==='Escape'){if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(memV){memV=null;render();return}if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
@@ -1952,6 +1976,9 @@ document.addEventListener('input',ev=>{
 
 /* info-bulles au survol et au clavier */
 const tipEl=document.createElement('div');tipEl.id='tip';tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
+function levelFx(L){document.querySelector('.lvlup')?.remove();const d=document.createElement('div');d.className='lvlup';d.setAttribute('data-act','lvclose');
+  d.innerHTML=`<div class="lvrays"></div>${confettiHtml(70)}<div class="lvbox"><div class="lvk">NIVEAU SUPÉRIEUR</div><div class="lvico">${icon('trophy')}</div><h2>${e(gx(L,myG()))}</h2><p>Bravo ${e((nameOf(S.meId)||'').split(' ')[0])} ! Vous montez en grade au ciné-club.</p><button class="btn" data-act="lvclose">Super !</button></div>`;
+  document.body.append(d);setTimeout(()=>d.classList.add('out'),5200);setTimeout(()=>d.remove(),5900)}
 function hideTip(){tipEl.style.display='none'}
 function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=gx(stripEmoji(txt),myG());tipEl.style.display='block';
   // la bulle se cale sur le bouton : on mesure comment le navigateur convertit left/top (zoom compris) puis on corrige
@@ -1976,7 +2003,7 @@ function derive(){
   const lv=cache.config.get('live')?{...cache.config.get('live')}:null;
   if(lastLive&&lastLive.state==='open'&&lv&&lv.state==='revealed'){SFX.reveal();toast('Les résultats de la séance sont révélés 🎬')}
   S.live=lv;lastLive=lv;
-  if(S.meId&&S.ready){const L=stats(S.meId).name;if(lastLevel&&L!==lastLevel&&LEVELS.findIndex(x=>x[1]===L)>LEVELS.findIndex(x=>x[1]===lastLevel)){SFX.level();toast('Niveau supérieur : '+L+' 🎉')}lastLevel=L;
+  if(S.meId&&S.ready){const L=stats(S.meId).name;if(lastLevel&&L!==lastLevel&&LEVELS.findIndex(x=>x[1]===L)>LEVELS.findIndex(x=>x[1]===lastLevel)){SFX.level();levelFx(L);toast('Niveau supérieur : '+L+' 🎉')}lastLevel=L;
     if(!isDir()){const dn=new Set(S.chals.filter(c=>chalDone(c,S.meId)).map(c=>c.id));if(lastDone)S.chals.filter(c=>dn.has(c.id)&&!lastDone.has(c.id)).forEach(c=>{SFX.level();toast('Défi relevé : '+c.title+' 🎉 +40 XP')});lastDone=dn}}}
 let lastSync=0,pollN=0;
 async function loadAll(full=true){
