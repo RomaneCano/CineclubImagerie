@@ -564,7 +564,7 @@ const watching=f=>S.watch.some(x=>x.id===f+'_'+S.meId);
 function card(f){const mine=rOf(f.id,S.meId),up=f.status==='upcoming',t=liveOpen(f.id)&&!isDir()?null:avg(team(f.id).map(r=>r.stars));
   const tag=up?'Bientôt':f.featured?'⭐ Film de la semaine':isDir()?'':mine?'✔ Noté':'À noter';
   return`<div class="card" data-act="open" data-id="${f.id}" tabindex="0">${isDir()?'':`<button class="wt ${watching(f.id)?'on':''}" data-act="watch" data-id="${f.id}" aria-label="À voir plus tard" data-tip="Ajouter à ma liste « À voir plus tard »">🔖</button>`}${poster(f).replace('<b>',`<span class="tag">${tag}</span><b>`)}
-   <div class="cap"><span>${mine?stars(mine.stars,null,1):'<span class="dim">'+e(f.genre)+'</span>'}</span><span>${t!=null?'👥 '+fmt(t):''}</span></div></div>`}
+   <div class="cap"><span>${mine?stars(mine.stars,null,1):'<span class="dim">'+e(f.genre)+(f.by&&f.by!==S.cfg.directorId?' · par '+e((nameOf(f.by)||'').split(' ')[0]):'')+'</span>'}</span><span>${t!=null?'👥 '+fmt(t):''}</span></div></div>`}
 function verdictRow(fid,mine){return`<div class="vd">${Object.entries(VERDICTS).map(([k,[em,l]])=>`<button class="${mine?.verdict===k?'on':''}" data-act="verdict" data-id="${fid}" data-v="${k}" data-tip="${k==='yes'?'Équivaut à 4 étoiles sur 5':k==='meh'?'Équivaut à 2,5 étoiles sur 5':'Équivaut à 1 étoile sur 5'}">${em} ${l}</button>`).join('')}</div>`}
 
 /* écrans */
@@ -829,11 +829,11 @@ async function wrapShareCard(){
   const blob=await new Promise(r=>c.toBlob(r,'image/png'));try{await S.dl.save({filename:'wrapped-'+new Date().getFullYear()+'.png',data:blob})}catch{}}
 function home(){
   const films=[...S.films].sort((a,b)=>b.added-a.added),liveF=films.filter(f=>f.status!=='upcoming'),up=films.filter(f=>f.status==='upcoming');
-  const feat=films.find(f=>f.featured)||liveF[0],genres=[...new Set(liveF.map(f=>f.genre))];
+  const isHF=f=>!f.by||f.by===S.cfg.directorId,feat=films.find(f=>f.featured&&isHF(f))||liveF.find(isHF),teamF=liveF.filter(f=>!isHF(f)&&f!==feat),genres=[...new Set(liveF.map(f=>f.genre))];
   let h=banners(films);
   if(!films.length){
     return h+(isDir()?`<div class="pn empty"><h2>Votre première séance</h2><p class="dim" style="margin-bottom:18px">Un titre, une phrase pour l’équipe, et c’est publié. En panne d’idée ? La roulette est là.</p><div class="row" style="justify-content:center"><button class="btn" data-act="add">Proposer un film</button><button class="btn ghost" data-act="nav" data-id="roulette">Tourner la roulette 🎡</button></div></div>`
-     :`<div class="pn empty"><h2>La salle est encore vide</h2><p class="dim">Hervé n’a pas encore proposé de film. Les séances apparaîtront ici.</p></div>`)}
+     :`<div class="pn empty"><h2>La salle est encore vide</h2><p class="dim" style="margin-bottom:18px">Hervé n’a pas encore proposé de film. Les séances apparaîtront ici, et vous pouvez lancer la première.</p><div class="row" style="justify-content:center"><button class="btn" data-act="add">＋ Proposer un film</button></div></div>`)}
   if(feat&&filter==='all'){const mine=rOf(feat.id,S.meId),dh=refOf(feat.id),lo=liveOpen(feat.id);
     h+=`<section class="hero"><div data-act="open" data-id="${feat.id}" data-tip="Ouvrir la fiche du film" style="cursor:pointer" tabindex="0" role="button" aria-label="Ouvrir la fiche de ${e(feat.title)}">${poster(feat)}</div><div class="wrap"><div class="k">⭐ ${feat.status==='upcoming'?'Prochain film de la semaine':'Le film de la semaine'}</div><h2>${e(feat.title)}</h2>
      <div class="meta">${[feat.year,feat.director,genreLabel(feat)].filter(Boolean).map(e).join(' · ')}</div>${feat.seanceAt?`<div class="meta" style="color:var(--ok);margin-top:4px">📅 Séance : ${e(seanceFull(feat.seanceAt))}${feat.seancePlace?' · '+e(feat.seancePlace):''}</div>`:''}${tvLabel(feat)?`<div class="meta" style="color:var(--acc);margin-top:4px">${e(tvLabel(feat))}</div>`:''}
@@ -843,6 +843,7 @@ function home(){
        ${!mine&&dh?'<p class="meta" style="margin-top:10px">🔒 La note de ${e(refName(feat.id))} se révèle quand vous avez noté. Un pari sur cette note rapporte +20 XP.</p>':''}`}</div></section>`}
   if(filter==='all')h+=duelBlock()+chalCards();
   if(up.filter(f=>f!==feat).length&&filter==='all')h+=`<div class="sect"><h3>Prochainement</h3><span class="dim">annoncés par Hervé, bientôt notables</span></div><div class="grid" style="margin-bottom:10px">${up.filter(f=>f!==feat).map(card).join('')}</div>`;
+  if(filter==='all'&&S.meId)h+=`<div class="sect"><h3>Proposés par l’équipe</h3><span class="dim">les films de vos collègues, à noter comme les autres</span><button class="btn ghost" data-act="add" style="margin-left:auto">＋ Proposer un film</button></div>${teamF.length?`<div class="grid" style="margin-bottom:18px">${teamF.slice(0,8).map(card).join('')}</div>`:`<div class="pn" style="margin-bottom:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="dim" style="flex:1;min-width:200px">Personne n’a encore proposé de film. Un coup de cœur à partager ? Une séance secondaire s’ouvre ici, à côté de celles d’Hervé.</span></div>`}`;
   h+=filmsSection(liveF,genres);
   if(S.meId)h+=`<button class="btn fab" data-act="add">＋ Proposer un film</button>`;
   return h}
@@ -910,7 +911,7 @@ function addModal(){const p=prefill||{};
     <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
     <div class="row" style="flex-wrap:wrap;gap:16px">${isDir()?`<label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label>`:''}<label class="row dim" style="gap:6px"><input type="checkbox" name="tvfilm" id="ftvf" style="width:auto" ${p.tv?'checked':''}> Téléfilm</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
-function remindText(){const f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured)||[...S.films].sort((a,b)=>b.added-a.added)[0];
+function remindText(){const hf=x=>!x.by||x.by===S.cfg.directorId,f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured&&hf(x))||[...S.films].filter(hf).sort((a,b)=>b.added-a.added)[0];
   return f?`Bonjour à toute l’équipe ! Le film de la semaine est « ${f.title} » (${f.year||'?'}). ${f.seanceAt?'La séance a lieu '+seanceFull(f.seanceAt)+(f.seancePlace?' ('+f.seancePlace+')':'')+'. ':''}Votre avis en deux minutes sur le Ciné-Club Imagerie : une note, un mot, et la note d’Hervé se révèle. Il reste ${S.films.filter(x=>x.status!=='upcoming').length?cons().filter(m=>!rOf(f.id,m.id)).length:0} avis à recueillir.`:'Aucun film proposé pour le moment.'}
 function dash(){
   if(!isDir())return'';
