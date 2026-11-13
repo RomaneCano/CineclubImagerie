@@ -267,6 +267,11 @@ details.more>summary{cursor:pointer;color:var(--mut);font-size:14px;padding:6px 
 .pimg{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;background:var(--panel2);box-shadow:0 6px 18px #0008}
 .nrank{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:16px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}.nomc:first-of-type .nrank,.nomc .nrank:is(:first-child){}.nomc.won .nrank{background:var(--acc);color:#1a1500;border-color:var(--acc)}
 .nomc{padding:16px 18px}.nomc b{font-size:inherit}
+html[data-club=books]{--acc:#4cd6a0;--acc2:#7c5cff}
+.clubsw{display:flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--panel);margin-right:10px;flex:none}.clubsw a{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;color:var(--mut);font-size:13px;font-weight:600;text-decoration:none}.clubsw a.on{background:var(--acc);color:#10140f}.clubsw a .ic{width:15px;height:15px}.clubsw a.on .ic{color:inherit}
+@media(max-width:1500px){.clubsw a span{display:none}.clubsw a{padding:6px 9px}}
+html[data-club=books] .row:has(#ftv),html[data-club=books] .row:has(#ef_tvch),html[data-club=books] label:has(#ftvf),html[data-club=books] [data-act=tvedit]{display:none!important}
+.bch{font:inherit;color:inherit;cursor:pointer;text-align:left}.bch:hover,.bch:focus-visible{border-color:var(--acc);background:#ffffff0c}
 </style>
 </head>
 <body>
@@ -275,6 +280,36 @@ details.more>summary{cursor:pointer;color:var(--mut);font-size:14px;padding:6px 
 <script src="config.js"></script>
 <script>const $=s=>document.querySelector(s);
 const e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* Book-Club : même application, mode « livres » choisi par l'adresse (?club=livres) */
+const BOOKS=new URLSearchParams(location.search).get('club')==='livres';
+document.documentElement.dataset.club=BOOKS?'books':'films';if(BOOKS)document.title='Book-Club Imagerie';
+const L_=(f,m)=>x=>x;
+const BK_RULES=BOOKS?[
+ [/CINÉ-CLUB/g,'BOOK-CLUB'],[/Ciné-Club/g,'Book-Club'],[/ciné-club/g,'book-club'],
+ [/Plus d’options : où le voir, diffusion télé, question, affiche/g,'Plus d’options : où le trouver, question, couverture'],[/Netflix, Prime, cinéma, DVD…/g,'Bibliothèque, librairie, Kindle…'],[/Où le voir/g,'Où le trouver'],
+ [/ \(CC BY-SA\), Wikidata(, TMDB)?\./g,'.'],[/Wikipédia/g,'Open Library'],
+ [/pour l[’']affiche/g,'pour être à l’honneur'],[/([Àà]) l[’']affiche/g,'$1 l’honneur'],[/(?<![\p{L}])([Ss])on affiche/gu,'$1a couverture'],[/l[’']affiche/g,'la couverture'],[/visionnage/g,'lecture'],[/le regarde/g,'le lit'],
+ [/Maître·sse du 7e art/g,'Maître·sse des lettres'],[/Légende du cinéma/g,'Légende des lettres'],
+ [/Cinéphile/g,'Bibliophile'],[/cinéphile/g,'bibliophile'],
+ [/Palme d’or/g,'Plume d’or'],[/Palmes/g,'Plumes'],[/Palme/g,'Plume'],
+ [/Programmateur·rice/g,'Libraire'],[/Programmatrice/g,'Libraire'],[/Programmateur/g,'Libraire'],[/programmateur·rice/g,'libraire'],
+ [/Spectateur·rice/g,'Lecteur·rice'],[/Spectatrice/g,'Lectrice'],[/Spectateur/g,'Lecteur'],[/spectateur/g,'lecteur'],
+ [/Œil de cadreur·se/g,'Œil de lecteur·rice'],[/cadreur·se/g,'lecteur·rice'],
+ [/Le plan qui m’a marqué/g,'Le passage qui m’a marqué'],[/plan marquant/g,'passage marquant'],[/plan qui vous a marqué/g,'passage qui vous a marqué'],
+ [/À voir plus tard/g,'À lire plus tard'],
+ [/Salle comble/g,'Cercle au complet'],
+ [/Réalisation/g,'Auteur'],[/réalisation/g,'auteur'],
+ [/cinémathèque/g,'bibliothèque'],[/cinéma/g,'lecture'],
+ [/(?<![\p{L}])([Ff])ilms(?![\p{L}])/gu,(m,f)=>f==='F'?'Livres':'livres'],
+ [/(?<![\p{L}])([Ff])ilm(?![\p{L}])/gu,(m,f)=>f==='F'?'Livre':'livre'],
+ [/(?<![\p{L}])FILMS?(?![\p{L}])/gu,m=>m==='FILMS'?'LIVRES':'LIVRE'],
+ [/(?<![\p{L}])([Aa])ffiche(s?)(?![\p{L}])/gu,(m,a,pl)=>(a==='A'?'Couverture':'couverture')+pl],
+ [/regarder/g,'lire'],[/regardez/g,'lisez'],[/regardé/g,'lu'],
+ [/(?<![\p{L}])vus(?![\p{L}])/gu,'lus'],[/(?<![\p{L}])Vu(?![\p{L}])/gu,'Lu'],[/(?<![\p{L}])vu(?![\p{L}])/gu,'lu']
+]:[];
+const bk=t=>{if(!BOOKS||t==null)return t;t=String(t);if(!/[A-Za-zÀ-ÿ]/.test(t))return t;for(const [a,b] of BK_RULES)t=t.replace(a,b);return t};
+const dbc=c=>BOOKS&&c!=='members'?'b_'+c:c;
+const fromDb=c=>BOOKS?(c==='members'?'members':String(c).startsWith('b_')?c.slice(2):null):c;
 
 /* icônes (traits fins) à la place des emojis */
 const IC={
@@ -358,6 +393,9 @@ const gxo=(t,g)=>g?gx(t,g):String(t).replace(/·/g,'·\u200b');
 const myG=()=>cache.members.get(S.meId)?.g||'';
 function iconizeNode(root){
   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),nodes=[];let n;while(n=w.nextNode())nodes.push(n);
+  if(BOOKS){const att=['placeholder','aria-label','data-tip','title','alt'],fix=el=>{if(el.closest&&el.closest('[data-nobk]'))return;for(const a of att){const v=el.getAttribute&&el.getAttribute(a);if(v){const x=bk(v);if(x!==v)el.setAttribute(a,x)}}};
+    nodes.forEach(t=>{if(t.parentElement&&t.parentElement.closest('[data-nobk]'))return;const v=t.nodeValue;if(v){const x=bk(v);if(x!==v)t.nodeValue=x}});
+    if(root.nodeType===1){fix(root);root.querySelectorAll('[placeholder],[aria-label],[data-tip],[title],[alt]').forEach(fix)}}
   {const g=myG();if(g)nodes.forEach(t=>{const v=t.nodeValue;if(v&&v.includes('·')&&/·[a-zéè]/.test(v)){const x=gx(v,g);if(x!==v)t.nodeValue=x}})}
   const tpl=document.createElement('template');
   nodes.forEach(t=>{const txt=t.nodeValue;if(!txt||txt.search(ALLRE)<0)return;const p=t.parentElement;if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.tagName))return;
@@ -383,15 +421,16 @@ const GRAD=[['#ff7a59','#7a1f5c'],['#3d6bff','#0b1a52'],['#ffcc00','#8a3a00'],['
 const VERDICTS={yes:['👍','Je le conseille',8],meh:['🤷','Bof',5],no:['👎','Pas pour moi',2]};
 const TROPHIES={fun:['😂','Plus drôle'],juste:['🎯','Plus juste'],bold:['😈','Plus insolent']};
 const RARITY={legendary:'Légendaire',rare:'Rare',holo:'Holo',common:'Commune'};
-const GENRES=['Drame','Comédie','Science-fiction','Thriller','Documentaire','Animation','Policier'];
+const GENRES=BOOKS?['Roman','Policier','Science-fiction','Fantasy','Thriller','Romance','Biographie','Histoire','Essai','BD','Jeunesse']:['Drame','Comédie','Science-fiction','Thriller','Documentaire','Animation','Policier'];
 const CAT=[["Blow-Up",1966,"Michelangelo Antonioni","Drame"],["Fenêtre sur cour",1954,"Alfred Hitchcock","Thriller"],["Vertigo",1958,"Alfred Hitchcock","Thriller"],["Ikiru",1952,"Akira Kurosawa","Drame"],["Rashomon",1950,"Akira Kurosawa","Drame"],["Les Sept Samouraïs",1954,"Akira Kurosawa","Drame"],["Tokyo Story",1953,"Yasujirō Ozu","Drame"],["Citizen Kane",1941,"Orson Welles","Drame"],["Playtime",1967,"Jacques Tati","Comédie"],["Mon oncle",1958,"Jacques Tati","Comédie"],["La Jetée",1962,"Chris Marker","Science-fiction"],["Le Mépris",1963,"Jean-Luc Godard","Drame"],["Hiroshima mon amour",1959,"Alain Resnais","Drame"],["Le Samouraï",1967,"Jean-Pierre Melville","Policier"],["Vol au-dessus d’un nid de coucou",1975,"Miloš Forman","Drame"],["Alien",1979,"Ridley Scott","Science-fiction"],["Blade Runner",1982,"Ridley Scott","Science-fiction"],["2001 : L’Odyssée de l’espace",1968,"Stanley Kubrick","Science-fiction"],["Gattaca",1997,"Andrew Niccol","Science-fiction"],["Matrix",1999,"Lana et Lilly Wachowski","Science-fiction"],["Minority Report",2002,"Steven Spielberg","Science-fiction"],["Her",2013,"Spike Jonze","Science-fiction"],["Ex Machina",2014,"Alex Garland","Science-fiction"],["Contagion",2011,"Steven Soderbergh","Thriller"],["Parasite",2019,"Bong Joon-ho","Thriller"],["Anatomie d’une chute",2023,"Justine Triet","Drame"],["Perfect Days",2023,"Wim Wenders","Drame"],["Aftersun",2022,"Charlotte Wells","Drame"],["Moonlight",2016,"Barry Jenkins","Drame"],["Whiplash",2014,"Damien Chazelle","Drame"],["La La Land",2016,"Damien Chazelle","Comédie"],["Lost in Translation",2003,"Sofia Coppola","Drame"],["Le Scaphandre et le Papillon",2007,"Julian Schnabel","Drame"],["Patch Adams",1998,"Tom Shadyac","Comédie"],["Le Dîner de cons",1998,"Francis Veber","Comédie"],["Le Fabuleux Destin d’Amélie Poulain",2001,"Jean-Pierre Jeunet","Comédie"],["Intouchables",2011,"Olivier Nakache et Éric Toledano","Comédie"],["La Haine",1995,"Mathieu Kassovitz","Drame"],["Un prophète",2009,"Jacques Audiard","Policier"],["Le Voyage de Chihiro",2001,"Hayao Miyazaki","Animation"],["Le Château dans le ciel",1986,"Hayao Miyazaki","Animation"],["WALL-E",2008,"Andrew Stanton","Animation"],["Être et avoir",2002,"Nicolas Philibert","Documentaire"],["Microcosmos",1996,"Claude Nuridsany et Marie Pérennou","Documentaire"],["Citizenfour",2014,"Laura Poitras","Documentaire"],["Man on Wire",2008,"James Marsh","Documentaire"],["Le Peuple migrateur",2001,"Jacques Perrin","Documentaire"]];
 CAT.push(...[["Le Parrain", 1972, "Francis Ford Coppola", "Policier"], ["Taxi Driver", 1976, "Martin Scorsese", "Drame"], ["Les Affranchis", 1990, "Martin Scorsese", "Policier"], ["Les Infiltrés", 2006, "Martin Scorsese", "Policier"], ["Les Évadés", 1994, "Frank Darabont", "Drame"], ["La Liste de Schindler", 1993, "Steven Spielberg", "Drame"], ["E.T. l’extra-terrestre", 1982, "Steven Spielberg", "Science-fiction"], ["Rencontres du troisième type", 1977, "Steven Spielberg", "Science-fiction"], ["Forrest Gump", 1994, "Robert Zemeckis", "Drame"], ["Retour vers le futur", 1985, "Robert Zemeckis", "Science-fiction"], ["Million Dollar Baby", 2004, "Clint Eastwood", "Drame"], ["Amour", 2012, "Michael Haneke", "Drame"], ["Le Ruban blanc", 2009, "Michael Haneke", "Drame"], ["Le Fils de Saul", 2015, "László Nemes", "Drame"], ["Mommy", 2014, "Xavier Dolan", "Drame"], ["Portrait de la jeune fille en feu", 2019, "Céline Sciamma", "Drame"], ["120 battements par minute", 2017, "Robin Campillo", "Drame"], ["La Vie d’Adèle", 2013, "Abdellatif Kechiche", "Drame"], ["De rouille et d’os", 2012, "Jacques Audiard", "Drame"], ["De battre mon cœur s’est arrêté", 2005, "Jacques Audiard", "Policier"], ["Les Quatre Cents Coups", 1959, "François Truffaut", "Drame"], ["Jules et Jim", 1962, "François Truffaut", "Drame"], ["À bout de souffle", 1960, "Jean-Luc Godard", "Policier"], ["Pierrot le Fou", 1965, "Jean-Luc Godard", "Drame"], ["Alphaville", 1965, "Jean-Luc Godard", "Science-fiction"], ["Les Enfants du paradis", 1945, "Marcel Carné", "Drame"], ["La Règle du jeu", 1939, "Jean Renoir", "Comédie"], ["La Grande Illusion", 1937, "Jean Renoir", "Drame"], ["Le Salaire de la peur", 1953, "Henri-Georges Clouzot", "Thriller"], ["Les Diaboliques", 1955, "Henri-Georges Clouzot", "Thriller"], ["Le Mystère Picasso", 1956, "Henri-Georges Clouzot", "Documentaire"], ["Le Corbeau", 1943, "Henri-Georges Clouzot", "Thriller"], ["Le Trou", 1960, "Jacques Becker", "Policier"], ["Le Cercle rouge", 1970, "Jean-Pierre Melville", "Policier"], ["Cléo de 5 à 7", 1962, "Agnès Varda", "Drame"], ["Sans toit ni loi", 1985, "Agnès Varda", "Drame"], ["Les Glaneurs et la Glaneuse", 2000, "Agnès Varda", "Documentaire"], ["Les Plages d’Agnès", 2008, "Agnès Varda", "Documentaire"], ["Visages villages", 2017, "Agnès Varda et JR", "Documentaire"], ["Au revoir les enfants", 1987, "Louis Malle", "Drame"], ["Ascenseur pour l’échafaud", 1958, "Louis Malle", "Policier"], ["Les Visiteurs", 1993, "Jean-Marie Poiré", "Comédie"], ["La Grande Vadrouille", 1966, "Gérard Oury", "Comédie"], ["Le Père Noël est une ordure", 1982, "Jean-Marie Poiré", "Comédie"], ["Bienvenue chez les Ch’tis", 2008, "Dany Boon", "Comédie"], ["OSS 117 : Le Caire, nid d’espions", 2006, "Michel Hazanavicius", "Comédie"], ["The Artist", 2011, "Michel Hazanavicius", "Comédie"], ["Le Grand Budapest Hotel", 2014, "Wes Anderson", "Comédie"], ["La Famille Tenenbaum", 2001, "Wes Anderson", "Comédie"], ["Little Miss Sunshine", 2006, "Jonathan Dayton et Valerie Faris", "Comédie"], ["Certains l’aiment chaud", 1959, "Billy Wilder", "Comédie"], ["Boulevard du crépuscule", 1950, "Billy Wilder", "Drame"], ["La Garçonnière", 1960, "Billy Wilder", "Comédie"], ["Les Temps modernes", 1936, "Charlie Chaplin", "Comédie"], ["Le Dictateur", 1940, "Charlie Chaplin", "Comédie"], ["Le Kid", 1921, "Charlie Chaplin", "Comédie"], ["Le Mécano de la « General »", 1926, "Buster Keaton", "Comédie"], ["Metropolis", 1927, "Fritz Lang", "Science-fiction"], ["M le maudit", 1931, "Fritz Lang", "Thriller"], ["Nosferatu le vampire", 1922, "F. W. Murnau", "Thriller"], ["Le Voleur de bicyclette", 1948, "Vittorio De Sica", "Drame"], ["La Strada", 1954, "Federico Fellini", "Drame"], ["La Dolce Vita", 1960, "Federico Fellini", "Drame"], ["Huit et demi", 1963, "Federico Fellini", "Drame"], ["Cinema Paradiso", 1988, "Giuseppe Tornatore", "Drame"], ["La vie est belle", 1997, "Roberto Benigni", "Drame"], ["Le Guépard", 1963, "Luchino Visconti", "Drame"], ["Le Septième Sceau", 1957, "Ingmar Bergman", "Drame"], ["Les Fraises sauvages", 1957, "Ingmar Bergman", "Drame"], ["Persona", 1966, "Ingmar Bergman", "Drame"], ["Stalker", 1979, "Andreï Tarkovski", "Science-fiction"], ["Solaris", 1972, "Andreï Tarkovski", "Science-fiction"], ["Le Miroir", 1975, "Andreï Tarkovski", "Drame"], ["Brazil", 1985, "Terry Gilliam", "Science-fiction"], ["Soleil vert", 1973, "Richard Fleischer", "Science-fiction"], ["Terminator", 1984, "James Cameron", "Science-fiction"], ["Terminator 2 : Le Jugement dernier", 1991, "James Cameron", "Science-fiction"], ["Aliens, le retour", 1986, "James Cameron", "Science-fiction"], ["Avatar", 2009, "James Cameron", "Science-fiction"], ["La Guerre des étoiles", 1977, "George Lucas", "Science-fiction"], ["Interstellar", 2014, "Christopher Nolan", "Science-fiction"], ["Inception", 2010, "Christopher Nolan", "Science-fiction"], ["Memento", 2000, "Christopher Nolan", "Thriller"], ["The Dark Knight", 2008, "Christopher Nolan", "Policier"], ["Oppenheimer", 2023, "Christopher Nolan", "Drame"], ["Dune", 2021, "Denis Villeneuve", "Science-fiction"], ["Premier Contact", 2016, "Denis Villeneuve", "Science-fiction"], ["Blade Runner 2049", 2017, "Denis Villeneuve", "Science-fiction"], ["Sicario", 2015, "Denis Villeneuve", "Thriller"], ["Prisoners", 2013, "Denis Villeneuve", "Thriller"], ["Barbie", 2023, "Greta Gerwig", "Comédie"], ["Lady Bird", 2017, "Greta Gerwig", "Comédie"], ["Eternal Sunshine of the Spotless Mind", 2004, "Michel Gondry", "Drame"], ["Soyez sympas, rembobinez", 2008, "Michel Gondry", "Comédie"], ["Se souvenir des belles choses", 2002, "Zabou Breitman", "Drame"], ["Mr. Nobody", 2009, "Jaco Van Dormael", "Science-fiction"], ["Le Huitième Jour", 1996, "Jaco Van Dormael", "Drame"], ["Dallas Buyers Club", 2013, "Jean-Marc Vallée", "Drame"], ["Philadelphia", 1993, "Jonathan Demme", "Drame"], ["Hippocrate", 2014, "Thomas Lilti", "Comédie"], ["Médecin de campagne", 2016, "Thomas Lilti", "Comédie"], ["Première année", 2018, "Thomas Lilti", "Comédie"], ["Elephant Man", 1980, "David Lynch", "Drame"], ["Good Will Hunting", 1997, "Gus Van Sant", "Drame"], ["Rain Man", 1988, "Barry Levinson", "Drame"], ["Un homme d’exception", 2001, "Ron Howard", "Drame"], ["L’Éveil", 1990, "Penny Marshall", "Drame"], ["Still Alice", 2014, "Richard Glatzer et Wash Westmoreland", "Drame"], ["Le Discours d’un roi", 2010, "Tom Hooper", "Drame"], ["Mar adentro", 2004, "Alejandro Amenábar", "Drame"], ["Les Autres", 2001, "Alejandro Amenábar", "Thriller"], ["127 heures", 2010, "Danny Boyle", "Drame"], ["Slumdog Millionaire", 2008, "Danny Boyle", "Drame"], ["Trainspotting", 1996, "Danny Boyle", "Drame"], ["Les Ailes du désir", 1987, "Wim Wenders", "Drame"], ["Paris, Texas", 1984, "Wim Wenders", "Drame"], ["Buena Vista Social Club", 1999, "Wim Wenders", "Documentaire"], ["Pina", 2011, "Wim Wenders", "Documentaire"], ["Le Sel de la Terre", 2014, "Wim Wenders et Juliano Ribeiro Salgado", "Documentaire"], ["Cameraperson", 2016, "Kirsten Johnson", "Documentaire"], ["À la recherche de Vivian Maier", 2013, "John Maloof et Charlie Siskel", "Documentaire"], ["Home", 2009, "Yann Arthus-Bertrand", "Documentaire"], ["La Marche de l’empereur", 2005, "Luc Jacquet", "Documentaire"], ["Bowling for Columbine", 2002, "Michael Moore", "Documentaire"], ["Sugar Man", 2012, "Malik Bendjelloul", "Documentaire"], ["Free Solo", 2018, "Elizabeth Chai Vasarhelyi et Jimmy Chin", "Documentaire"], ["Grizzly Man", 2005, "Werner Herzog", "Documentaire"], ["Aguirre, la colère de Dieu", 1972, "Werner Herzog", "Drame"], ["Fitzcarraldo", 1982, "Werner Herzog", "Drame"], ["Le Roi lion", 1994, "Roger Allers et Rob Minkoff", "Animation"], ["Toy Story", 1995, "John Lasseter", "Animation"], ["Vice-versa", 2015, "Pete Docter", "Animation"], ["Là-haut", 2009, "Pete Docter et Bob Peterson", "Animation"], ["Soul", 2020, "Pete Docter", "Animation"], ["Coco", 2017, "Lee Unkrich", "Animation"], ["Ratatouille", 2007, "Brad Bird", "Animation"], ["Les Indestructibles", 2004, "Brad Bird", "Animation"], ["Persepolis", 2007, "Marjane Satrapi et Vincent Paronnaud", "Animation"], ["Ernest et Célestine", 2012, "Stéphane Aubier, Vincent Patar et Benjamin Renner", "Animation"], ["Kirikou et la Sorcière", 1998, "Michel Ocelot", "Animation"], ["Les Triplettes de Belleville", 2003, "Sylvain Chomet", "Animation"], ["Mon voisin Totoro", 1988, "Hayao Miyazaki", "Animation"], ["Princesse Mononoké", 1997, "Hayao Miyazaki", "Animation"], ["Le Garçon et le Héron", 2023, "Hayao Miyazaki", "Animation"], ["Le Tombeau des lucioles", 1988, "Isao Takahata", "Animation"], ["Your Name", 2016, "Makoto Shinkai", "Animation"], ["Akira", 1988, "Katsuhiro Otomo", "Animation"], ["Ghost in the Shell", 1995, "Mamoru Oshii", "Animation"], ["La Planète sauvage", 1973, "René Laloux", "Animation"], ["L’Étrange Noël de monsieur Jack", 1993, "Henry Selick", "Animation"], ["Valse avec Bachir", 2008, "Ari Folman", "Animation"], ["Le Silence des agneaux", 1991, "Jonathan Demme", "Thriller"], ["Seven", 1995, "David Fincher", "Thriller"], ["Fight Club", 1999, "David Fincher", "Drame"], ["Zodiac", 2007, "David Fincher", "Thriller"], ["The Social Network", 2010, "David Fincher", "Drame"], ["Gone Girl", 2014, "David Fincher", "Thriller"], ["Psychose", 1960, "Alfred Hitchcock", "Thriller"], ["Les Oiseaux", 1963, "Alfred Hitchcock", "Thriller"], ["La Mort aux trousses", 1959, "Alfred Hitchcock", "Thriller"], ["Shining", 1980, "Stanley Kubrick", "Thriller"], ["Orange mécanique", 1971, "Stanley Kubrick", "Science-fiction"], ["Eyes Wide Shut", 1999, "Stanley Kubrick", "Drame"], ["Chinatown", 1974, "Roman Polanski", "Policier"], ["Rosemary’s Baby", 1968, "Roman Polanski", "Thriller"], ["Le Pianiste", 2002, "Roman Polanski", "Drame"], ["Mulholland Drive", 2001, "David Lynch", "Thriller"], ["Blue Velvet", 1986, "David Lynch", "Thriller"], ["Old Boy", 2003, "Park Chan-wook", "Thriller"], ["Mademoiselle", 2016, "Park Chan-wook", "Thriller"], ["Memories of Murder", 2003, "Bong Joon-ho", "Policier"], ["The Host", 2006, "Bong Joon-ho", "Science-fiction"], ["Snowpiercer", 2013, "Bong Joon-ho", "Science-fiction"], ["Heat", 1995, "Michael Mann", "Policier"], ["Scarface", 1983, "Brian De Palma", "Policier"], ["Pulp Fiction", 1994, "Quentin Tarantino", "Policier"], ["Reservoir Dogs", 1992, "Quentin Tarantino", "Policier"], ["Inglourious Basterds", 2009, "Quentin Tarantino", "Drame"], ["Django Unchained", 2012, "Quentin Tarantino", "Drame"], ["Garde à vue", 1981, "Claude Miller", "Policier"], ["Le Boucher", 1970, "Claude Chabrol", "Policier"], ["La Cérémonie", 1995, "Claude Chabrol", "Thriller"], ["Une séparation", 2011, "Asghar Farhadi", "Drame"], ["Le Client", 2016, "Asghar Farhadi", "Drame"], ["Capharnaüm", 2018, "Nadine Labaki", "Drame"], ["Timbuktu", 2014, "Abderrahmane Sissako", "Drame"], ["Mustang", 2015, "Deniz Gamze Ergüven", "Drame"], ["Ida", 2013, "Paweł Pawlikowski", "Drame"], ["Cold War", 2018, "Paweł Pawlikowski", "Drame"], ["Drive My Car", 2021, "Ryūsuke Hamaguchi", "Drame"], ["Une affaire de famille", 2018, "Hirokazu Kore-eda", "Drame"], ["Nobody Knows", 2004, "Hirokazu Kore-eda", "Drame"], ["Tel père, tel fils", 2013, "Hirokazu Kore-eda", "Drame"], ["After Life", 1998, "Hirokazu Kore-eda", "Drame"], ["Départs", 2008, "Yōjirō Takita", "Drame"], ["Les Misérables", 2019, "Ladj Ly", "Drame"], ["Entre les murs", 2008, "Laurent Cantet", "Drame"], ["Rosetta", 1999, "Jean-Pierre et Luc Dardenne", "Drame"], ["Deux jours, une nuit", 2014, "Jean-Pierre et Luc Dardenne", "Drame"], ["Le Gamin au vélo", 2011, "Jean-Pierre et Luc Dardenne", "Drame"], ["Moi, Daniel Blake", 2016, "Ken Loach", "Drame"], ["Billy Elliot", 2000, "Stephen Daldry", "Drame"], ["The Full Monty", 1997, "Peter Cattaneo", "Comédie"], ["Les Chariots de feu", 1981, "Hugh Hudson", "Drame"], ["Gladiator", 2000, "Ridley Scott", "Drame"], ["Thelma et Louise", 1991, "Ridley Scott", "Drame"], ["Lawrence d’Arabie", 1962, "David Lean", "Drame"], ["Le Pont de la rivière Kwaï", 1957, "David Lean", "Drame"], ["Casablanca", 1942, "Michael Curtiz", "Drame"], ["Autant en emporte le vent", 1939, "Victor Fleming", "Drame"], ["Chantons sous la pluie", 1952, "Stanley Donen et Gene Kelly", "Comédie"], ["West Side Story", 1961, "Robert Wise et Jerome Robbins", "Drame"], ["Mary Poppins", 1964, "Robert Stevenson", "Comédie"], ["Qui veut la peau de Roger Rabbit", 1988, "Robert Zemeckis", "Comédie"], ["SOS Fantômes", 1984, "Ivan Reitman", "Comédie"], ["Un jour sans fin", 1993, "Harold Ramis", "Comédie"], ["Madame Doubtfire", 1993, "Chris Columbus", "Comédie"], ["Big", 1988, "Penny Marshall", "Comédie"], ["Le Truman Show", 1998, "Peter Weir", "Drame"], ["Le Cercle des poètes disparus", 1989, "Peter Weir", "Drame"], ["Sixième Sens", 1999, "M. Night Shyamalan", "Thriller"], ["Le Labyrinthe de Pan", 2006, "Guillermo del Toro", "Drame"], ["La Forme de l’eau", 2017, "Guillermo del Toro", "Drame"], ["Parle avec elle", 2002, "Pedro Almodóvar", "Drame"], ["Tout sur ma mère", 1999, "Pedro Almodóvar", "Drame"], ["Volver", 2006, "Pedro Almodóvar", "Comédie"], ["Douleur et Gloire", 2019, "Pedro Almodóvar", "Drame"], ["Amours chiennes", 2000, "Alejandro González Iñárritu", "Drame"], ["Birdman", 2014, "Alejandro González Iñárritu", "Comédie"], ["Roma", 2018, "Alfonso Cuarón", "Drame"], ["Gravity", 2013, "Alfonso Cuarón", "Science-fiction"], ["Les Fils de l’homme", 2006, "Alfonso Cuarón", "Science-fiction"], ["La Cité de Dieu", 2002, "Fernando Meirelles", "Policier"], ["Central do Brasil", 1998, "Walter Salles", "Drame"]]);
+if(BOOKS){CAT.length=0;CAT.push(...[["L’Étranger",1942,"Albert Camus","Roman"],["La Peste",1947,"Albert Camus","Roman"],["Le Petit Prince",1943,"Antoine de Saint-Exupéry","Jeunesse"],["Les Misérables",1862,"Victor Hugo","Roman"],["Madame Bovary",1857,"Gustave Flaubert","Roman"],["Le Rouge et le Noir",1830,"Stendhal","Roman"],["Voyage au bout de la nuit",1932,"Louis-Ferdinand Céline","Roman"],["Germinal",1885,"Émile Zola","Roman"],["Bel-Ami",1885,"Guy de Maupassant","Roman"],["Le Comte de Monte-Cristo",1844,"Alexandre Dumas","Roman"],["Les Trois Mousquetaires",1844,"Alexandre Dumas","Roman"],["Candide",1759,"Voltaire","Roman"],["Notre-Dame de Paris",1831,"Victor Hugo","Roman"],["Le Père Goriot",1835,"Honoré de Balzac","Roman"],["Au revoir là-haut",2013,"Pierre Lemaitre","Roman"],["Les Choses",1965,"Georges Perec","Roman"],["La Vie devant soi",1975,"Romain Gary","Roman"],["L’Amant",1984,"Marguerite Duras","Roman"],["Bonjour tristesse",1954,"Françoise Sagan","Roman"],["Le Parfum",1985,"Patrick Süskind","Roman"],["L’Écume des jours",1947,"Boris Vian","Roman"],["Cent ans de solitude",1967,"Gabriel García Márquez","Roman"],["Le Vieil Homme et la mer",1952,"Ernest Hemingway","Roman"],["Des souris et des hommes",1937,"John Steinbeck","Roman"],["L’Attrape-cœurs",1951,"J. D. Salinger","Roman"],["Moby Dick",1851,"Herman Melville","Roman"],["Crime et châtiment",1866,"Fiodor Dostoïevski","Roman"],["Anna Karénine",1877,"Léon Tolstoï","Roman"],["La Métamorphose",1915,"Franz Kafka","Roman"],["Le Procès",1925,"Franz Kafka","Roman"],["L’Élégance du hérisson",2006,"Muriel Barbery","Roman"],["L’Alchimiste",1988,"Paulo Coelho","Roman"],["1984",1949,"George Orwell","Science-fiction"],["Le Meilleur des mondes",1932,"Aldous Huxley","Science-fiction"],["Fahrenheit 451",1953,"Ray Bradbury","Science-fiction"],["Dune",1965,"Frank Herbert","Science-fiction"],["Fondation",1951,"Isaac Asimov","Science-fiction"],["Neuromancien",1984,"William Gibson","Science-fiction"],["Le Problème à trois corps",2008,"Liu Cixin","Science-fiction"],["Le Seigneur des anneaux",1954,"J. R. R. Tolkien","Fantasy"],["Le Hobbit",1937,"J. R. R. Tolkien","Fantasy"],["Harry Potter à l’école des sorciers",1997,"J. K. Rowling","Fantasy"],["Le Nom du vent",2007,"Patrick Rothfuss","Fantasy"],["Le Trône de fer",1996,"George R. R. Martin","Fantasy"],["Ils étaient dix",1939,"Agatha Christie","Policier"],["Le Crime de l’Orient-Express",1934,"Agatha Christie","Policier"],["Arsène Lupin, gentleman cambrioleur",1907,"Maurice Leblanc","Policier"],["Le Chien des Baskerville",1902,"Arthur Conan Doyle","Policier"],["Millénium : Les hommes qui n’aimaient pas les femmes",2005,"Stieg Larsson","Thriller"],["Gone Girl",2012,"Gillian Flynn","Thriller"],["Da Vinci Code",2003,"Dan Brown","Thriller"],["Le Silence des agneaux",1988,"Thomas Harris","Thriller"],["Shining",1977,"Stephen King","Thriller"],["Misery",1987,"Stephen King","Thriller"],["Ça",1986,"Stephen King","Thriller"],["Orgueil et Préjugés",1813,"Jane Austen","Romance"],["Les Hauts de Hurlevent",1847,"Emily Brontë","Romance"],["Jane Eyre",1847,"Charlotte Brontë","Romance"],["Autant en emporte le vent",1936,"Margaret Mitchell","Romance"],["Sapiens",2011,"Yuval Noah Harari","Histoire"],["Les Piliers de la terre",1989,"Ken Follett","Histoire"],["Mémoires d’Hadrien",1951,"Marguerite Yourcenar","Histoire"],["Une brève histoire du temps",1988,"Stephen Hawking","Essai"],["Le Deuxième Sexe",1949,"Simone de Beauvoir","Essai"],["Becoming",2018,"Michelle Obama","Biographie"],["Steve Jobs",2011,"Walter Isaacson","Biographie"],["Journal d’Anne Frank",1947,"Anne Frank","Biographie"],["Persepolis",2000,"Marjane Satrapi","BD"],["Maus",1986,"Art Spiegelman","BD"],["Astérix le Gaulois",1961,"René Goscinny","BD"],["Le Lotus bleu",1936,"Hergé","BD"],["L’Arabe du futur",2014,"Riad Sattouf","BD"],["Watchmen",1986,"Alan Moore","BD"],["Charlie et la chocolaterie",1964,"Roald Dahl","Jeunesse"],["Matilda",1988,"Roald Dahl","Jeunesse"]])}
 
 let sb=null;
 const S={films:[],ratings:[],members:[],cfg:{},live:null,ideas:[],duels:[],dvotes:[],chals:[],noms:[],nvotes:[],diary:[],shared:[],watch:[],names:{},meId:null,isOwner:false,ready:false,db:null,assets:null,dl:null};
 let lastDone=null,lastLevel=null,authTab='in',authMsg='',view='home',filter='all',q='',film=null,adding=false,prefill=null,dTxt=null,dShot=null,posterUrl='',addNote=0,bet=0,seasonMode='season',showRemind=false,lastLive=null;
 const reelHtml=(txt,small)=>`<div class="reel ${small?'sm':''}" role="status"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#ffcc00"/><g fill="#0f0e14"><circle cx="24" cy="11" r="4.6"/><circle cx="36.4" cy="20" r="4.6"/><circle cx="31.7" cy="34.6" r="4.6"/><circle cx="16.3" cy="34.6" r="4.6"/><circle cx="11.6" cy="20" r="4.6"/><circle cx="24" cy="24" r="3.4"/></g></svg>${txt?`<span>${txt}</span>`:''}</div>`;
-const R={pool:[],angle:0,spinning:false,result:null,src:'wd',loading:false,err:'',tried:false,f:{genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all',kind:'all',pl:''},fopen:false,ftab:'kind',det:null,detLoading:false};
+const R={pool:[],angle:0,spinning:false,result:null,src:'wd',loading:false,err:'',tried:false,f:{genres:[],from:'',to:'',dir:'',act:'',dur:'',pop:'all',kind:'all',pl:''},fopen:false,ftab:BOOKS?'genres':'kind',det:null,detLoading:false};
 let rModal=false;
 
 const member=id=>S.members.find(m=>m.id===id);
@@ -414,7 +453,7 @@ function memberModal(){const id=memV,m=S.members.find(x=>x.id===id);if(!m)return
   return`<div class="modal" data-act="memclose"><div class="sheet" data-stop style="width:min(680px,100%)" role="dialog" aria-label="Profil de ${e(nameOf(id))}"><button class="x" data-act="memclose" aria-label="Fermer">✕</button>
    <div class="row" style="gap:16px;align-items:center;flex-wrap:nowrap"><div class="avbig" style="width:84px;height:84px;flex:none">${av}</div><div style="min-width:0;flex:1"><h2 style="margin:0">${e(nameOf(id))}</h2><div class="dim">${e(gxo(st.name,g))} · ${st.xp} XP${rank&&id!==S.cfg.directorId?` · ${rank}${rank===1?'er':'e'} au classement`:''}</div><div class="xp" style="width:100%;height:8px;margin-top:8px"><i style="width:${Math.round(st.pct)}%"></i></div></div></div>
    <div class="kpi" style="margin:14px 0"><div class="pn"><b>${got.length}</b><span class="dim">badge${got.length>1?'s':''} obtenu${got.length>1?'s':''}</span></div><div class="pn"><b>${bt.have}</b><span class="dim">paliers débloqués</span></div><div class="pn"><b>${st.count}</b><span class="dim">film${st.count>1?'s':''} noté${st.count>1?'s':''}</span></div></div>
-   <h3 style="margin:0 0 8px">Ses badges</h3>${got.length?`<div class="bwall">${got.map(badgeChip).join('')}</div>`:'<p class="dim">Aucun badge pour le moment.</p>'}</div></div>`}
+   <h3 style="margin:0 0 8px">Ses badges</h3>${got.length?`<div class="bwall">${got.map(f=>badgeChip(f,id)).join('')}</div>`:'<p class="dim">Aucun badge pour le moment.</p>'}</div></div>`}
 let dPick=null,dEdit=null,dStars=0,dDate='',dText='',dFilter='',dShare=false;
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function carnetView(){
@@ -521,7 +560,7 @@ function stats(id,from=0,to=Infinity,withBadges=false){
 
 /* badges : familles à paliers, pour jouer pendant des mois et des années */
 const TIERN=['Bronze','Argent','Or','Platine','Diamant','Légende','Mythique','Éternel'];
-const GEMO={'Drame':'🎭','Comédie':'😂','Science-fiction':'🚀','Thriller':'🕵️','Documentaire':'📽️','Animation':'🎨','Policier':'🔎'};
+const GEMO=BOOKS?{'Roman':'📚','Policier':'🔎','Science-fiction':'🚀','Fantasy':'🌍','Thriller':'🕵️','Romance':'😂','Biographie':'🎭','Histoire':'⏳','Essai':'🎯','BD':'🎨','Jeunesse':'🍿'}:{'Drame':'🎭','Comédie':'😂','Science-fiction':'🚀','Thriller':'🕵️','Documentaire':'📽️','Animation':'🎨','Policier':'🔎'};
 const plur=(n,w)=>`${n} ${w}${n>1&&!w.endsWith('s')?'s':''}`;
 function progBadges(id,fs){
   const live=fs.filter(f=>f.status!=='upcoming'),cs=cons(),uniq=a=>new Set(a.filter(Boolean)).size;
@@ -623,7 +662,7 @@ function badgeRow(f){const i=famInfo(f);
 function closestBadges(fs,n){return fs.map(f=>[f,famInfo(f)]).filter(x=>!x[1].done).sort((a,b)=>b[1].cur/b[1].nx-a[1].cur/a[1].nx||a[1].nx-b[1].nx).slice(0,n).map(x=>x[0])}
 function badgeRows(fs){return[...new Set(fs.map(f=>f.cat))].map(c=>`<div class="gh">${c}</div><div style="display:grid;gap:8px">${fs.filter(f=>f.cat===c).map(badgeRow).join('')}</div>`).join('')}
 function badgeSummary(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
-  const got=earnedBadges(fs);return`${got.length?`<div class="bwall">${got.slice(0,14).map(badgeChip).join('')}${got.length>14?`<span class="dim" style="align-self:center">+${got.length-14}</span>`:''}</div>`:''}<p class="dim" style="font-size:13px;margin:4px 0 12px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Voici les plus proches :</p><div style="display:grid;gap:8px">${closestBadges(fs,4).map(badgeRow).join('')}</div><button class="btn ghost" style="margin-top:12px" data-act="nav" data-id="badges">Voir tous mes badges</button>`}
+  const got=earnedBadges(fs);return`${got.length?`<div class="bwall">${got.slice(0,14).map(f=>badgeChip(f)).join('')}${got.length>14?`<span class="dim" style="align-self:center">+${got.length-14}</span>`:''}</div>`:''}<p class="dim" style="font-size:13px;margin:4px 0 12px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Voici les plus proches :</p><div style="display:grid;gap:8px">${closestBadges(fs,4).map(badgeRow).join('')}</div><button class="btn ghost" style="margin-top:12px" data-act="nav" data-id="badges">Voir tous mes badges</button>`}
 function badgesView(){const fs=stats(S.meId,0,Infinity,true).badges,t=badgeTotals(fs);
   return`<div class="gwrap" style="max-width:1000px"><div class="row" style="flex-wrap:wrap;margin-bottom:6px"><h2 style="flex:1">Mes badges</h2><button class="btn ghost" data-act="nav" data-id="profile">Retour à mon profil</button></div><p class="dim" style="margin-bottom:14px">${t.have} palier${t.have>1?'s':''} débloqué${t.have>1?'s':''} sur ${t.total}. Chaque badge a plusieurs paliers (Bronze, Argent, Or…) : certains se gagnent en quelques jours, d’autres en plusieurs mois.</p>${badgePanel(fs)}</div>`}
 
@@ -643,13 +682,15 @@ function verdictRow(fid,mine){return`<div class="vd">${Object.entries(VERDICTS).
 
 /* écrans */
 const LOGO_MARK=`<svg viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-8 32 32)" stroke="#0f0e14" stroke-width="2.5" stroke-linejoin="round"><rect x="9" y="26" width="46" height="27" rx="4" fill="#ffcc00"/><path d="M9 20 L55 13 L56.5 24 L10.5 31 Z" fill="#f3f1ea"/><path d="M17 29 L25 19 M29 27.5 L37 17.5 M41 26 L49 16" stroke="#0f0e14" stroke-width="4.5"/><circle cx="32" cy="40" r="7" fill="#0f0e14" stroke="none"/><path d="M30 36.5 L36.5 40 L30 43.5 Z" fill="#ffcc00" stroke="none"/></g></svg>`;
-const logoHtml=(lg)=>`<span class="brand${lg?' lg':''}" role="img" aria-label="Ciné-Club Imagerie">${LOGO_MARK}<span class="bt"><b>CINÉ-CLUB</b><i>IMAGERIE</i></span></span>`;
+const LOGO_BOOK=`<svg viewBox="0 0 64 64" aria-hidden="true"><g transform="rotate(-6 32 32)" stroke="#0f0e14" stroke-width="2.5" stroke-linejoin="round"><path d="M8 14 H29 a4 4 0 0 1 3 1.5 a4 4 0 0 1 3-1.5 H56 V51 H35 a4 4 0 0 0-3 1.5 a4 4 0 0 0-3-1.5 H8 Z" fill="#4cd6a0"/><path d="M32 15.5 V52.5" fill="none"/><path d="M14 22 H26 M14 29 H26 M38 22 H50 M38 29 H50" stroke-width="3" fill="none"/></g></svg>`;
+const logoHtml=(lg)=>`<span class="brand${lg?' lg':''}" role="img" aria-label="${BOOKS?'Book-Club':'Ciné-Club'} Imagerie">${BOOKS?LOGO_BOOK:LOGO_MARK}<span class="bt"><b>CINÉ-CLUB</b><i>IMAGERIE</i></span></span>`;
 let menuOpen=false;
-const NAVICON={home:'clap',dash:'chart',animer:'flag',team:'users',palmares:'trophy',election:'star',roulette:'wheel',profile:'user',guide:'book'};
+const NAVICON={home:BOOKS?'book':'clap',dash:'chart',animer:'flag',team:'users',palmares:'trophy',election:'star',roulette:'wheel',profile:'user',guide:'book'};
 const NAVTIP={election:'Proposez un film et votez : le plus voté passe automatiquement à l’affiche chaque lundi',home:'Les films proposés par Hervé et par l’équipe',dash:'Notes, participation et statistiques de chaque film',animer:'Lancer un défi du mois ou un duel entre deux films',team:'Classement, palmes et défis du mois',palmares:'Les mieux notés, les plus détestés, les plus commentés et les reviewers du mois',roulette:'Roulette et films populaires de la semaine pour trouver des idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
 function header(){const s=stats(S.meId),nav=[['home','Films'],['election','Élection']];if(isDir())nav.push(['dash','Tableau de bord']);if(isDir())nav.push(['animer','Animer']);nav.push(['team','Équipe']);nav.push(['palmares','Palmarès']);nav.push(['roulette','Idées']);nav.push(['profile','Mon profil']);nav.push(['guide','Guide']);
   return`<header><div class="logo">${logoHtml()}</div><nav>${nav.map(([k,l])=>`<button class="${view===k?'on':''}" data-act="nav" data-id="${k}" data-tip="${e(NAVTIP[k])}">${icon(NAVICON[k]||'star')}${l}</button>`).join('')}</nav>
   <div class="sp"></div>
+  <div class="clubsw" role="group" aria-label="Choisir le club" data-nobk><a class="${BOOKS?'':'on'}" href="${location.pathname}" data-tip="Le ciné-club : les films">${icon('clap')}<span>Films</span></a><a class="${BOOKS?'on':''}" href="${location.pathname}?club=livres" data-tip="Le book-club : les livres">${icon('book')}<span>Livres</span></a></div>
   <div class="mewrap"><button class="me" data-act="menu" aria-haspopup="true" aria-expanded="${menuOpen}" data-tip="Mon profil et mes réglages"><span class="av">${emojiOf(S.meId)}</span><div style="line-height:1.15;text-align:left"><div style="font-size:13px;font-weight:600">${e(nameOf(S.meId).split(' ')[0])}${s.streak?` 🔥${s.streak}`:''}</div><div class="xp"><i style="width:${s.pct}%"></i></div></div><span class="dim" aria-hidden="true">▾</span></button>${menuOpen?profileMenu(s):''}</div></header>`}
 function profileMenu(s){return`<div class="menu" role="menu"><div class="row" style="gap:12px;margin-bottom:12px"><span class="av" style="width:48px;height:48px;font-size:26px">${emojiOf(S.meId)}</span><div style="min-width:0"><b>${e(nameOf(S.meId))}</b><div class="dim" style="font-size:13px">${s.name}</div></div></div>
   <div class="xp" style="width:100%;height:8px"><i style="width:${s.pct}%"></i></div><div class="dim" style="font-size:12px;margin:6px 0 12px">${s.xp} XP${s.next?` · encore ${s.next[0]-s.xp} pour devenir ${s.next[1]}`:' · niveau maximum'}${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''} d’affilée`:''}</div>
@@ -666,7 +707,7 @@ function banners(films){
   if(!isDir()&&S.cfg.directorId){const todo=films.filter(f=>f.status!=='upcoming'&&!rOf(f.id,S.meId));
     if(todo.length&&!lf)h+=`<div class="banner"><span>Il vous reste <b>${todo.length} film${todo.length>1?'s':''}</b> à noter.</span><button class="btn" data-act="open" data-id="${todo[todo.length-1].id}">Noter le plus ancien</button></div>`}
   return h}
-const CHAL_TPL=[['🎞️','Classique','before','1980',2,'Rat de cinémathèque'],['📽️','Docu du mois','genre','Documentaire',1,'Curieux·se du réel'],['🎨','Animation','genre','Animation',1,'Cœur d’enfant'],['🚀','Science-fiction','genre','Science-fiction',2,'Voyageur·se du futur'],['😂','Fou rire','genre','Comédie',2,'Zygomatique'],['🕵️','Frissons','genre','Thriller',2,'Sang-froid'],['🔎','Polar','genre','Policier',2,'Fin limier'],['🆕','Nouveautés','after','2020',2,'À la page'],['🍿','Marathon','count','',3,'Marathonien·ne'],['🌍','Éclectique','genres','',3,'Papillon de salle']];
+const CHAL_TPL=BOOKS?[['🎞️','Classique','before','1960',2,'Rat de bibliothèque'],['🔎','Polar','genre','Policier',2,'Fin limier'],['🚀','Science-fiction','genre','Science-fiction',2,'Voyageur·se du futur'],['🌍','Fantasy','genre','Fantasy',2,'Aventurier·ère'],['🕵️','Frissons','genre','Thriller',2,'Sang-froid'],['🎨','BD du mois','genre','BD',1,'Cœur d’enfant'],['📽️','Biographie','genre','Biographie',1,'Curieux·se du réel'],['🆕','Nouveautés','after','2020',2,'À la page'],['🍿','Marathon','count','',3,'Marathonien·ne'],['🌍','Éclectique','genres','',3,'Papillon de page']]:[['🎞️','Classique','before','1980',2,'Rat de cinémathèque'],['📽️','Docu du mois','genre','Documentaire',1,'Curieux·se du réel'],['🎨','Animation','genre','Animation',1,'Cœur d’enfant'],['🚀','Science-fiction','genre','Science-fiction',2,'Voyageur·se du futur'],['😂','Fou rire','genre','Comédie',2,'Zygomatique'],['🕵️','Frissons','genre','Thriller',2,'Sang-froid'],['🔎','Polar','genre','Policier',2,'Fin limier'],['🆕','Nouveautés','after','2020',2,'À la page'],['🍿','Marathon','count','',3,'Marathonien·ne'],['🌍','Éclectique','genres','',3,'Papillon de salle']];
 const BADGE_PRESETS=[['🎬','Cinéphile du mois'],['🌟','Étoile montante'],['🔭','Explorateur·rice'],['🎯','Pile dans le mille'],['🧠','Esprit critique'],['💎','Pépite dénichée'],['🔥','Sur une lancée'],['🍿','Pop-corn addict'],['🌍','Globe-trotter'],['🏛️','Mémoire du cinéma'],['🆕','Dans le coup'],['🎭','Grand·e spectateur·rice']];
 function chalHelp(c){const used=new Set(S.ratings.filter(r=>r.userId===S.meId&&chalMatch(c,r)).map(r=>S.films.find(f=>f.id===r.filmId)?.genre));
   return S.films.filter(f=>f.status!=='upcoming'&&!rOf(f.id,S.meId)&&(c.type==='genre'?f.genre===c.value:c.type==='before'?!!(+f.year&&+f.year<+c.value):c.type==='after'?!!(+f.year&&+f.year>=+c.value):c.type==='genres'?!used.has(f.genre):true)).slice(0,3)}
@@ -801,7 +842,7 @@ function wrapData(){
   const rs=S.ratings.filter(r=>r.userId===id&&r.ts>=y0&&r.ts<y1&&Fm(r));
   const top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1]);
   const cnt=(arr)=>{const o={};arr.forEach(k=>{if(k!=null&&k!=='')o[k]=(o[k]||0)+1});return o};
-  const mins=rs.reduce((n,r)=>n+(Fm(r).runtime||110),0);
+  const mins=rs.reduce((n,r)=>n+(Fm(r).runtime||(BOOKS?300:110)),0);
   const byStars=[1,2,3,4,5].map(k=>rs.filter(r=>Math.ceil(r.stars/2)===k).length);
   const avgS=avg(rs.map(r=>r.stars));
   const gen=top(cnt(rs.map(r=>Fm(r).genre))),dec=top(cnt(rs.map(r=>+Fm(r).year>1800?Math.floor(+Fm(r).year/10)*10:null)));
@@ -838,10 +879,10 @@ function wrapSlides(){
     const per=fs.map(f=>{const t=team(f.id),a=avg(t.map(r=>r.stars)),sd=t.length>1?Math.sqrt(avg(t.map(r=>(r.stars-a)**2))):0;return{f,t,a,sd}});
     const ranked=per.filter(x=>x.t.length>=1&&x.a!=null).sort((a,b)=>b.a-a.a),top1=ranked[0],div1=[...per].sort((a,b)=>b.sd-a.sd)[0];
     const part=cons().length&&per.length?Math.round(avg(per.map(x=>Math.min(1,x.t.length/cons().length)))*100):0;
-    const all=S.ratings.filter(r=>r.userId!==S.cfg.directorId&&r.ts>=y0&&r.ts<y1),mins=fs.reduce((n,f)=>n+(f.runtime||110),0);
+    const all=S.ratings.filter(r=>r.userId!==S.cfg.directorId&&r.ts>=y0&&r.ts<y1),mins=fs.reduce((n,f)=>n+(f.runtime||(BOOKS?300:110)),0);
     const gen=Object.entries(fs.reduce((o,f)=>(o[f.genre]=(o[f.genre]||0)+1,o),{})).sort((a,b)=>b[1]-a[1]);
     W('intro',`<div class="wk">Votre année de programmation</div><div class="wbig">${yr}</div><h2 class="wh">Le bilan de vos films</h2><p class="wd">Prêt·e pour le récap ?</p>`);
-    W('films',`<div class="wk">Vous avez proposé</div><div class="wbig"><b class="cnt-up" data-to="${fs.length}">0</b></div><h2 class="wh">film${fs.length>1?'s':''}</h2><p class="wd">${fs.length?`Soit environ ${hh(mins/60)} h de cinéma à partager, ${(mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.`:'La saison commence : proposez un premier film.'}</p>`);
+    W('films',`<div class="wk">Vous avez proposé</div><div class="wbig"><b class="cnt-up" data-to="${fs.length}">0</b></div><h2 class="wh">film${fs.length>1?'s':''}</h2><p class="wd">${fs.length?`${BOOKS?`Soit environ ${mins} pages à partager, comme ${Math.max(1,Math.round(mins/300))} romans de 300 pages.`:`Soit environ ${hh(mins/60)} h de cinéma à partager, ${(mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.`}`:'La saison commence : proposez un premier film.'}</p>`);
     if(gen.length)W('genres',`<div class="wk">Vos goûts</div><h2 class="wh">Vous programmez surtout du ${e(gen[0][0].toLowerCase())}</h2>${gen.slice(0,4).map(([g,n])=>`<div class="wrow"><span>${e(g)}</span><div class="wbar"><i style="--w:${Math.round(n/gen[0][1]*100)}%"></i></div><b>${n}</b></div>`).join('')}`);
     if(top1)W('best',`<div class="wk">Le favori de l’équipe</div><div class="wrow2">${mini(top1.f)}<div><h2 class="wh" style="font-size:24px">${e(top1.f.title)}</h2><p class="wd">${fmt(top1.a)} sur 5 en moyenne, ${plur(top1.t.length,'avis')}.</p>${div1&&div1.sd>=1.5&&div1.f.id!==top1.f.id?`<p class="wd" style="margin-top:10px">Le plus divisif : <b>${e(div1.f.title)}</b>.</p>`:''}</div></div>`);
     if(ranked.length>=3)W('top',`<div class="wk">Votre podium</div><h2 class="wh" style="font-size:24px">Les 3 films préférés de l’équipe</h2><div class="wtop">${ranked.slice(0,3).map((x,i)=>`<div class="wrow2"><b class="wrank">${i+1}</b>${mini(x.f)}<div><h3 class="wh" style="font-size:18px">${e(x.f.title)}</h3><p class="wd">${fmt(x.a)} sur 5, ${plur(x.t.length,'avis')}</p></div></div>`).join('')}</div>`);
@@ -855,7 +896,7 @@ function wrapSlides(){
   }else{
     const f=D.Fm,peak=D.chrono&&D.chrono[0],ch={night:['Noctambule','Vous notez quand les autres dorment.','moon'],morning:['Lève-tôt','Un café, un film, une note : vous êtes matinal·e.','sunrise'],afternoon:['De l’après-midi','Vos avis tombent en plein après-midi.','clock'],evening:['Du soir','Vos notes arrivent le soir, après le film.','sofa']}[peak||'evening'];
     W('intro',`<div class="wk">Votre année ciné</div><div class="wbig">${D.yr}</div><h2 class="wh">${e(nameOf(S.meId).split(' ')[0])}, c’est l’heure du récap</h2><p class="wd">Appuyez sur Suivant pour découvrir votre année.</p>`);
-    W('films',`<div class="wk">Vous avez noté</div><div class="wbig"><b class="cnt-up" data-to="${D.n}">0</b></div><h2 class="wh">film${D.n>1?'s':''}</h2><p class="wd">Environ ${hh(D.mins/60)} h de cinéma, soit ${(D.mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.</p>`);
+    W('films',`<div class="wk">Vous avez noté</div><div class="wbig"><b class="cnt-up" data-to="${D.n}">0</b></div><h2 class="wh">film${D.n>1?'s':''}</h2><p class="wd">${BOOKS?`Environ ${D.mins} pages lues, soit ${Math.max(1,Math.round(D.mins/300))} romans de 300 pages.`:`Environ ${hh(D.mins/60)} h de cinéma, soit ${(D.mins/60/8).toFixed(1).replace('.',',')} fois Paris-New York en avion.`}</p>`);
     if(D.gen.length)W('genres',`<div class="wk">Votre genre favori</div><h2 class="wh">Vous êtes plutôt ${e(D.gen[0][0].toLowerCase())}</h2>${D.gen.slice(0,4).map(([g,n])=>`<div class="wrow"><span>${e(g)}</span><div class="wbar"><i style="--w:${Math.round(n/D.gen[0][1]*100)}%"></i></div><b>${n}</b></div>`).join('')}`);
     if(D.dec.length)W('dec',`<div class="wk">Votre époque</div><div class="wbig" style="font-size:64px">${D.dec[0][0]}</div><h2 class="wh">Les années ${D.dec[0][0]} vous parlent</h2><p class="wd">${plur(D.dec[0][1],'film')} de cette décennie sur ${plur(D.n,'film')} notés.</p>`);
     W('notes',`<div class="wk">Votre façon de noter</div><div class="wbig" style="font-size:72px"><b class="cnt-up" data-to="${(D.avgS/2).toFixed(1)}" data-dec="1">0</b><small>/5</small></div>${D.byStars.map((n,i)=>`<div class="wrow"><span>${i+1} ${icon('star')}</span><div class="wbar"><i style="--w:${Math.round(n/Math.max(...D.byStars,1)*100)}%"></i></div><b>${n}</b></div>`).join('')}<p class="wd">${D.avgS>=7.6?'Vous êtes plutôt indulgent·e.':D.avgS<=5.4?'Vous êtes plutôt exigeant·e.':'Vous êtes équilibré·e.'}</p>`);
@@ -888,11 +929,11 @@ async function wrapShareCard(){
   const SL=wrapSlides();if(!S.dl)return;const D=isDir()?null:wrapData();
   const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,1080,1350);g.addColorStop(0,'#2b2d6e');g.addColorStop(1,'#7a1f5c');x.fillStyle=g;x.fillRect(0,0,1080,1350);
-  x.fillStyle='#ffcc00';x.font='700 36px Inter,sans-serif';x.fillText('CINÉ-CLUB IMAGERIE',80,120);
+  x.fillStyle='#ffcc00';x.font='700 36px Inter,sans-serif';x.fillText(bk('CINÉ-CLUB IMAGERIE'),80,120);
   x.fillStyle='#fff';x.font='800 120px Inter,sans-serif';x.fillText(String(new Date().getFullYear()),80,290);
   x.font='600 44px Inter,sans-serif';x.fillText(nameOf(S.meId),80,360);
   const lines=D?[[D.n,D.n>1?'films notés':'film noté'],[(D.avgS/2).toFixed(1).replace('.',','),'note moyenne'],[D.texts.length,'avis écrits'],[D.st.xp,'XP · '+D.st.name]]:[[S.films.length,'films proposés'],[S.duels.length,'duels'],[S.chals.length,'défis'],[S.ratings.filter(r=>r.trophy).length,'trophées']];
-  lines.forEach(([v,l],i)=>{x.fillStyle='#ffcc00';x.font='800 96px Inter,sans-serif';x.fillText(String(v),80,520+i*170);x.fillStyle='#ffffffcc';x.font='500 40px Inter,sans-serif';x.fillText(l,80,566+i*170)});
+  lines.map(([v,l])=>[v,bk(l)]).forEach(([v,l],i)=>{x.fillStyle='#ffcc00';x.font='800 96px Inter,sans-serif';x.fillText(String(v),80,520+i*170);x.fillStyle='#ffffffcc';x.font='500 40px Inter,sans-serif';x.fillText(l,80,566+i*170)});
   const ptxt=gx(D?D.pers[0]:'',myG()).replace(/·/g,'');
   x.fillStyle='#ffffff22';for(let k=0;k<9;k++)x.fillRect(80+k*112,1120,84,26);
   if(D&&D.gen[0]){x.fillStyle='#ffffffcc';x.font='500 36px Inter,sans-serif';x.fillText('Genre favori : '+D.gen[0][0],80,1190)}
@@ -974,7 +1015,7 @@ function addModal(){const p=prefill||{};
     <div class="field"><label for="ft">Titre</label><input type="hidden" name="qid" id="fq" value="${e(p.qid||'')}"><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"><span class="dim" style="font-size:12px">Tapez le titre : des propositions avec affiche apparaissent, un clic remplit les champs.</span></div>
     <div id="sug" class="sug"></div>
     <div class="field"><label for="fpitch">Pourquoi je vous le propose</label><textarea name="pitch" id="fpitch" rows="2"></textarea></div>
-    <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||'Drame')}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
+    <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||GENRES[0])}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
     <details class="more"><summary>Plus d’options : où le voir, diffusion télé, question, affiche</summary><div style="display:grid;gap:12px;margin-top:12px">
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:170px"><label for="fw">Où le voir</label><input name="where" id="fw" placeholder="Netflix, Prime, cinéma, DVD…"></div></div>
     <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:170px"><label for="ftv">Chaîne de diffusion (si télé)</label><input name="tvch" id="ftv" list="tvl" placeholder="Arte, France 2, Canal+…"><datalist id="tvl">${TVCH.map(c=>`<option>${c}</option>`).join('')}</datalist></div><div class="field" style="flex:1;min-width:200px"><label for="ftvd">Date et heure de diffusion</label><input name="tvat" id="ftvd" type="datetime-local"></div></div>
@@ -1122,7 +1163,16 @@ function avatarTab(){
    <div style="flex:1;min-width:260px"><div class="tabs">${parts.map(([k,l])=>`<button class="tab ${avPart===k?'on':''}" data-act="avpart" data-id="${k}">${l}</button>`).join('')}</div>${(subs[avPart]||[]).length?`<div class="subtabs" style="margin-bottom:12px">${subs[avPart].map(([k,l])=>`<button class="stab ${sub===k?'on':''}" data-act="avsub" data-id="${k}">${l}</button>`).join('')}</div>`:''}${grid}</div></div>
    <p class="dim" style="font-size:12px;margin-top:12px">Votre personnage s’affiche à côté de votre nom dans le classement, les avis et les podiums. Chaque changement est enregistré tout de suite.</p></div>`}
 let pTab='apercu',bCat='mine';
-function badgeChip(f){const i=famInfo(f);return`<div class="bch" style="--h:${hash(f.name)%360}" data-tip="${e(f.name+' : '+(i.done?'palier maximum':'palier '+i.k+' sur '+f.tiers.length))}"><span class="bico" style="--h:${hash(f.name)%360}">${f.emoji}</span><b>${e(f.name)}</b><span class="badge">${TIERN[i.k-1]||''}</span></div>`}
+function badgeChip(f,u){const i=famInfo(f);return`<button type="button" class="bch" data-act="binfo" data-id="${e(f.name)}" data-u="${e(u||S.meId)}" style="--h:${hash(f.name)%360}" data-tip="${e(f.name+' : '+(i.done?'palier maximum':'palier '+i.k+' sur '+f.tiers.length)+' (cliquez pour le détail)')}"><span class="bico" style="--h:${hash(f.name)%360}">${f.emoji}</span><b>${e(f.name)}</b><span class="badge">${TIERN[i.k-1]||''}</span></button>`}
+let binfo=null;
+function badgeModal(){if(!binfo)return'';const st=stats(binfo.u,0,Infinity,true),f=st.badges.find(x=>x.name===binfo.name);if(!f)return'';const i=famInfo(f),me=binfo.u===S.meId,who=me?'Votre progression':'Progression de '+e((nameOf(binfo.u)||'').split(' ')[0]);
+  const pct=i.done?100:Math.round(i.cur/i.nx*100);
+  return`<div class="modal" data-act="biclose" style="z-index:60"><div class="sheet" data-stop style="width:min(520px,100%)" role="dialog" aria-label="${e(f.name)}"><button class="x" data-act="biclose" aria-label="Fermer">✕</button>
+   <div class="row" style="gap:14px;align-items:center;flex-wrap:nowrap"><span class="bico" style="--h:${hash(f.name)%360};width:56px;height:56px;font-size:28px;flex:none">${f.emoji}</span><div style="min-width:0"><h2 style="margin:0">${e(f.name)}</h2><div class="dim">${e(f.cat)}${i.k?' · '+TIERN[i.k-1]:' · pas encore obtenu'}</div></div></div>
+   <p style="margin:14px 0 6px"><b>${who}</b> : ${i.done?'palier maximum atteint':`${i.cur} sur ${i.nx} pour le palier suivant`}</p><div class="xp" style="width:100%;height:8px"><i style="width:${pct}%"></i></div>
+   <h3 style="margin:18px 0 8px">Comment l’obtenir</h3>
+   <div style="display:grid;gap:8px">${f.tiers.map((t,k)=>{const ok=f.cur>=t;return`<div class="row" style="gap:10px;align-items:flex-start;flex-wrap:nowrap;opacity:${ok?1:.75}"><span class="badge" style="flex:none;min-width:64px;justify-content:center;${ok?'border-color:var(--ok);color:var(--ok)':''}">${ok?'✔ ':''}${TIERN[k]||'Palier '+(k+1)}</span><span style="min-width:0">${e(f.desc(t))}</span></div>`}).join('')}</div>
+  </div></div>`}
 const earnedBadges=fs=>fs.filter(f=>famInfo(f).k>0).sort((a,b)=>famInfo(b).k-famInfo(a).k||a.name.localeCompare(b.name,'fr'));
 function badgePanel(fs){
   const cats=[...new Set(fs.map(f=>f.cat))],mine=earnedBadges(fs);if(bCat==='mine'&&!mine.length)bCat='close';if(bCat!=='close'&&bCat!=='mine'&&!cats.includes(bCat))bCat='close';
@@ -1145,7 +1195,7 @@ function profile(){
   else if(pTab==='reglages')body=`<div class="pn" style="display:grid;gap:16px"><div class="row" style="flex-wrap:wrap"><label for="myname" class="dim">Mon nom affiché</label><input id="myname" value="${e(nameOf(S.meId))}" maxlength="40" style="flex:1;min-width:180px"><button class="btn ghost" data-act="savename" data-tip="Le nom que vos collègues voient dans le classement et les avis">Enregistrer</button></div>
    <div class="row" style="flex-wrap:wrap;gap:8px"><span class="dim">Vous êtes</span>${[['f','Une femme'],['m','Un homme'],['','Ne pas préciser']].map(([k,l])=>`<button class="chip ${(myG()||'')===k?'on':''}" data-act="setgender" data-id="${k||'x'}">${l}</button>`).join('')}</div></div>`;
   else body=`<div class="kpi" style="margin-bottom:6px">${tile(rs.length,rs.length>1?'films notés':'film noté')}${tile(texts,'avis écrits')}${tile(likes,'likes reçus')}${tile(bt.have+' sur '+bt.total,'badges débloqués')}</div>
-    ${earnedBadges(s.badges).length?`<div class="sect"><h3>Mes badges</h3><button class="chip" data-act="ptab" data-id="badges">Tout voir</button></div><div class="bwall">${earnedBadges(s.badges).slice(0,14).map(badgeChip).join('')}</div>`:''}
+    ${earnedBadges(s.badges).length?`<div class="sect"><h3>Mes badges</h3><button class="chip" data-act="ptab" data-id="badges">Tout voir</button></div><div class="bwall">${earnedBadges(s.badges).slice(0,14).map(f=>badgeChip(f)).join('')}</div>`:''}
     <div class="sect"><h3>Prochains badges</h3><button class="chip" data-act="ptab" data-id="badges">Tous les badges</button></div><div class="bgrid">${closestBadges(s.badges,4).map(badgeRow).join('')}</div>
     <div class="sect"><h3>Derniers avis</h3><button class="chip" data-act="ptab" data-id="journal">Tout le journal</button></div>${journalRows(rs.slice(0,3))}`;
   return`<div class="pn row" style="gap:16px;margin-bottom:14px;flex-wrap:wrap"><button class="av avbtn" style="width:56px;height:56px;font-size:28px" data-act="goavatar" data-tip="Créer ou modifier mon avatar">${emojiOf(S.meId)}<span class="avedit">${icon('pen')}</span></button><div style="flex:1;min-width:200px"><h2 style="font-size:24px">${e(nameOf(S.meId))}</h2><div class="dim" style="font-size:14px">${s.name} · ${s.xp} XP${s.streak?` · 🔥 ${s.streak} semaine${s.streak>1?'s':''}`:''}${s.next?` · encore ${s.next[0]-s.xp} XP pour devenir ${s.next[1]}`:''}</div><div class="xp" style="width:100%;margin-top:8px"><i style="width:${s.pct}%"></i></div></div><button class="btn" data-act="wrapopen" data-tip="Votre année de cinéma racontée en diapositives animées">${icon('sparkles')} Mon Wrapped</button></div>
@@ -1154,7 +1204,7 @@ function profile(){
 /* roulette */
 function buildLocal(){
   const f=R.f,have=new Set(S.films.map(x=>x.title.toLowerCase())),seen=new Set();
-  const ideas=myIdeas(S.meId).map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||'Drame',from:'idea',id:i.id,qid:i.qid||'',poster:i.poster||'',wikiTitle:i.wikiTitle||'',tv:!!i.tv}));
+  const ideas=myIdeas(S.meId).map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||GENRES[0],from:'idea',id:i.id,qid:i.qid||'',poster:i.poster||'',wikiTitle:i.wikiTitle||'',tv:!!i.tv}));
   const cat=CAT.map(([title,year,director,genre])=>({title,year,director,genre,from:'cat'}));
   const okF=x=>{const y=+x.year;return(!f.genres.length||f.genres.includes(x.genre))&&(!f.from||!y||y>=+f.from)&&(!f.to||!y||y<=+f.to)&&(!f.dir.trim()||norm(x.director).includes(norm(f.dir)))};
   let p=(R.src==='ideas'?ideas:[...shuffle(ideas).slice(0,4),...shuffle(cat)]).filter(x=>{const k=x.title.toLowerCase();if(have.has(k)||seen.has(k)||!okF(x))return false;seen.add(k);return true});
@@ -1173,7 +1223,7 @@ const qidOf=u=>u.slice(u.lastIndexOf('/')+1);
 const LBL='SERVICE wikibase:label { bd:serviceParam wikibase:language "fr,en". }';
 function wdRows(j){const m=new Map();
   (j.results?.bindings||[]).forEach(b=>{const id=qidOf(b.f.value),t=b.fLabel?.value||'';if(!t||/^Q\d+$/.test(t))return;
-    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:'Drame',poster:'',sl:0,wiki:'',tv:false,from:'wd'};
+    const o=m.get(id)||{qid:id,title:t,year:'',director:'',genre:GENRES[0],poster:'',sl:0,wiki:'',tv:false,from:'wd'};
     if(b.tvf&&b.tvf.value==='true')o.tv=true;
     if(b.sl)o.sl=Math.max(o.sl,+b.sl.value||0);
     if(b.art&&!o.wiki)o.wiki=decodeURIComponent(qidOf(b.art.value)).replace(/_/g,' ');
@@ -1213,7 +1263,29 @@ async function wdPool(F,y0,y1,ids){
     OPTIONAL { ?f wdt:P57 ?d }
     ${LBL} }`;
   const rows=wdRows(await sparql(q,12000));R.wd[key]=rows;return rows}
-async function wdPoster(qid){
+const OLF='key,title,author_name,first_publish_year,cover_i,subject,number_of_pages_median,edition_count';
+const olCover=id=>id?'https://covers.openlibrary.org/b/id/'+id+'-M.jpg':'';
+function olGenre(subj){const t=(subj||[]).join(' ').toLowerCase(),h=x=>t.includes(x);
+  if(h('graphic novel')||h('comic')||h('bande dessin'))return'BD';if(h('juvenile')||h('children'))return'Jeunesse';if(h('fantasy'))return'Fantasy';if(h('science fiction'))return'Science-fiction';
+  if(h('detective')||h('mystery')||h('crime'))return'Policier';if(h('thriller')||h('suspense')||h('horror'))return'Thriller';if(h('romance')||h('love stor'))return'Romance';
+  if(h('biograph')||h('memoir'))return'Biographie';if(h('histor'))return'Histoire';if(h('essay')||h('philosoph'))return'Essai';return h('fiction')||h('novel')?'Roman':''}
+const olMap=d=>({qid:d.key||'',title:d.title,year:String(d.first_publish_year||''),director:(d.author_name||[])[0]||'',genre:olGenre(d.subject),poster:olCover(d.cover_i),pages:d.number_of_pages_median||0,sl:d.edition_count||0,wiki:d.key?'https://openlibrary.org'+d.key:'',from:'ol'});
+async function olSearch(text0){const [t,y]=splitYear(text0),q=encodeURIComponent(t+(y?' first_publish_year:'+y:''));
+  const j=await wdGet(`https://openlibrary.org/search.json?q=${q}&limit=24&fields=${OLF}`,10000);return mergeResults((j.docs||[]).filter(d=>d.title).map(olMap),text0)}
+async function olPoster(title,year){try{const j=await wdGet(`https://openlibrary.org/search.json?title=${encodeURIComponent(title)}&limit=5&fields=cover_i,first_publish_year,title`,9000);
+  const d=(j.docs||[]).find(x=>x.cover_i&&(!year||String(x.first_publish_year)===String(year)))||(j.docs||[]).find(x=>x.cover_i);return d?olCover(d.cover_i):''}catch{return''}}
+async function olDetails(f){const patch={};let key=String(f.qid||'').startsWith('/works/')?f.qid:'',doc=null;
+  if(!key||!f.director||!f.year){try{const j=await wdGet(`https://openlibrary.org/search.json?title=${encodeURIComponent(f.title)}${f.director?'&author='+encodeURIComponent(f.director):''}&limit=1&fields=${OLF}`,9000);doc=(j.docs||[])[0]||null;if(doc&&!key)key=doc.key||''}catch{}}
+  if(doc){const m=olMap(doc);if(!f.director&&m.director)patch.director=m.director;if(!f.year&&m.year)patch.year=m.year;if(m.pages)patch.runtime=m.pages;if(m.poster&&!f.poster)patch.poster=m.poster}
+  if(key){patch.qid=key;patch.wiki='https://openlibrary.org'+key;
+    try{const w=await wdGet('https://openlibrary.org'+key+'.json',9000);let d=w.description;if(d&&typeof d==='object')d=d.value;if(d)patch.synopsis=String(d).replace(/\r?\n+/g,' ').replace(/\(\[source\][^)]*\)/g,'').slice(0,900);
+      if(!patch.poster&&!f.poster&&w.covers&&w.covers[0])patch.poster=olCover(w.covers[0])}catch{}}
+  patch.enriched=Date.now();return patch}
+const BOOK_SUBJ={'Roman':['literary_fiction','historical_fiction','classic_literature'],'Policier':['detective_and_mystery_stories','crime'],'Science-fiction':['science_fiction'],'Fantasy':['fantasy'],'Thriller':['thriller','horror'],'Romance':['romance','love_stories'],'Biographie':['biography'],'Histoire':['history'],'Essai':['essays','philosophy'],'BD':['graphic_novels','comics'],'Jeunesse':['juvenile_fiction','childrens_literature']};
+async function bookPool(F){const gs=F.genres.length?F.genres:Object.keys(BOOK_SUBJ),picks=shuffle(gs).slice(0,3).map(g=>[g,shuffle(BOOK_SUBJ[g])[0]]);
+  const res=await Promise.all(picks.map(async([g,sj])=>{try{const j=await wdGet(`https://openlibrary.org/subjects/${sj}.json?limit=40&offset=${Math.floor(Math.random()*150)}`,10000);
+    return(j.works||[]).filter(w=>w.title&&w.cover_id).map(w=>({title:w.title,year:String(w.first_publish_year||''),director:((w.authors||[])[0]||{}).name||'',genre:g,poster:olCover(w.cover_id),qid:w.key||'',from:'ol'}))}catch{return[]}}));return res.flat()}
+async function wdPoster(qid){if(BOOKS)return'';
   const j=await sparql(`SELECT ?pf ?im WHERE { OPTIONAL { wd:${qid} wdt:P3383 ?pf } OPTIONAL { wd:${qid} wdt:P18 ?im } } LIMIT 1`);
   const b=j.results?.bindings?.[0];const u=b?.pf?.value||b?.im?.value;return u?u.replace(/^http:/,'https:')+'?width=400':''}
 const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
@@ -1242,6 +1314,7 @@ async function tmdbSearch(text,qyear){
   if(k){tm=(await Promise.all([tmq('movie',qyear),tmq('tv',qyear)])).flat();if(qyear&&!tm.length)tm=(await Promise.all([tmq('movie',''),tmq('tv','')])).flat()}
   return tm}
 async function wdSearch(text0){
+  if(BOOKS)return olSearch(text0);
   const [text,qyear]=splitYear(text0);const tmP=tmdbSearch(text,qyear);
   const A='https://www.wikidata.org/w/api.php?origin=*&format=json&',W='https://fr.wikipedia.org/w/api.php?origin=*&format=json&';
   const ent=l=>A+'action=wbsearchentities&type=item&limit=50&language='+l+'&uselang='+l+'&search='+encodeURIComponent(text);
@@ -1263,9 +1336,10 @@ async function wdSearch(text0){
 
 /* fiche film : Wikidata + Wikipédia (+ TMDB si une clé est fournie dans config.js) */
 const tmdbKey=()=>(window.CINECLUB||{}).tmdbKey||'';
-const hm=m=>m>=60?`${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')}`:`${m} min`;
+const hm=m=>BOOKS?m+' pages':m>=60?`${Math.floor(m/60)} h ${String(m%60).padStart(2,'0')}`:`${m} min`;
 const triedEnrich=new Set();
 async function fetchDetails(f){
+  if(BOOKS)return olDetails(f);
   const patch={};let qid=f.qid,pre=null;
   const wpP=f.poster?Promise.resolve(''):wikiPoster(f.title,f.year);
   if(!qid&&f.wikiTitle){try{pre=await wdGet('https://fr.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(f.wikiTitle),9000);qid=pre.wikibase_item||''}catch{}}
@@ -1314,6 +1388,7 @@ async function enrichFilm(id,force){
   if(f.poster&&!force)delete p.poster;if(f.director&&!force)delete p.director;if(f.year&&!force)delete p.year;
   await upd('films/'+id,p)}
 async function wikiPoster(title,year){
+  if(BOOKS)return olPoster(title,year);
   try{const j=await wdGet('https://fr.wikipedia.org/w/api.php?action=query&generator=search&gsrnamespace=0&gsrlimit=6&gsrsearch='+encodeURIComponent(`${title} film${year?' '+year:''}`)+'&prop=pageimages&piprop=thumbnail&pithumbsize=400&format=json&origin=*',10000);
     const pages=Object.values(j.query?.pages||{}).sort((a,b)=>a.index-b.index).filter(p=>p.thumbnail),n=norm(title);
     const best=pages.find(p=>norm(p.title).startsWith(n)&&(!year||/film/i.test(p.title)||p.title.includes(String(year))))||pages.find(p=>norm(p.title).startsWith(n))||pages.find(p=>norm(p.title).includes(n));
@@ -1368,8 +1443,10 @@ async function buildPool(){
   R.slow=!!adv;
   try{
     const have=new Set(S.films.map(f=>f.title.toLowerCase()));
-    const ideas=shuffle(myIdeas(S.meId).map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||'Drame',from:'idea',id:i.id,qid:i.qid||'',poster:i.poster||'',wikiTitle:i.wikiTitle||'',tv:!!i.tv}))).filter(x=>(!F.genres.length||F.genres.includes(x.genre))&&(!F.dir.trim()&&!F.act.trim())).slice(0,3);
+    const ideas=shuffle(myIdeas(S.meId).map(i=>({title:i.title,year:i.year||'',director:i.director||'',genre:i.genre||GENRES[0],from:'idea',id:i.id,qid:i.qid||'',poster:i.poster||'',wikiTitle:i.wikiTitle||'',tv:!!i.tv}))).filter(x=>(!F.genres.length||F.genres.includes(x.genre))&&(!F.dir.trim()&&!F.act.trim())).slice(0,3);
     R.wdSeen=R.wdSeen||new Set();R.years=R.years||new Set();
+    if(BOOKS){let all=(await bookPool(F)).filter(x=>!have.has(x.title.toLowerCase())&&!R.wdSeen.has(x.qid));if(tok!==R.tok)return;all=all.filter((x,i)=>all.findIndex(y=>y.title===x.title)===i);
+      if(all.length<2)throw new Error('vide');const pk=shuffle(all).slice(0,12-ideas.length);pk.forEach(x=>R.wdSeen.add(x.qid));R.pool=shuffle([...ideas,...pk]);R.loading=false;R.slow=false;return render()}
     let all=[];
     if(!adv){
       for(let t=0;t<2&&all.length<12;t++){const items=await wpPool(F);if(tok!==R.tok)return;
@@ -1445,7 +1522,7 @@ function spin(){if(R.spinning||R.pool.length<2)return;R.spinning=true;R.result=n
 
 const DECADES=[['Avant 1960','',1959],['1960s',1960,1969],['1970s',1970,1979],['1980s',1980,1989],['1990s',1990,1999],['2000s',2000,2009],['2010s',2010,2019],['2020s',2020,2026]];
 function rFilters(){const f=R.f,n=rFilterCount(),wd=R.src==='wd';
-  const tabs=[['kind','Cinéma ou télé',f.kind&&f.kind!=='all'?1:0],['genres','Genres',f.genres.length],['period','Période',(f.from||f.to)?1:0],['people','Réalisation et acteurs',(f.dir.trim()?1:0)+(f.act.trim()?1:0)],['dur','Durée du film',f.dur?1:0],['pop','Popularité',f.pop!=='all'?1:0],['pl','Plateforme',f.pl?1:0]];
+  const tabs=BOOKS?[['genres','Genres',f.genres.length]]:[['kind','Cinéma ou télé',f.kind&&f.kind!=='all'?1:0],['genres','Genres',f.genres.length],['period','Période',(f.from||f.to)?1:0],['people','Réalisation et acteurs',(f.dir.trim()?1:0)+(f.act.trim()?1:0)],['dur','Durée du film',f.dur?1:0],['pop','Popularité',f.pop!=='all'?1:0],['pl','Plateforme',f.pl?1:0]];
   const ck=(type,name,on,act,id,label,tip)=>`<label class="ck" ${tip?`data-tip="${e(tip)}"`:''}><input type="${type}" name="${name}" ${on?'checked':''} data-act="${act}" data-id="${e(id)}"> ${label}</label>`;
   let panel='';
   if(R.ftab==='kind')panel=`<div class="ckgrid">${[['all','Films et téléfilms'],['cinema','Films de cinéma'],['tv','Téléfilms uniquement']].map(([k,l])=>ck('radio','kind',(f.kind||'all')===k,'rfkind',k,l)).join('')}</div><p class="dim" style="font-size:12px;margin-top:8px">Les téléfilms viennent de la même base ouverte (Wikidata). Certains n’ont pas de genre renseigné.</p>`;
@@ -1485,6 +1562,12 @@ function electionBase(){
 const TMDB_GENRES={28:'Action',12:'Aventure',16:'Animation',35:'Comédie',80:'Policier',99:'Documentaire',18:'Drame',878:'Science-fiction',53:'Thriller',9648:'Policier'};
 let TR={items:null,loading:false,page:0,src:''},trendV=null,trDet=null,trLoading=false;
 async function loadTrending(){if(TR.items||TR.loading)return;TR.loading=true;
+  if(BOOKS){const cb=lsGet('trendb',6*3600e3);if(cb&&cb.length>=6){TR.items=cb;TR.loading=false;return render()}
+    try{const j=await wdGet('https://openlibrary.org/trending/weekly.json?limit=60',10000);const seen=new Set();
+      TR.items=(j.works||[]).filter(w=>w.title&&w.cover_i).map(w=>({title:w.title,year:String(w.first_publish_year||''),director:(w.author_name||[])[0]||'',genre:olGenre(w.subject),poster:olCover(w.cover_i),qid:w.key||'',overview:'',from:'ol'})).filter(m=>{const k=m.title+'|'+m.year;if(seen.has(k))return false;seen.add(k);return true}).slice(0,60);
+      if(TR.items.length<6)throw 0;lsSet('trendb',TR.items)}
+    catch{TR.src='cat';TR.items=shuffle(CAT.map(([title,year,director,genre])=>({title,year:String(year),director,genre,poster:'',from:'cat'}))).slice(0,60)}
+    TR.loading=false;return render()}
   const cached=lsGet('trend2',6*3600e3);if(cached&&cached.length>=6){TR.items=cached;TR.loading=false;return render()}
   try{if(!tmdbKey())throw 0;
     const pages=await Promise.all([1,2,3].map(pg=>wdGet('https://api.themoviedb.org/3/trending/movie/week?language=fr-FR&page='+pg,9000).catch(()=>({results:[]}))));
@@ -1610,7 +1693,7 @@ function chFromTpl(t,start){const s0=dayStart(start||Date.now()),end=chDur==='7'
 async function removeChallenge(id){const c=S.chals.find(x=>x.id===id);if(!c)return;const doc={...c};delete doc.id;
   if(await del('challenges/'+id))toastAction(chStatus(c)==='sched'?'Lancement annulé':'Défi retiré','Annuler',()=>put('challenges/'+id,doc))}
 function chFormOf(c,mode){const today=Date.now(),b=c.badge;
-  const d={title:c.title||'',emoji:c.emoji||'⛳',type:c.type||'genre',value:c.value||(c.type==='before'?'1980':c.type==='after'?'2020':'Drame'),target:c.target||2,start:ymd(c.start||today),end:ymd(c.end||monthEnd(today)),bmode:b?'custom':'none',bpreset:0,bemoji:b?.emoji||'🏅',bname:b?.name||''};
+  const d={title:c.title||'',emoji:c.emoji||'⛳',type:c.type||'genre',value:c.value||(c.type==='before'?'1980':c.type==='after'?'2020':GENRES[0]),target:c.target||2,start:ymd(c.start||today),end:ymd(c.end||monthEnd(today)),bmode:b?'custom':'none',bpreset:0,bemoji:b?.emoji||'🏅',bname:b?.name||''};
   if(mode==='dup'){const len=(c.end&&c.start)?c.end-c.start:monthEnd(today)-dayStart(today);d.title=(c.title||'')+' (copie)';d.start=ymd(today);d.end=ymd(dayStart(today)+len);d.bmode='none';d.bname='';}
   return{id:mode==='edit'?c.id:null,mode,d}}
 function readChForm(){if(!chForm)return;const d=chForm.d;['title','emoji','type','value','target','start','end','bmode','bpreset','bemoji','bname'].forEach(k=>{const el=$('#cf_'+k);if(el)d[k]=el.value})}
@@ -1684,7 +1767,7 @@ const TOUR_DIR=[
  ['🗳️','L’élection de la semaine',['Mettez vos films en lice dans l’onglet <b>Élection</b>, comme l’équipe : tout le monde vote.','Le vote se ferme tout seul le dimanche soir et le plus voté passe à l’affiche le lundi. Vous pouvez aussi mettre un film en vedette vous-même, il prend alors la place du film élu.']],
  ['🎡','Roulette et idées',['Pas d’inspiration ? L’onglet <b>Idées</b> propose une roulette qui tire 12 films au hasard dans une base mondiale ou dans vos idées.','« Le proposer à l’équipe » préremplit le formulaire. Gardez vos idées pour plus tard dans la liste à droite.']]];
 let tour=null;
-const tourKey=()=>'cineclub-tour-'+S.meId;
+const tourKey=()=>'cineclub-tour-'+(BOOKS?'b-':'')+S.meId;
 function finishTour(){tour=null;try{localStorage.setItem(tourKey(),'1')}catch{}render()}
 function tourModal(){const sl=isDir()?TOUR_DIR:TOUR_TEAM,i=Math.min(tour.i,sl.length-1),[em,t,b]=sl[i];
   return`<div class="modal" data-act="tourskip"><div class="sheet" data-stop style="width:min(560px,100%);text-align:center" role="dialog" aria-label="Visite guidée"><div class="tico">${em}</div><h2 style="margin:6px 0 12px">${t}</h2>
@@ -1694,7 +1777,7 @@ function tourModal(){const sl=isDir()?TOUR_DIR:TOUR_TEAM,i=Math.min(tour.i,sl.le
 
 let gTab=null,gOpen=null;
 const GL=(items)=>`<ul>${items.map(x=>`<li>${x}</li>`).join('')}</ul>`;
-const G_PRINCIPE=GL(['<b>En une phrase :</b> chacun propose des films, l’équipe vote chaque semaine pour celui qui passe à l’affiche, puis chacun le regarde quand il veut et le note.','<b>Proposition</b> : un film ajouté avec « Proposer un film » par Hervé ou par un membre de l’équipe. Il apparaît sur l’accueil et tout le monde peut le noter.','<b>Élection</b> : chaque semaine, les films en lice (propositions faites pour l’affiche) sont soumis au vote de l’équipe, une voix par personne. Elle se clôt automatiquement le dimanche soir.','<b>À l’affiche</b> : le film le plus voté de l’élection de la semaine précédente, affiché en grand en haut de l’accueil (« film de la semaine »). Il n’y en a qu’un à la fois.','<b>Séance</b> : seulement quand un film passe à la télé en direct, c’est l’heure de diffusion (chaîne, jour, heure) indiquée sur sa fiche et dans le bandeau du haut. Sinon, pas de rendez-vous : chacun regarde le film quand il veut, puis le note.'])+'<p class="dim" style="margin-top:10px">Le fil : proposition → élection → affiche → visionnage → notes et points.</p>';
+const G_PRINCIPE=GL((['<b>En une phrase :</b> chacun propose des films, l’équipe vote chaque semaine pour celui qui passe à l’affiche, puis chacun le regarde quand il veut et le note.','<b>Proposition</b> : un film ajouté avec « Proposer un film » par Hervé ou par un membre de l’équipe. Il apparaît sur l’accueil et tout le monde peut le noter.','<b>Élection</b> : chaque semaine, les films en lice (propositions faites pour l’affiche) sont soumis au vote de l’équipe, une voix par personne. Elle se clôt automatiquement le dimanche soir.','<b>À l’affiche</b> : le film le plus voté de l’élection de la semaine précédente, affiché en grand en haut de l’accueil (« film de la semaine »). Il n’y en a qu’un à la fois.','<b>Séance</b> : seulement quand un film passe à la télé en direct, c’est l’heure de diffusion (chaîne, jour, heure) indiquée sur sa fiche et dans le bandeau du haut. Sinon, pas de rendez-vous : chacun regarde le film quand il veut, puis le note.','<b>Deux clubs</b> : le bouton « Films / Livres » en haut à droite permet de passer du ciné-club au book-club. Les deux fonctionnent pareil, avec les mêmes comptes, mais chacun a ses propres propositions, notes, élections et classement.']).filter((x,i)=>!(BOOKS&&x.startsWith('<b>Séance</b>')))) +'<p class="dim" style="margin-top:10px">Le fil : proposition → élection → '+(BOOKS?'à l’honneur → lecture':'affiche → visionnage')+' → notes et points.</p>';
 const G_ELECTION='<p>Chaque semaine, les films en lice sont ceux qu’Hervé et l’équipe proposent pour l’affiche (onglet Élection). Chacun vote pour son préféré : une voix, pas pour son propre film. Le vote se ferme tout seul dans la nuit de dimanche à lundi : le film le plus voté passe alors à l’affiche, sans que personne n’ait à valider (à égalité, le film proposé en premier l’emporte). Proposer rapporte 10 XP, être élu 50 XP.</p>';
 function guideData(){
   const team=[['Démarrer',[
@@ -1737,12 +1820,13 @@ function guideData(){
    ['Suivre',[
     ['tableau','📊','Tableau de bord','<p>Pour chaque film : votre note, la moyenne de l’équipe, l’écart, la participation et les personnes qui n’ont pas encore noté. Le badge ⚡ signale un film qui divise. « Télécharger les notes » enregistre un fichier à ouvrir dans Excel.</p>']]]];
   return{team,dir}}
+const G_TV=new Set(['seance_t','seance_d']);
 function guide(){
   const tab=gTab||(isDir()?'dir':'team'),D=guideData(),groups=tab==='dir'?D.dir:D.team;
   if(gOpen===null&&!S._gInit){S._gInit=1;gOpen=tab==='dir'?'principe_d':'principe'}
   return`<div class="gwrap"><div class="row" style="flex-wrap:wrap;margin-bottom:14px"><h2 style="flex:1">Guide</h2><button class="btn ghost" data-act="tourstart" data-tip="Revoir les écrans d’accueil du ciné-club">Revoir la visite guidée</button></div>
    ${isDir()?`<div class="row" style="margin-bottom:6px"><button class="tab ${tab==='dir'?'on':''}" data-act="gtab" data-id="dir">Pour Hervé</button><button class="tab ${tab==='team'?'on':''}" data-act="gtab" data-id="team">Ce que voit l’équipe</button></div>`:''}
-   ${groups.map(([gt,items])=>`<div class="gh">${gt}</div><div class="pn gl">${items.map(([id,em,t,c])=>{const o=gOpen===id;return`<div class="gi"><button class="gq ${o?'on':''}" data-act="gopen" data-id="${id}" aria-expanded="${o}"><span>${em}</span><b>${t}</b><i>${o?'−':'+'}</i></button>${o?`<div class="ga">${typeof c==='function'?c():c}</div>`:''}</div>`}).join('')}</div>`).join('')}</div>`}
+   ${groups.map(([gt,items])=>`<div class="gh">${gt}</div><div class="pn gl">${items.filter(x=>!(BOOKS&&G_TV.has(x[0]))).map(([id,em,t,c])=>{const o=gOpen===id;return`<div class="gi"><button class="gq ${o?'on':''}" data-act="gopen" data-id="${id}" aria-expanded="${o}"><span>${em}</span><b>${t}</b><i>${o?'−':'+'}</i></button>${o?`<div class="ga">${typeof c==='function'?c():c}</div>`:''}</div>`}).join('')}</div>`).join('')}</div>`}
 let editFilm=null;
 function editForm(f){const v=x=>e(x??'');
   return`<form id="editf" class="pn" style="margin-top:12px;display:grid;gap:10px" onsubmit="return false"><datalist id="gl2">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist><datalist id="tvl3">${TVCH.map(c=>`<option>${c}</option>`).join('')}</datalist>
@@ -1760,11 +1844,11 @@ let lastMk='';
 function render(){
   if((adding&&$('#addf'))||(editFilm&&$('#editf'))||(chForm&&$('#chf'))){return}
   hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
-  const mk=[film,adding,rModal,nomV,trendV,memV,tour&&tour.i,podium&&1,chForm&&1].join('|'),keepScroll=mk===lastMk?(document.querySelector('.modal .sheet')?.scrollTop||0):0;
+  const mk=[film,adding,rModal,nomV,trendV,memV,binfo&&binfo.name,tour&&tour.i,podium&&1,chForm&&1].join('|'),keepScroll=mk===lastMk?(document.querySelector('.modal .sheet')?.scrollTop||0):0;
   if(!S.ready){a.innerHTML=`<div class="empty dim" style="padding-top:120px">${reelHtml('Ouverture de la salle…')}</div>`;return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,election:electionView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(trendV!=null?trendModal():'')+(memV?memberModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(trendV!=null?trendModal():'')+(memV?memberModal():'')+(binfo?badgeModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
   lastMk=mk;if(keepScroll){const sh=document.querySelector('.modal .sheet');if(sh)sh.scrollTop=keepScroll}
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
@@ -1784,7 +1868,7 @@ async function shareCard(fid){
   const c=document.createElement('canvas');c.width=1080;c.height=1350;const x=c.getContext('2d'),[a,b]=GRAD[hash(f.title)%GRAD.length];
   const g=x.createLinearGradient(0,0,1080,1350);g.addColorStop(0,a);g.addColorStop(1,b);x.fillStyle=g;x.fillRect(0,0,1080,1350);
   x.fillStyle='#ffffff22';x.fillRect(60,60,960,1230);x.fillStyle='#fff';x.textAlign='left';
-  x.font='600 34px Inter,sans-serif';x.fillText('CINÉ-CLUB IMAGERIE',100,140);
+  x.font='600 34px Inter,sans-serif';x.fillText(bk('CINÉ-CLUB IMAGERIE'),100,140);
   const wrapT=(t,mx,y,lh,font,maxL)=>{x.font=font;const ws=t.split(' ');let l='',n=0;for(const wd of ws){const tt=l?l+' '+wd:wd;if(x.measureText(tt).width>mx&&l){x.fillText(l,100,y);y+=lh;l=wd;if(++n>=maxL-1)break}else l=tt}x.fillText(l,100,y);return y+lh};
   let y=wrapT(f.title,880,420,120,'800 108px Inter,system-ui,sans-serif',3);
   x.font='500 40px Inter,sans-serif';x.fillStyle='#ffffffcc';x.fillText(`${f.year||''}${f.director?' · '+f.director:''}`,100,y+10);
@@ -1834,12 +1918,14 @@ document.addEventListener('click',async ev=>{
   else if(act==='trmore'){TR.page++;render()}
   else if(act==='trclose'){trendV=null;trDet=null;render()}
   else if(act==='tropen'){const m=TR.items&&TR.items[+id];if(!m)return;trendV=+id;trDet=null;trLoading=true;render();
-    fetchDetails({title:m.title,year:m.year,director:m.director||'',qid:'',wikiTitle:'',poster:m.poster||''}).then(d=>{if(trendV===+id){trDet=d;trLoading=false;render()}}).catch(()=>{if(trendV===+id){trDet={};trLoading=false;render()}})}
+    fetchDetails({title:m.title,year:m.year,director:m.director||'',qid:m.qid||'',wikiTitle:'',poster:m.poster||''}).then(d=>{if(trendV===+id){trDet=d;trLoading=false;render()}}).catch(()=>{if(trendV===+id){trDet={};trLoading=false;render()}})}
   else if(act==='tridea'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{};trendV=null;trDet=null;render();addIdea({title:m.title,year:d.year||m.year,director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||''})}
   else if(act==='trprop'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{};prefill={title:m.title,year:d.year||m.year,director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||''};trendV=null;trDet=null;adding=true;addNote=0;posterUrl='';render();$('#ft')?.focus()}
   else if(act==='trnom'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{},w=curWeek(),dir=isDir(),ex=!dir&&S.noms.find(n=>n.week===w&&n.userId===S.meId);
     if(ex&&t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='Remplacer mon film en lice ?';return}
     put('noms/'+(dir?w+'_d'+uid():w+'_'+S.meId),{week:w,userId:S.meId,title:m.title,year:d.year||m.year||'',director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||'',pitch:'',ts:Date.now()}).then(ok=>{if(ok){trendV=null;trDet=null;SFX.ding();toast('Film mis en lice pour cette semaine');render()}})}
+  else if(act==='binfo'){binfo={name:id,u:t.dataset.u||S.meId};render()}
+  else if(act==='biclose'){binfo=null;render()}
   else if(act==='viewmember'){memV=id;render()}
   else if(act==='memclose'){memV=null;render()}
   else if(act==='lvclose'){document.querySelector('.lvlup')?.remove()}
@@ -1887,7 +1973,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='editsave'){const g=x=>($('#'+x)?.value||'').trim(),f=S.films.find(x=>x.id===id);if(!f)return;if(!g('ef_title'))return toast('Le titre ne peut pas être vide');
     const feat=$('#ef_feat').checked,up=$('#ef_up').checked,at=$('#ef_tvat').value?new Date($('#ef_tvat').value).getTime():0;
     if(feat)S.films.filter(x=>x.featured&&x.id!==id).forEach(x=>upd('films/'+x.id,{featured:false}));
-    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||'Drame',pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,poster:g('ef_poster'),featured:feat,kind:$('#ef_tvf')?.checked?'tv':'',status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
+    editFilm=null;upd('films/'+id,{title:g('ef_title'),year:g('ef_year'),director:g('ef_dir'),genre:g('ef_genre')||GENRES[0],pitch:g('ef_pitch'),synopsis:g('ef_syn'),where:g('ef_where'),ask:g('ef_ask'),tvCh:g('ef_tvch'),tvAt:at,poster:g('ef_poster'),featured:feat,kind:$('#ef_tvf')?.checked?'tv':'',status:up?'upcoming':'live',...(f.status==='upcoming'&&!up?{added:Date.now()}:{})}).then(ok=>ok&&(SFX.ding(),toast('Fiche mise à jour ✔')))}
   else if(act==='pmtab'){pmTab=id;pmLimit=20;render()}
   else if(act==='pmmore'){pmLimit+=20;render()}
   else if(act==='podium'){if(id)openPodium(id);else toast('Aucun podium pour le moment')}
@@ -1972,11 +2058,11 @@ function setFormPoster(u,auto){const i=$('#fp');if(!i||!u||i.value.trim())return
 document.addEventListener('click',ev=>{const db=ev.target.closest('[data-dr]');if(db){try{dPick=JSON.parse(db.dataset.dr);dStars=0;dDate='';dText='';dShare=false;render()}catch{}return}const nb=ev.target.closest('[data-nm]');if(nb){try{nomPick=JSON.parse(nb.dataset.nm);render()}catch{}return}const b=ev.target.closest('[data-is]');if(!b)return;try{addIdea(JSON.parse(b.dataset.is))}catch{}});
 let acT=null;
 document.addEventListener('click',ev=>{const b=ev.target.closest('[data-s]');if(!b)return;const m=JSON.parse(b.dataset.s);
-  $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||'Drame';if($('#ftvf'))$('#ftvf').checked=!!m.tv;window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
+  $('#ft').value=m.title;$('#fq').value=m.qid||'';$('#fy').value=m.year||'';$('#fd').value=m.director||'';$('#fg').value=m.genre||GENRES[0];if($('#ftvf'))$('#ftvf').checked=!!m.tv;window._fpAuto=false;$('#fp').value=m.poster||'';previewPoster();$('#sug').innerHTML='';$('#fpitch').focus();
   if(!m.poster){(m.qid?wdPoster(m.qid).catch(()=>''):Promise.resolve('')).then(u=>u||wikiPoster(m.title,m.year)).then(u=>setFormPoster(u,false))}});
 document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();render()}
   if(ev.target.id==='pmsel'){pmMonth=ev.target.value;render()}
-  if(ev.target.id==='cf_type'||ev.target.id==='cf_bmode'){readChForm();const d=chForm.d;if(ev.target.id==='cf_type'){d.value=d.type==='before'?'1980':d.type==='after'?'2020':d.type==='genre'?'Drame':''}$('#chf')?.remove();render();return}
+  if(ev.target.id==='cf_type'||ev.target.id==='cf_bmode'){readChForm();const d=chForm.d;if(ev.target.id==='cf_type'){d.value=d.type==='before'?'1980':d.type==='after'?'2020':d.type==='genre'?GENRES[0]:''}$('#chf')?.remove();render();return}
   if(ev.target.id&&ev.target.id.startsWith('cf_')){readChForm();return}
   if(ev.target.id==='hsort'){homeSort=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='hdec'){decSel=ev.target.value;homeLimit=24;render()}
@@ -1985,7 +2071,7 @@ document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();re
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(wrap&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();wrap.i=Math.max(0,wrap.i+(ev.key==='ArrowRight'?1:-1));render();return}
-  if(ev.key==='Escape'){if(trendV!=null){trendV=null;trDet=null;render();return}if(memV){memV=null;render();return}if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(binfo){binfo=null;render();return}if(trendV!=null){trendV=null;trDet=null;render();return}if(memV){memV=null;render();return}if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
@@ -1998,7 +2084,7 @@ document.addEventListener('submit',async ev=>{
   if(f.id==='addf'){const dirU=isDir(),id='f'+uid(),up=dirU&&!!d.up;
     if(dirU&&d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
-    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:dirU&&!!d.feat,featuredAt:dirU&&d.feat?Date.now():0,status:up?'upcoming':'live',by:S.meId,added:Date.now()})];
+    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||GENRES[0]).trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:dirU&&!!d.feat,featuredAt:dirU&&d.feat?Date.now():0,status:up?'upcoming':'live',by:S.meId,added:Date.now()})];
     if(addNote&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote})));
     const fromIdea=prefill&&prefill.from==='idea'?prefill.id:null;if(fromIdea)ops.push(del('ideas/'+fromIdea));
     adding=false;prefill=null;render();Promise.all(ops).then(()=>{SFX.win();toast(up?'Film annoncé dans Prochainement 🗓️':'Film publié pour l’équipe 🎬');enrichFilm(id)})}
@@ -2051,13 +2137,14 @@ function levelFx(L){document.querySelector('.lvlup')?.remove();const d=document.
   d.innerHTML=`<div class="lvrays"></div>${confettiHtml(70)}<div class="lvbox"><div class="lvk">NIVEAU SUPÉRIEUR</div><div class="lvico">${icon('trophy')}</div><h2>${e(gx(L,myG()))}</h2><p>Bravo ${e((nameOf(S.meId)||'').split(' ')[0])} ! Vous montez en grade au ciné-club.</p><button class="btn" data-act="lvclose">Super !</button></div>`;
   document.body.append(d);setTimeout(()=>d.classList.add('out'),5200);setTimeout(()=>d.remove(),5900)}
 function hideTip(){tipEl.style.display='none'}
-function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=gx(stripEmoji(txt),myG());tipEl.style.display='block';
+function showTip(t,ev){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=gx(stripEmoji(txt),myG());tipEl.style.display='block';
   // la bulle se cale sur le bouton : on mesure comment le navigateur convertit left/top (zoom compris) puis on corrige
   tipEl.style.left='100px';tipEl.style.top='100px';
   const c=tipEl.getBoundingClientRect(),kx=c.left/100||1,ky=c.top/100||1,w=c.width,h=c.height,r=t.getBoundingClientRect();
   let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);
+  if(ev&&r.width>340&&typeof ev.clientX==='number'){x=Math.min(Math.max(8,ev.clientX-w/2),innerWidth-w-8);y=ev.clientY+22;if(y+h>innerHeight-8)y=Math.max(8,ev.clientY-h-14)}
   tipEl.style.left=(x/kx)+'px';tipEl.style.top=(y/ky)+'px'}
-document.addEventListener('mouseover',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
+document.addEventListener('mouseover',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t,ev):hideTip()});
 document.addEventListener('focusin',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusout',hideTip);document.addEventListener('scroll',hideTip,true);
 /* données : Supabase */
@@ -2073,7 +2160,7 @@ function derive(){
   S.ratings=arr('ratings').map(r=>({...r,likes:lk[r.id]||[],trophy:cache.trophies.get(r.id)?.kind||null}));
   {const W=curWeek(),win=W>0?weekWinner(W-1):null;
    if(win){let wf=S.films.find(f=>norm(f.title)===norm(win.title)&&(!win.year||!f.year||String(f.year)===String(win.year)));
-    if(!wf){wf={id:'e_'+win.id,title:win.title,year:win.year||'',director:win.director||'',genre:win.genre||'Drame',poster:win.poster||'',qid:win.qid||'',wikiTitle:win.wikiTitle||'',pitch:win.pitch||'',kind:win.tv?'tv':'',status:'live',by:win.userId,added:weekStart(W),virtual:true};S.films.push(wf)}
+    if(!wf){wf={id:'e_'+win.id,title:win.title,year:win.year||'',director:win.director||'',genre:win.genre||GENRES[0],poster:win.poster||'',qid:win.qid||'',wikiTitle:win.wikiTitle||'',pitch:win.pitch||'',kind:win.tv?'tv':'',status:'live',by:win.userId,added:weekStart(W),virtual:true};S.films.push(wf)}
     const manual=S.films.some(f=>f!==wf&&f.featured&&(f.featuredAt||0)>=weekStart(W)),wid=wf.id;
     S.films=S.films.map(f=>f.id===wid?{...f,elected:true,featured:!manual}:(manual?f:{...f,featured:false}))}}
   const lv=cache.config.get('live')?{...cache.config.get('live')}:null;
@@ -2089,22 +2176,22 @@ async function loadAll(full=true){
   const [d,p]=await Promise.all([q,sb.from('profiles').select('id,name,role')]);
   if(d.error)throw d.error;if(p.error)throw p.error;
   if(!delta)COLLS.forEach(c=>cache[c]=new Map());
-  d.data.forEach(r=>{if(cache[r.coll])cache[r.coll].set(r.id,r.data);const t=Date.parse(r.updated_at)||0;if(t>lastSync)lastSync=t});
+  d.data.forEach(r=>{const cc=fromDb(r.coll);if(cc&&cache[cc])cache[cc].set(r.id,r.data);const t=Date.parse(r.updated_at)||0;if(t>lastSync)lastSync=t});
   profiles=p.data;derive();ensureElected()}
 const ensuring=new Set();
 async function ensureElected(){const f=S.films.find(x=>x.virtual);if(!f||ensuring.has(f.id)||!S.meId)return;ensuring.add(f.id);
   try{let patch={};try{patch=await fetchDetails({title:f.title,year:f.year,director:f.director,qid:f.qid||'',wikiTitle:f.wikiTitle||'',poster:f.poster||''})}catch{}
     const doc={title:f.title,year:f.year,director:f.director,genre:f.genre,pitch:f.pitch,kind:f.kind,status:'live',by:f.by,elected:true,added:f.added,...patch,qid:patch.qid||f.qid||'',poster:patch.poster||f.poster||'',enriched:Date.now()};
-    const {error}=await sb.from('docs').upsert({coll:'films',id:f.id,data:doc,owner:S.meId,updated_at:new Date().toISOString()});
+    const {error}=await sb.from('docs').upsert({coll:dbc('films'),id:f.id,data:doc,owner:S.meId,updated_at:new Date().toISOString()});
     if(!error){cache.films.set(f.id,doc);derive();render()}}catch{}}
 async function wr(path,op,data){
   const [c,id]=path.split('/'),m=cache[c];
   if(!m)throw{code:'invalid_argument'};
   if(op==='delete'){m.delete(id);derive();render();
-    const {error}=await sb.from('docs').delete().eq('coll',c).eq('id',id);if(error){await loadAll().catch(()=>{});render();throw{code:'invalid_argument'}}return}
+    const {error}=await sb.from('docs').delete().eq('coll',dbc(c)).eq('id',id);if(error){await loadAll().catch(()=>{});render();throw{code:'invalid_argument'}}return}
   const doc=op==='update'?{...(m.get(id)||{}),...data}:{...data};delete doc.id;if(c==='ratings'){delete doc.likes;delete doc.trophy}
   m.set(id,doc);derive();render();
-  const {error}=await sb.from('docs').upsert({coll:c,id,data:doc,owner:S.meId,updated_at:new Date().toISOString()});
+  const {error}=await sb.from('docs').upsert({coll:dbc(c),id,data:doc,owner:S.meId,updated_at:new Date().toISOString()});
   if(error){await loadAll().catch(()=>{});render();throw{code:'invalid_argument'}}}
 const adapter={doc:p=>({set:d=>wr(p,'set',d),update:d=>wr(p,'update',d),delete:()=>wr(p,'delete')})};
 const saver={save:async({filename,data})=>{const b=data instanceof Blob?data:new Blob([data],{type:filename.endsWith('.ics')?'text/calendar;charset=utf-8':'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}};

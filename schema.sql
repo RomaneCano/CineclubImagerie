@@ -58,48 +58,53 @@ end $$;
 create trigger on_auth_user_created after insert on auth.users
 for each row execute function public.handle_new_user();
 
+-- Le book-club utilise les mêmes tables avec le préfixe b_ (b_films, b_ratings...) : mêmes règles que le ciné-club.
+create or replace function public.base_coll(c text) returns text language sql immutable as $$
+  select case when c like 'b\_%' then substr(c, 3) else c end
+$$;
+
 -- Lecture : tout membre connecté. Les visiteurs anonymes ne voient rien.
 create policy profiles_read on public.profiles for select to authenticated using (true);
 -- Le carnet personnel ('diary') n'est lisible que par son auteur (même pas Hervé), sauf les revues qu'il choisit de partager.
-create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
+create policy docs_read on public.docs for select to authenticated using (public.base_coll(coll) <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
 
 -- Écriture : Hervé écrit partout. Chaque membre écrit ses propres lignes (notes, votes, liste à voir, likes, avatar),
 -- identifiées par un identifiant qui se termine par son id, et peut proposer des films (qu'il peut ensuite modifier ou retirer).
 drop policy if exists docs_read on public.docs;
-create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
+create policy docs_read on public.docs for select to authenticated using (public.base_coll(coll) <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
 drop policy if exists docs_insert on public.docs;
 drop policy if exists docs_update on public.docs;
 drop policy if exists docs_delete on public.docs;
 create policy docs_insert on public.docs for insert to authenticated with check (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary')
+  or (public.base_coll(coll) in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary')
       and right(id, 36) = auth.uid()::text
       and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text
       and coalesce(data->>'elected','false') <> 'true')
-  or (coll = 'films' and owner = auth.uid()
+  or (public.base_coll(coll) = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
       and coalesce(data->>'featured','false') <> 'true')
-  or (coll = 'films' and id like 'e\_%' and owner = auth.uid()
+  or (public.base_coll(coll) = 'films' and id like 'e\_%' and owner = auth.uid()
       and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_update on public.docs for update to authenticated using (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary') and right(id, 36) = auth.uid()::text)
-  or (coll = 'films' and owner = auth.uid())
+  or (public.base_coll(coll) in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary') and right(id, 36) = auth.uid()::text)
+  or (public.base_coll(coll) = 'films' and owner = auth.uid())
 ) with check (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary')
+  or (public.base_coll(coll) in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary')
       and right(id, 36) = auth.uid()::text
       and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text
       and coalesce(data->>'elected','false') <> 'true')
-  or (coll = 'films' and owner = auth.uid()
+  or (public.base_coll(coll) = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
       and coalesce(data->>'featured','false') <> 'true')
-  or (coll = 'films' and id like 'e\_%' and owner = auth.uid()
+  or (public.base_coll(coll) = 'films' and id like 'e\_%' and owner = auth.uid()
       and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_delete on public.docs for delete to authenticated using (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary') and right(id, 36) = auth.uid()::text)
-  or (coll = 'films' and owner = auth.uid())
+  or (public.base_coll(coll) in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes','diary') and right(id, 36) = auth.uid()::text)
+  or (public.base_coll(coll) = 'films' and owner = auth.uid())
 );

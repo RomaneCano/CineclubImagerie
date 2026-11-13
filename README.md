@@ -42,3 +42,10 @@ Pour activer la recherche de GIF dans l'app, créez une clé gratuite sur https:
 
 Sur l'écran de connexion, « Mot de passe oublié ? » envoie un e-mail avec un lien. Pour que ce lien ramène sur le site, dans Supabase :
 Authentication > URL Configuration : mettre l'adresse du site dans « Site URL » et l'ajouter dans « Redirect URLs ».
+
+## Book-Club
+
+Le même site sert aussi un club de lecture : ajoutez `?club=livres` à l'adresse (le bouton « Films / Livres » en haut à droite fait le lien).
+Mêmes comptes et même base Supabase, mais chaque club a ses propres propositions, notes, élections, badges et classement :
+les données du book-club sont stockées avec le préfixe `b_` (`b_films`, `b_ratings`, ...). Il faut relancer `schema.sql`
+(règles de sécurité) pour que les membres puissent écrire dans ces collections. Les livres viennent d'Open Library (gratuit, sans clé).
