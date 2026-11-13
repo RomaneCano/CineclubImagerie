@@ -236,6 +236,13 @@ nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{op
 .ws{overflow:hidden;padding:0}.wsc{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:safe center;gap:12px;padding:24px 28px;overflow-y:auto;scrollbar-width:none;position:relative;z-index:1;overscroll-behavior:contain}.wsc::-webkit-scrollbar{display:none}
 .wbig small{margin-left:.35em;letter-spacing:.02em}
 .wgrid>div{min-width:0}.wgrid b{font-variant-numeric:lining-nums;line-height:1.05}.wgrid b.wtx{font-size:20px;line-height:1.3;overflow-wrap:anywhere}.wgrid b small{font-size:.5em;margin-left:.12em;font-weight:700;opacity:.85;vertical-align:baseline}.wgrid>div>span{margin-top:4px}
+/* grands écrans : on agrandit l'interface par paliers pour qu'elle reste lisible */
+@media(min-width:1700px){html{zoom:1.2}main{max-width:1280px}}
+@media(min-width:2000px){html{zoom:1.4}}
+@media(min-width:2500px){html{zoom:1.7}}
+@media(min-width:3200px){html{zoom:2.1}}
+.subtabs{max-width:100%;overflow-x:auto;scrollbar-width:none}.subtabs::-webkit-scrollbar{display:none}.subtabs .stab{flex:none;white-space:nowrap}
+.animgrid>*,.cols>*,.gwrap>*{min-width:0}@media(max-width:900px){.animgrid{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
 <body>
