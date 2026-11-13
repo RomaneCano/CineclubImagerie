@@ -1743,7 +1743,7 @@ function gifUrl(u){u=String(u||'').trim();if(!/^https:\/\/[^\s]{4,400}$/i.test(u
   const m=u.match(/^https:\/\/(?:www\.)?giphy\.com\/(?:gifs|embed)\/(?:[^/?#]*-)?([A-Za-z0-9]+)(?:[/?#].*)?$/i);
   return m?`https://media.giphy.com/media/${m[1]}/giphy.gif`:u}
 function keepDrafts(){dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;dGif=$('#gif')?.value??dGif}
-const GIFQ={'Applaudissements':'applause','Rire':'laughing','Surprise':'surprised','Peur':'scared','Larmes':'crying','Danse':'dancing','Pop-corn':'popcorn','Cinéma':'cinema'};
+const GIFQ=BOOKS?{'Applaudissements':'applause','Rire':'laughing','Surprise':'shocked','Peur':'scared','Larmes':'crying','Coup de cœur':'heart eyes','Lecture':'reading book','Bibliothèque':'library books'}:{'Applaudissements':'applause','Rire':'laughing','Surprise':'surprised','Peur':'scared','Larmes':'crying','Danse':'dancing','Pop-corn':'popcorn','Cinéma':'cinema'};
 async function gifSearch(q){
   const k=gifKey();
   if(!k){const qq=(GIFQ[q]||q||'applause').trim();
