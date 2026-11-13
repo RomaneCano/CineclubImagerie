@@ -1025,7 +1025,7 @@ function addModal(){const p=prefill||{};
     <div class="field"><label for="fask">Une question pour l’équipe (optionnel)</label><input name="ask" id="fask" placeholder="Et vous, que pensez-vous de la fin ?"></div>
     <div class="field"><label for="fp">Affiche (remplie automatiquement, modifiable)</label><div class="row"><input id="fp" name="posterurl" type="url" placeholder="https://…" value="${e(p.poster||'')}" style="flex:1"><img id="fpv" class="fpv" alt="Aperçu de l’affiche" ${p.poster?`src="${e(p.poster)}"`:'hidden'}></div></div>
     </div></details>
-    <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
+    <div class="field"><div class="row" style="flex-wrap:wrap;margin-bottom:6px"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div><label for="frev">Mon avis (facultatif, visible par l’équipe)</label><textarea name="review" id="frev" rows="2" placeholder="Ce que vous en avez pensé, en deux mots ou plus"></textarea></div>
     <div class="row" style="flex-wrap:wrap;gap:16px">${isDir()?`<label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Mettre à l’affiche tout de suite</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label>`:''}<label class="row dim" style="gap:6px"><input type="checkbox" name="tvfilm" id="ftvf" style="width:auto" ${p.tv?'checked':''}> Téléfilm</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
 function remindText(){const hf=x=>!x.by||x.by===S.cfg.directorId,f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured&&hf(x))||[...S.films].filter(hf).sort((a,b)=>b.added-a.added)[0];
@@ -2100,11 +2100,11 @@ document.addEventListener('submit',async ev=>{
   ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));
   if(f.id==='authf')return doAuth(d);
   if(f.id==='recf')return doRecovery(d);
-  if(f.id==='addf'){const dirU=isDir(),id='f'+uid(),up=dirU&&!!d.up;
+  if(f.id==='addf'){const dirU=isDir(),id='f'+uid(),up=dirU&&!!d.up;if((d.review||'').trim()&&!addNote&&!up)return toast('Mettez une note pour accompagner votre avis');
     if(dirU&&d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
     const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||GENRES[0]).trim(),pitch:(d.pitch||'').trim(),pitchGif:gifUrl(d.pitchgif||''),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:dirU&&!!d.feat,featuredAt:dirU&&d.feat?Date.now():0,status:up?'upcoming':'live',by:S.meId,added:Date.now()})];
-    if(addNote&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote})));
+    if((addNote||(d.review||'').trim())&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote||5,text:(d.review||'').trim()})));
     const fromIdea=prefill&&prefill.from==='idea'?prefill.id:null;if(fromIdea)ops.push(del('ideas/'+fromIdea));
     adding=false;prefill=null;render();Promise.all(ops).then(()=>{SFX.win();toast(up?'Film annoncé dans Prochainement 🗓️':'Film publié pour l’équipe 🎬');enrichFilm(id)})}
   else if(f.id==='duelf'){const fa=S.films.find(x=>norm(x.title)===norm(d.a)),fb=S.films.find(x=>norm(x.title)===norm(d.b));if(!fa||!fb)return toast('Choisissez deux films de la liste (tapez le début du titre)');if(fa.id===fb.id)return toast('Choisissez deux films différents');S.duels.filter(x=>x.open).forEach(x=>upd('duels/'+x.id,{open:false}));put('duels/'+uid(),{a:fa.id,b:fb.id,open:true,created:Date.now()}).then(ok=>ok&&(SFX.ding(),toast('Duel lancé ⚔️')))}
