@@ -1569,15 +1569,15 @@ const TMDB_GENRES={28:'Action',12:'Aventure',16:'Animation',35:'Comédie',80:'Po
 let TR={items:null,loading:false,page:0,src:''},trendV=null,trDet=null,trLoading=false;
 async function loadTrending(){if(TR.items||TR.loading)return;TR.loading=true;
   if(BOOKS){const cb=lsGet('trendb',6*3600e3);if(cb&&cb.length>=6){TR.items=cb;TR.loading=false;return render()}
-    try{const j=await wdGet('https://openlibrary.org/trending/weekly.json?limit=60',10000);const seen=new Set();
-      TR.items=(j.works||[]).filter(w=>w.title&&w.cover_i).map(w=>({title:w.title,year:String(w.first_publish_year||''),director:(w.author_name||[])[0]||'',genre:olGenre(w.subject),poster:olCover(w.cover_i),qid:w.key||'',overview:'',from:'ol'})).filter(m=>{const k=m.title+'|'+m.year;if(seen.has(k))return false;seen.add(k);return true}).slice(0,60);
+    try{const j=await wdGet('https://openlibrary.org/trending/weekly.json?limit=300',10000);const seen=new Set();
+      TR.items=(j.works||[]).filter(w=>w.title&&w.cover_i).map(w=>({title:w.title,year:String(w.first_publish_year||''),director:(w.author_name||[])[0]||'',genre:olGenre(w.subject),poster:olCover(w.cover_i),qid:w.key||'',overview:'',from:'ol'})).filter(m=>{const k=m.title+'|'+m.year;if(seen.has(k))return false;seen.add(k);return true}).slice(0,300);
       if(TR.items.length<6)throw 0;lsSet('trendb',TR.items)}
     catch{TR.src='cat';TR.items=shuffle(CAT.map(([title,year,director,genre])=>({title,year:String(year),director,genre,poster:'',from:'cat'}))).slice(0,60)}
     TR.loading=false;return render()}
   const cached=lsGet('trend2',6*3600e3);if(cached&&cached.length>=6){TR.items=cached;TR.loading=false;return render()}
   try{if(!tmdbKey())throw 0;
-    const pages=await Promise.all([1,2,3].map(pg=>wdGet('https://api.themoviedb.org/3/trending/movie/week?language=fr-FR&page='+pg,9000).catch(()=>({results:[]}))));
-    const seen=new Set();TR.items=pages.flatMap(j=>j.results||[]).filter(m=>m.poster_path&&m.title).map(m=>({title:m.title,year:(m.release_date||'').slice(0,4),genre:(m.genre_ids||[]).map(i=>TMDB_GENRES[i]).find(x=>x&&GENRES.includes(x))||'',poster:'https://image.tmdb.org/t/p/w342'+m.poster_path,overview:m.overview||'',from:'tmdb'})).filter(m=>{const k=m.title+'|'+m.year;if(seen.has(k))return false;seen.add(k);return true}).slice(0,60);
+    const pages=await Promise.all([...[1,2,3,4,5,6,7,8,9,10].map(pg=>'trending/movie/week?language=fr-FR&page='+pg),...[1,2,3,4,5,6].map(pg=>'movie/popular?language=fr-FR&page='+pg)].map(u=>wdGet('https://api.themoviedb.org/3/'+u,9000).catch(()=>({results:[]}))));
+    const seen=new Set();TR.items=pages.flatMap(j=>j.results||[]).filter(m=>m.poster_path&&m.title).map(m=>({title:m.title,year:(m.release_date||'').slice(0,4),genre:(m.genre_ids||[]).map(i=>TMDB_GENRES[i]).find(x=>x&&GENRES.includes(x))||'',poster:'https://image.tmdb.org/t/p/w342'+m.poster_path,overview:(m.overview||'').slice(0,400),from:'tmdb'})).filter(m=>{const k=m.title+'|'+m.year;if(seen.has(k))return false;seen.add(k);return true}).slice(0,300);
     if(TR.items.length<6)throw 0;lsSet('trend2',TR.items)}
   catch{TR.src='cat';TR.items=shuffle(CAT.map(([title,year,director,genre])=>({title,year:String(year),director,genre,poster:'',from:'cat'}))).slice(0,60)}
   TR.loading=false;render()}
@@ -1592,8 +1592,8 @@ function trendingStrip(){if(!S.meId)return'';if(!TR.items&&!TR.loading)setTimeou
   return`<div class="pn" style="margin-bottom:14px"><div class="row" style="align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:10px"><h3 style="margin:0">Besoin d’une idée ? Populaires cette semaine</h3><button class="chip" data-act="gotrend" style="margin-left:auto">Tout voir</button></div><div class="trgrid trstrip">${idx.map(trCard).join('')}</div></div>`}
 function trendingBlock(){if(!S.meId)return'';if(!TR.items&&!TR.loading)setTimeout(loadTrending,0);
   if(!TR.items)return`<div class="pn">${reelHtml('Chargement des films du moment…',true)}</div>`;
-  const idx=trIdx(24);setTimeout(()=>trPosters(idx.map(i=>TR.items[i])),0);
-  return`<div class="row" style="align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:12px"><span class="dim" style="font-size:14px">${TR.src==='cat'?'Une sélection de films pour vous donner des idées':'Les films du moment : cliquez sur une affiche pour la fiche, puis mettez-le en lice ou gardez-le en idée.'}</span><button class="chip" data-act="trmore" style="margin-left:auto">Autres idées</button></div><div class="trgrid">${idx.map(trCard).join('')}</div>`}
+  const nsh=Math.min(TR.show||60,TR.items.length),idx=Array.from({length:nsh},(_,i)=>i);setTimeout(()=>trPosters(idx.slice(0,nsh).map(i=>TR.items[i])),0);
+  return`<div class="row" style="align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:12px"><span class="dim" style="font-size:14px">${TR.src==='cat'?'Une sélection de films pour vous donner des idées':'Les films du moment : cliquez sur une affiche pour la fiche, puis mettez-le en lice ou gardez-le en idée.'}</span><span class="dim" style="font-size:13px;margin-left:auto">${nsh} sur ${TR.items.length}</span></div><div class="trgrid">${idx.map(trCard).join('')}</div>${nsh<TR.items.length?`<div style="text-align:center;margin-top:14px"><button class="btn" data-act="trmore">Afficher plus</button></div>`:''}`}
 function trendModal(){const m=TR.items&&TR.items[trendV];if(!m)return'';const d=trDet||{},pst=d.poster||m.poster||'',meta=[d.year||m.year,d.director||m.director,m.genre].filter(Boolean).map(e).join(' · '),syn=d.synopsis||m.overview||'';
   return`<div class="modal" data-act="trclose"><div class="sheet" data-stop style="width:min(640px,100%)" role="dialog" aria-label="${e(m.title)}"><button class="x" data-act="trclose" aria-label="Fermer">✕</button>
    <div class="row" style="gap:18px;align-items:flex-start;flex-wrap:nowrap"><div style="width:130px;flex:none">${pimg({title:m.title,year:d.year||m.year,director:d.director||m.director,poster:pst})}</div><div style="min-width:0;flex:1">
@@ -1930,7 +1930,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='avsub'){avSub=id;render()}
   else if(act==='rtab'){rTab=id;render();scrollTo(0,0)}
   else if(act==='gotrend'){view='roulette';rTab='trend';render();scrollTo(0,0)}
-  else if(act==='trmore'){TR.page++;render()}
+  else if(act==='trmore'){TR.show=(TR.show||60)+60;render()}
   else if(act==='trclose'){trendV=null;trDet=null;render()}
   else if(act==='tropen'){const m=TR.items&&TR.items[+id];if(!m)return;trendV=+id;trDet=null;trLoading=true;render();
     fetchDetails({title:m.title,year:m.year,director:m.director||'',qid:m.qid||'',wikiTitle:'',poster:m.poster||''}).then(d=>{if(trendV===+id){trDet=d;trLoading=false;render()}}).catch(()=>{if(trendV===+id){trDet={};trLoading=false;render()}})}
