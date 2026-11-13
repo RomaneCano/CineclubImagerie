@@ -1710,13 +1710,16 @@ function editForm(f){const v=x=>e(x??'');
    <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_feat" ${f.featured?'checked':''} style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_up" ${f.status==='upcoming'?'checked':''} style="width:auto"> Annoncer seulement, sans ouvrir les notes</label><label class="row dim" style="gap:6px"><input type="checkbox" id="ef_tvf" ${f.kind==='tv'?'checked':''} style="width:auto"> Téléfilm</label></div>
    <div class="row"><button class="btn" type="button" data-act="editsave" data-id="${f.id}">Enregistrer</button><button class="chip" type="button" data-act="editcancel">Annuler</button></div></form>`}
 function filmStep(d){editFilm=null;revLimit=8;revSort='recent';const l=[...S.films].sort((a,b)=>b.added-a.added),i=l.findIndex(x=>x.id===film);if(i<0)return;film=l[(i+d+l.length)%l.length].id;dTxt=dShot=null;bet=0;render();if(isDir())enrichFilm(film)}
+let lastMk='';
 function render(){
   if((adding&&$('#addf'))||(editFilm&&$('#editf'))||(chForm&&$('#chf'))){return}
   hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
+  const mk=[film,adding,rModal,nomV,memV,tour&&tour.i,podium&&1,chForm&&1].join('|'),keepScroll=mk===lastMk?(document.querySelector('.modal .sheet')?.scrollTop||0):0;
   if(!S.ready){a.innerHTML=`<div class="empty dim" style="padding-top:120px">${reelHtml('Ouverture de la salle…')}</div>`;return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,election:electionView,guide,badges:badgesView,palmares,animer}[view]();
   a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(memV?memberModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
+  lastMk=mk;if(keepScroll){const sh=document.querySelector('.modal .sheet');if(sh)sh.scrollTop=keepScroll}
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
   if(wrap)animateCounters();
