@@ -914,19 +914,19 @@ function wrapped(){
 
 /* créateur d'avatar : un petit personnage à composer */
 const AV={skin:['#f6d5b8','#eec39b','#d9a273','#b87b4b','#8d5a35','#5e3a22'],hair:['none','short','buzz','long','bob','curly','ponytail','bun'],hairColor:['#2b1d12','#5a3a1e','#a0622d','#d8a64a','#c9c9c9','#b8412f','#3a6ea5','#8f4fd1'],eyes:['dots','happy','wide','sleepy'],mouth:['smile','grin','neutral','open'],acc:['none','glasses','sunglasses','headphones','cap'],shirt:['#3d6bff','#e05d5d','#2fb5a0','#d9b43a','#a05ce0','#2b2f3a','#e8873a','#7a8699'],bg:['#ffd9a8','#cfe3ff','#d4f0dc','#f8d0e0','#e3d4ff','#ffe9a8','#d0e8e8','#e5e5ea']};
-const AVLAB={hair:{none:'Chauve',short:'Courts',buzz:'Rasés',long:'Longs',bob:'Carré',curly:'Bouclés',ponytail:'Queue de cheval',bun:'Chignon'},eyes:{dots:'Ronds',happy:'Rieurs',wide:'Grands',sleepy:'Endormis'},mouth:{smile:'Sourire',grin:'Grand sourire',neutral:'Neutre',open:'Bouche ouverte'},acc:{none:'Aucun',glasses:'Lunettes',sunglasses:'Lunettes de soleil',headphones:'Casque',cap:'Casquette'}};
+const AVLAB={hair:{none:'Chauve',short:'Courts',buzz:'Rasés',long:'Longs',bob:'Carré',curly:'Bouclés',ponytail:'Couettes',bun:'Chignon'},eyes:{dots:'Ronds',happy:'Rieurs',wide:'Grands',sleepy:'Endormis'},mouth:{smile:'Sourire',grin:'Grand sourire',neutral:'Neutre',open:'Bouche ouverte'},acc:{none:'Aucun',glasses:'Lunettes',sunglasses:'Lunettes de soleil',headphones:'Casque',cap:'Casquette'}};
 function avDefault(id){const h=hash(id||'x'),pick=(a,o)=>a[(h>>o)%a.length];return{skin:pick(AV.skin,1),hair:pick(AV.hair,3),hairColor:pick(AV.hairColor,5),eyes:pick(AV.eyes,7),mouth:pick(AV.mouth,9),acc:'none',shirt:pick(AV.shirt,11),bg:pick(AV.bg,13)}}
 function avatarSvg(c){
-  const hc=c.hairColor,H=c.hair,ink='#2a2118';
-  const front='M19 27C18 14 27 10 33 10C42 10 47 16 45 27C42 21 38 19 32 19C26 19 22 21 19 27Z';
+  const hc=c.hairColor,H=c.hair,ink='#2a2118',brow=H==='none'||H==='buzz'?'#5a4636':hc;
+  const front='M18.8 29C16.8 12 26.5 8.3 32 8.3C37.5 8.3 47.2 12 45.2 29C43.7 22 39 17 32 17C25 17 20.3 22 18.8 29Z';
   let back='',fr='';
-  if(H==='long')back=`<path d="M17 28C15 50 21 54 25 54H39C43 54 49 50 47 28Z" fill="${hc}"/>`;
-  if(H==='bob')back=`<path d="M17 27C16 40 19 43 22 43H42C45 43 48 40 47 27Z" fill="${hc}"/>`;
-  if(H==='ponytail')back=`<ellipse cx="49" cy="33" rx="4.5" ry="9" fill="${hc}"/>`;
+  if(H==='long')back=`<path d="M16.5 28C14 52 20 56 25 56H39C44 56 50 52 47.5 28Z" fill="${hc}"/>`;
+  if(H==='bob')back=`<path d="M16.5 27C15.5 41 19 44.5 22.5 44.5H41.5C45 44.5 48.5 41 47.5 27Z" fill="${hc}"/>`;
+  if(H==='ponytail')back=`<g fill="${hc}"><ellipse cx="15" cy="37" rx="4.6" ry="9.5"/><ellipse cx="49" cy="37" rx="4.6" ry="9.5"/></g><g fill="#e76f6f"><circle cx="16.5" cy="29" r="1.8"/><circle cx="47.5" cy="29" r="1.8"/></g>`;
   if(H==='bun')back=`<circle cx="32" cy="9" r="6" fill="${hc}"/>`;
   if(['short','long','bob','ponytail','bun'].includes(H))fr=`<path d="${front}" fill="${hc}"/>`;
-  if(H==='buzz')fr=`<path d="M19.5 25C20 14 28 12 32 12C40 12 45 15 44.5 25C42 20 38 18 32 18C26 18 22 20 19.5 25Z" fill="${hc}" opacity=".85"/>`;
-  if(H==='curly')fr=`<g fill="${hc}"><circle cx="22" cy="18" r="6"/><circle cx="32" cy="14" r="7"/><circle cx="42" cy="18" r="6"/><circle cx="19.5" cy="26" r="4"/><circle cx="44.5" cy="26" r="4"/></g>`;
+  if(H==='buzz')fr=`<path d="M19.5 25C19.5 14.5 27.5 12 32 12C36.5 12 44.5 14.5 44.5 25C42 20 38 18 32 18C26 18 22 20 19.5 25Z" fill="${hc}" opacity=".85"/>`;
+  if(H==='curly')fr=`<g fill="${hc}"><circle cx="22" cy="18" r="6"/><circle cx="32" cy="14" r="7"/><circle cx="42" cy="18" r="6"/><circle cx="26.5" cy="12.5" r="5"/><circle cx="37.5" cy="12.5" r="5"/><circle cx="19.5" cy="26" r="4"/><circle cx="44.5" cy="26" r="4"/></g>`;
   const eyes={dots:`<circle cx="26" cy="29" r="1.9" fill="${ink}"/><circle cx="38" cy="29" r="1.9" fill="${ink}"/>`,
     happy:`<g fill="none" stroke="${ink}" stroke-width="1.8" stroke-linecap="round"><path d="M23.8 30Q26 26.8 28.2 30"/><path d="M35.8 30Q38 26.8 40.2 30"/></g>`,
     wide:`<ellipse cx="26" cy="29" rx="2.8" ry="3.1" fill="#fff" stroke="${ink}" stroke-width=".8"/><ellipse cx="38" cy="29" rx="2.8" ry="3.1" fill="#fff" stroke="${ink}" stroke-width=".8"/><circle cx="26" cy="29.4" r="1.4" fill="${ink}"/><circle cx="38" cy="29.4" r="1.4" fill="${ink}"/>`,
@@ -938,8 +938,8 @@ function avatarSvg(c){
   const acc={glasses:`<g fill="none" stroke="#2a2a2a" stroke-width="1.6"><circle cx="26" cy="29" r="5"/><circle cx="38" cy="29" r="5"/><path d="M31 29H33"/></g>`,
     sunglasses:`<g fill="#1b1b1b"><rect x="20.5" y="25.5" width="11" height="7" rx="3"/><rect x="32.5" y="25.5" width="11" height="7" rx="3"/><rect x="31" y="27.5" width="2" height="1.6"/></g>`,
     headphones:`<path d="M17 29C17 9 47 9 47 29" fill="none" stroke="#2f3340" stroke-width="3"/><rect x="14.5" y="26" width="6" height="11" rx="3" fill="#2f3340"/><rect x="43.5" y="26" width="6" height="11" rx="3" fill="#2f3340"/>`,
-    cap:`<path d="M18.5 23C18.5 8 45.5 8 45.5 23Z" fill="#e05d5d"/><rect x="13" y="22" width="24" height="4" rx="2" fill="#c24444"/>`}[c.acc]||'';
-  return`<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${c.bg}"/>${back}<path d="M6 64C6 52 18 46 32 46C46 46 58 52 58 64Z" fill="${c.shirt}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="${c.skin}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="#000" opacity=".08"/><circle cx="19" cy="30" r="2.6" fill="${c.skin}"/><circle cx="45" cy="30" r="2.6" fill="${c.skin}"/><ellipse cx="32" cy="29" rx="13" ry="15" fill="${c.skin}"/><circle cx="23" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/><circle cx="41" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/>${eyes}${mouth}${fr}${acc}</svg>`}
+    cap:`<path d="M18.5 22C18.5 5.5 45.5 5.5 45.5 22Z" fill="#e05d5d"/><path d="M17 22H47C47 25 41.5 26.2 32 26.2C22.5 26.2 17 25 17 22Z" fill="#c24444"/><circle cx="32" cy="7.2" r="1.4" fill="#c24444"/>`}[c.acc]||'';
+  return`<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" fill="${c.bg}"/>${back}<path d="M6 64C6 52 18 46 32 46C46 46 58 52 58 64Z" fill="${c.shirt}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="${c.skin}"/><rect x="27" y="38" width="10" height="11" rx="3" fill="#000" opacity=".08"/><circle cx="19" cy="30" r="2.6" fill="${c.skin}"/><circle cx="45" cy="30" r="2.6" fill="${c.skin}"/><ellipse cx="32" cy="29" rx="13" ry="15" fill="${c.skin}"/><circle cx="23" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/><circle cx="41" cy="34" r="2.2" fill="#e76f6f" opacity=".18"/><g fill="none" stroke="${brow}" stroke-width="1.4" stroke-linecap="round"><path d="M22.5 24.4Q26 22.6 29.5 24"/><path d="M34.5 24Q38 22.6 41.5 24.4"/></g><path d="M31 32.4Q32 34 33 32.4" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="1.1" stroke-linecap="round"/>${eyes}${mouth}${fr}${acc}</svg>`}
 function avatarOf(id,name,av){return`<i class="ini">${avatarSvg({...avDefault(id),...(av&&av.skin?av:{})})}</i>`}
 let avPart='face',avSub='';
 function avCfg(){return{...avDefault(S.meId),...(cache.members.get(S.meId)?.av||{})}}
