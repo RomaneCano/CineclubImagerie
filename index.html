@@ -383,7 +383,7 @@ const curWeek=()=>weekOf(Date.now());
 const weekNoms=w=>S.noms.filter(n=>n.week===w);
 const nomVotes=id=>S.nvotes.filter(v=>v.nomId===id);
 const weekLabel=w=>{const f=d=>d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'});return`du ${f(new Date((w*7-3)*DAY))} au ${f(new Date((w*7+3)*DAY))}`};
-let nomPick=null,nomPitch='';
+let nomPick=null,nomPitch='',nomV=null,nomDet=null,nomDetLoading=false;
 const refUid=fid=>{const f=S.films.find(x=>x.id===fid);return f&&f.by&&f.by!==S.cfg.directorId?f.by:S.cfg.directorId};
 const refName=fid=>{const u=refUid(fid);return!u||u===S.cfg.directorId?'Hervé':((cache.members.get(u)?.name||profiles.find(p=>p.id===u)?.name||'').split(' ')[0]||'le proposeur')};
 const refOf=fid=>{const u=refUid(fid);return u?rOf(fid,u):null};
@@ -591,7 +591,7 @@ const LOGO_MARK=`<svg viewBox="0 0 64 64" aria-hidden="true"><g transform="rotat
 const logoHtml=(lg)=>`<span class="brand${lg?' lg':''}" role="img" aria-label="Ciné-Club Imagerie">${LOGO_MARK}<span class="bt"><b>CINÉ-CLUB</b><i>IMAGERIE</i></span></span>`;
 let menuOpen=false;
 const NAVICON={home:'clap',dash:'chart',animer:'flag',team:'users',palmares:'trophy',election:'star',roulette:'wheel',profile:'user',guide:'book'};
-const NAVTIP={election:'Proposez un film pour l’affiche de la semaine et votez : Hervé choisit parmi les propositions',home:'Les films proposés par Hervé et par l’équipe',dash:'Notes, participation et statistiques de chaque film',animer:'Lancer un défi du mois ou un duel entre deux films',team:'Classement, palmes et défis du mois',palmares:'Les mieux notés, les plus détestés, les plus commentés et les reviewers du mois',roulette:'Tirer un film au hasard quand on manque d’idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
+const NAVTIP={election:'Proposez un film pour l’affiche de la semaine et votez : le plus voté passe à l’affiche',home:'Les films proposés par Hervé et par l’équipe',dash:'Notes, participation et statistiques de chaque film',animer:'Lancer un défi du mois ou un duel entre deux films',team:'Classement, palmes et défis du mois',palmares:'Les mieux notés, les plus détestés, les plus commentés et les reviewers du mois',roulette:'Tirer un film au hasard quand on manque d’idées',profile:'Votre niveau, vos badges, vos cartes et votre journal',guide:'Comment fonctionne le ciné-club'};
 function header(){const s=stats(S.meId),nav=[['home','Séances'],['election','Élection']];if(isDir())nav.push(['dash','Tableau de bord']);if(isDir())nav.push(['animer','Animer']);nav.push(['team','Équipe']);nav.push(['palmares','Palmarès']);nav.push(['roulette','Roulette']);nav.push(['profile','Mon profil']);nav.push(['guide','Guide']);
   return`<header><div class="logo">${logoHtml()}</div><nav>${nav.map(([k,l])=>`<button class="${view===k?'on':''}" data-act="nav" data-id="${k}" data-tip="${e(NAVTIP[k])}">${icon(NAVICON[k]||'star')}${l}</button>`).join('')}</nav>
   <div class="sp"></div>
@@ -1399,32 +1399,46 @@ function rFilters(){const f=R.f,n=rFilterCount(),wd=R.src==='wd';
   ${R.fopen?`<div class="pn" style="margin-bottom:16px;padding:0"><div class="tabs" style="padding:0 12px;margin:0">${tabs.map(([k,l,c])=>`<button class="tab ${R.ftab===k?'on':''}" data-act="rftab" data-id="${k}">${l}${c?` <span class="cnt">${c}</span>`:''}</button>`).join('')}</div><div style="padding:14px 16px">${panel}${wd?'':'<p class="dim" style="font-size:12px;margin-top:8px">Avec « Classiques » ou « Mes idées », acteurs, durée et popularité sont ignorés.</p>'}</div></div>`:''}`}
 
 function electionView(){
-  const w=curWeek(),dir=isDir(),noms=weekNoms(w).map(n=>({...n,v:nomVotes(n.id).length,mine:n.userId===S.meId,iv:nomVotes(n.id).some(x=>x.userId===S.meId)})).sort((a,b)=>(b.elected?1:0)-(a.elected?1:0)||b.v-a.v||a.ts-b.ts);
-  const won=noms.find(n=>n.elected),mn=noms.find(n=>n.mine),past=S.noms.filter(n=>n.elected&&n.week!==w).sort((a,b)=>b.week-a.week).slice(0,6);
+  const w=curWeek(),dir=isDir(),DID=S.cfg.directorId,noms=weekNoms(w).map(n=>({...n,v:nomVotes(n.id).length,mine:n.userId===S.meId,iv:nomVotes(n.id).some(x=>x.userId===S.meId)})).sort((a,b)=>(b.elected?1:0)-(a.elected?1:0)||b.v-a.v||a.ts-b.ts);
+  const won=noms.find(n=>n.elected),mn=dir?null:noms.find(n=>n.mine),past=S.noms.filter(n=>n.elected&&n.week!==w).sort((a,b)=>b.week-a.week).slice(0,6);
+  const lead=won?0:Math.max(0,...noms.map(n=>n.v)),tied=lead>0?noms.filter(n=>n.v===lead):[];
   const first=id=>(nameOf(id)||'').split(' ')[0]||'Un collègue';
-  const card=n=>`<div class="pn nomc ${n.elected?'won':''}"><div class="row" style="gap:14px;align-items:flex-start;flex-wrap:nowrap"><div style="width:80px;flex:none">${poster({title:n.title,year:n.year,director:n.director,poster:n.poster})}</div><div style="min-width:0;flex:1">
-    <div class="row" style="gap:8px;flex-wrap:wrap"><b style="font-size:17px">${e(n.title)}</b>${n.elected?'<span class="badge" style="border-color:var(--acc);color:var(--acc)">Élu</span>':''}</div>
+  const card=n=>`<div class="pn nomc ${n.elected?'won':''}"><div class="row" style="gap:14px;align-items:flex-start;flex-wrap:nowrap"><div style="width:80px;flex:none;cursor:pointer" data-act="nomopen" data-id="${n.id}" data-tip="Voir la description" tabindex="0" role="button" aria-label="Voir la description de ${e(n.title)}">${poster({title:n.title,year:n.year,director:n.director,poster:n.poster})}</div><div style="min-width:0;flex:1">
+    <div class="row" style="gap:8px;flex-wrap:wrap"><b style="font-size:17px;cursor:pointer" data-act="nomopen" data-id="${n.id}" data-tip="Voir la description">${e(n.title)}</b>${n.elected?'<span class="badge" style="border-color:var(--acc);color:var(--acc)">Élu</span>':!won&&lead>0&&n.v===lead?'<span class="badge" style="border-color:var(--ok);color:var(--ok)">En tête</span>':''}${n.userId===DID?'<span class="badge">Choix d’Hervé</span>':''}</div>
     <div class="dim" style="font-size:13px">${[n.year,n.director,n.genre].filter(Boolean).map(e).join(' · ')}</div>
     <div class="dim" style="font-size:13px;margin-top:2px">Proposé par ${n.mine?'vous':e(first(n.userId))}</div>
     ${n.pitch?`<div class="pitch" style="margin:8px 0 0">« ${e(n.pitch)} »</div>`:''}
     <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap"><span class="badge" data-tip="Voix de l’équipe">${n.v} voix</span>
-     ${won?'':dir?`<button class="btn" data-act="nomelect" data-id="${n.id}" data-tip="Met ce film à l’affiche cette semaine">Élire ce film</button>`:n.mine?'':`<button class="chip ${n.iv?'on':''}" data-act="nomvote" data-id="${n.id}" data-tip="Une seule voix par semaine">${n.iv?'Voté ✔':'Voter'}</button>`}
-     ${n.mine&&!n.elected?`<button class="chip" data-act="nomdel" data-id="${n.id}">Retirer</button>`:''}</div></div></div></div>`;
-  const pk=nomPick,form=dir?'':`<div class="pn"><h3>${mn?'Changer ma proposition':'Proposer un film pour l’affiche'}</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">Une proposition par semaine. Cherchez un film et choisissez-le dans la liste.</p>
+     ${won?'':n.mine?'':`<button class="chip ${n.iv?'on':''}" data-act="nomvote" data-id="${n.id}" data-tip="Une seule voix par semaine">${n.iv?'Voté ✔':'Voter'}</button>`}
+     ${dir&&!won&&tied.length>1&&n.v===lead?`<button class="btn" data-act="nomelect" data-id="${n.id}" data-tip="Égalité : vous départagez">Choisir ce film</button>`:''}
+     ${n.mine&&!n.elected&&!won?`<button class="chip" data-act="nomdel" data-id="${n.id}">Retirer</button>`:''}</div></div></div></div>`;
+  const pk=nomPick,form=`<div class="pn"><h3>${dir?'Ajouter un film à l’affiche':mn?'Changer ma proposition':'Proposer un film pour l’affiche'}</h3><p class="dim" style="font-size:13px;margin:4px 0 10px">${dir?'Ajoutez les films que vous mettez en lice : ils sont soumis au vote de l’équipe, comme les propositions des collègues.':'Une proposition par semaine. Cherchez un film et choisissez-le dans la liste.'}</p>
     ${pk?`<div class="row" style="gap:12px;align-items:center;margin-bottom:10px;flex-wrap:nowrap"><div style="width:52px;flex:none">${poster({title:pk.title,year:pk.year,director:pk.director,poster:pk.poster})}</div><div style="min-width:0;flex:1"><b>${e(pk.title)}</b><div class="dim" style="font-size:12px">${[pk.year,pk.director].filter(Boolean).map(e).join(' · ')}</div></div><button class="chip" data-act="nomclear">Changer</button></div>
-     <div class="field"><label for="nomp">Pourquoi ce film cette semaine ? (facultatif)</label><textarea id="nomp" rows="2" maxlength="200">${e(nomPitch)}</textarea></div><button class="btn" style="margin-top:10px" data-act="nompub">${mn?'Remplacer ma proposition':'Proposer ce film'}</button>`
+     <div class="field"><label for="nomp">${dir?'Un mot pour l’équipe (facultatif)':'Pourquoi ce film cette semaine ? (facultatif)'}</label><textarea id="nomp" rows="2" maxlength="200">${e(nomPitch)}</textarea></div><button class="btn" style="margin-top:10px" data-act="nompub">${dir?'Ajouter ce film':mn?'Remplacer ma proposition':'Proposer ce film'}</button>`
      :`<input id="nomt" placeholder="Tapez un titre de film…" autocomplete="off"><div id="nomsug" class="sug"></div>`}</div>`;
-  return`<div class="gwrap" style="max-width:1040px"><h2 style="margin-bottom:4px">L’élection de la semaine</h2><p class="dim" style="margin-bottom:16px">Chacun propose un film pour l’affiche, l’équipe vote, et ${dir?'vous choisissez':'Hervé choisit'}. Semaine ${weekLabel(w)}.</p>
-   ${won?`<div class="banner"><span><b>Film élu cette semaine : ${e(won.title)}</b>, proposé par ${won.mine?'vous':e(first(won.userId))}. Une nouvelle élection s’ouvre la semaine prochaine.</span></div>`:''}
-   <div class="animgrid" style="align-items:start"><div style="display:grid;gap:12px;min-width:0">${noms.length?noms.map(card).join(''):`<div class="pn empty"><h3>Aucune proposition pour le moment</h3><p class="dim">${dir?'Les propositions de l’équipe apparaîtront ici.':'Soyez la première personne à proposer un film pour l’affiche.'}</p></div>`}</div>
-   <div style="display:grid;gap:12px;min-width:0">${form}${past.length?`<div class="pn"><h3>Derniers élus</h3>${past.map(n=>`<div class="row" style="gap:8px;margin-top:8px"><span class="dim" style="font-size:12px;min-width:92px">Semaine ${weekLabel(n.week).replace('du ','').split(' au ')[0]}</span><span><b>${e(n.title)}</b> <span class="dim">par ${e(first(n.userId))}</span></span></div>`).join('')}</div>`:''}</div></div></div>`}
+  const closer=dir&&!won&&noms.length?`<div class="pn" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:220px">${tied.length===1?`En tête : <b>${e(tied[0].title)}</b> avec ${tied[0].v} voix.`:tied.length>1?`<b>Égalité</b> entre ${tied.map(t=>'« '+e(t.title)+' »').join(' et ')} : choisissez entre eux.`:'Aucun vote pour le moment.'}</span>${tied.length===1?`<button class="btn" data-act="nomelect" data-id="${tied[0].id}">Clôturer le vote : élire ce film</button>`:''}</div>`:'';
+  return`<div class="gwrap" style="max-width:1040px"><h2 style="margin-bottom:4px">L’élection de la semaine</h2><p class="dim" style="margin-bottom:16px">Hervé et l’équipe mettent des films en lice, tout le monde vote, et le plus voté passe à l’affiche. Semaine ${weekLabel(w)}.</p>
+   ${won?`<div class="banner" style="cursor:pointer" data-act="nomopen" data-id="${won.id}" data-tip="Voir la description"><span><b>Film élu cette semaine : ${e(won.title)}</b> (${won.v} voix), proposé par ${won.mine?'vous':e(first(won.userId))}. Une nouvelle élection s’ouvre la semaine prochaine.</span></div>`:''}
+   <div class="animgrid" style="align-items:start"><div style="display:grid;gap:12px;min-width:0">${closer}${noms.length?noms.map(card).join(''):`<div class="pn empty"><h3>Aucun film en lice pour le moment</h3><p class="dim">${dir?'Ajoutez vos films, l’équipe pourra voter.':'Soyez la première personne à proposer un film pour l’affiche.'}</p></div>`}</div>
+   <div style="display:grid;gap:12px;min-width:0">${form}${past.length?`<div class="pn"><h3>Derniers élus</h3>${past.map(n=>`<div class="row" style="gap:8px;margin-top:8px;cursor:pointer" data-act="nomopen" data-id="${n.id}" data-tip="Voir la description"><span class="dim" style="font-size:12px;min-width:92px">Semaine ${weekLabel(n.week).replace('du ','').split(' au ')[0]}</span><span><b>${e(n.title)}</b> <span class="dim">par ${e(first(n.userId))}</span></span></div>`).join('')}</div>`:''}</div></div></div>`}
+function nomModal(){const n=S.noms.find(x=>x.id===nomV);if(!n)return'';const d=nomDet||{},pst=d.poster||n.poster||'',first=(nameOf(n.userId)||'').split(' ')[0]||'Un collègue',v=nomVotes(n.id).length;
+  const meta=[d.year||n.year,d.director||n.director,n.genre].filter(Boolean).map(e).join(' · ');
+  return`<div class="modal" data-act="nomclose"><div class="sheet" data-stop style="width:min(640px,100%)" role="dialog" aria-label="${e(n.title)}"><button class="x" data-act="nomclose" aria-label="Fermer">✕</button>
+   <div class="row" style="gap:18px;align-items:flex-start;flex-wrap:nowrap"><div style="width:130px;flex:none">${poster({title:n.title,year:d.year||n.year,director:d.director||n.director,poster:pst})}</div><div style="min-width:0;flex:1">
+    <h2 style="margin:0">${e(n.title)}</h2><div class="dim" style="margin-top:4px">${meta}</div>
+    <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${d.runtime?`<span class="badge">${icon('clock')} ${hm(d.runtime)}</span>`:''}${d.country?`<span class="badge">${icon('globe')} ${e(d.country)}</span>`:''}<span class="badge">${v} voix</span>${n.elected?'<span class="badge" style="border-color:var(--acc);color:var(--acc)">Élu</span>':''}</div>
+    <p class="dim" style="margin-top:8px;font-size:13px">Proposé par ${n.userId===S.meId?'vous':e(first)}${n.pitch?` : « ${e(n.pitch)} »`:''}</p>
+    ${nomDetLoading?`<div style="margin-top:12px">${reelHtml('Recherche de la description…',true)}</div>`:''}
+    ${d.cast&&d.cast.length?`<p class="dim" style="margin-top:10px;font-size:14px">Avec ${d.cast.slice(0,6).map(e).join(', ')}</p>`:''}
+    ${d.synopsis?`<p style="margin-top:10px;line-height:1.55;color:#dcd9e6">${e(d.synopsis)}</p>`:(!nomDetLoading?'<p class="dim" style="margin-top:10px">Aucune description trouvée pour ce film.</p>':'')}
+   </div></div></div></div>`}
 function electionTeaser(){if(!S.meId)return'';const w=curWeek(),all=weekNoms(w);if(all.some(n=>n.elected))return'';const dir=isDir(),n=all.length;
-  if(dir&&!n)return'';
   const bn=(txt,btn)=>`<div class="banner"><span>${txt}</span><button class="btn" data-act="nav" data-id="election">${btn}</button></div>`;
-  if(dir)return bn(`<b>Élection de la semaine.</b> ${n} proposition${n>1?'s':''} en lice. Choisissez le film de la semaine parmi les propositions.`,'Voir les propositions');
-  const mine=all.find(x=>x.userId===S.meId),others=all.filter(x=>x.userId!==S.meId),voted=S.nvotes.some(v=>v.week===w&&v.userId===S.meId);
-  if(!mine)return bn(`<b>Élection de la semaine.</b> ${n?`${n} proposition${n>1?'s':''} en lice. `:''}Proposez un film pour l’affiche et votez pour vos préférés.`,'Participer');
-  if(others.length&&!voted)return bn(`<b>Votre proposition est enregistrée.</b> Il vous reste à voter pour votre préférée parmi ${others.length>1?'les '+others.length+' autres propositions':'l’autre proposition'}.`,'Voter');
+  const voted=S.nvotes.some(v=>v.week===w&&v.userId===S.meId),mine=all.find(x=>x.userId===S.meId),others=all.filter(x=>x.userId!==S.meId);
+  if(dir){if(!n)return bn('<b>Élection de la semaine.</b> Ajoutez les films que vous mettez en lice : l’équipe votera.','Ajouter des films');
+    return bn(`<b>Élection de la semaine.</b> ${n} film${n>1?'s':''} en lice. Le plus voté passe à l’affiche : vous clôturez le vote quand vous voulez.`,'Voir le vote')}
+  if(!mine)return bn(`<b>Élection de la semaine.</b> ${n?`${n} film${n>1?'s':''} en lice. `:''}Proposez un film pour l’affiche et votez pour vos préférés.`,'Participer');
+  if(others.length&&!voted)return bn(`<b>Votre proposition est enregistrée.</b> Il vous reste à voter pour votre préférée parmi ${others.length>1?'les '+others.length+' autres films':'l’autre film'}.`,'Voter');
   return''}
 function rouletteView(){
   if(!R.pool.length&&!R.result&&!R.loading&&!R.tried){R.tried=true;setTimeout(buildPool,0)}
@@ -1608,7 +1622,7 @@ function guideData(){
   const dir=[['Proposer',[
     ['proposer','➕','Proposer un film',GL(['Appuyez sur <b>N</b> ou sur le bouton jaune, puis tapez 3 lettres du titre : l’app remplit année, réalisation, genre et affiche.','Ajoutez si vous voulez une phrase pour l’équipe, où le voir et une question.','« Film de la semaine » le met en vedette. Indiquez la date et l’heure de la séance : un bandeau jaune la rappelle en haut de toutes les pages.'])],
     ['annoncer','🗓️','Annoncer seulement','<p>Avec « Annoncer seulement », le film apparaît dans « Prochainement » sur l’accueil : l’équipe le voit mais ne peut pas le noter. Plus tard, ouvrez-le et cliquez sur « Mettre à l’affiche » pour ouvrir les notes.</p>'],
-    ['election','🗳️','L’élection de la semaine','<p>Chaque semaine, chacun peut proposer un film pour l’affiche (onglet Élection), puis l’équipe vote pour sa proposition préférée, avec une voix par semaine. Hervé choisit ensuite le film de la semaine parmi les propositions. Proposer rapporte 10 XP, être élu 50 XP.</p>'],
+    ['election','🗳️','L’élection de la semaine','<p>Chaque semaine, chacun peut proposer un film pour l’affiche (onglet Élection), Hervé met aussi ses films en lice. Tout le monde vote pour son film préféré (une voix par semaine, pas pour son propre film), et le film le plus voté passe à l’affiche quand Hervé clôture le vote. Proposer rapporte 10 XP, être élu 50 XP.</p>'],
     ['roulette','🎡','Roulette et idées','<p>Onglet Roulette, ouvert à toute l’équipe : 12 films tirés au hasard dans une base mondiale ou dans vos idées (vos idées sont personnelles). Filtrez par genre, tournez, puis « Le proposer à l’équipe ». La liste d’idées à droite alimente la roue.</p>']]],
    ['Animer',[
     ['direct2','🔴','Séance en direct','<p>Dans la fiche d’un film, « Lancer une séance en direct » cache les résultats à l’équipe pendant qu’elle note. « Révéler les résultats » les montre à tous en même temps, « Terminer la séance » la ferme.</p>'],
@@ -1644,7 +1658,7 @@ function render(){
   if(!S.ready){a.innerHTML=`<div class="empty dim" style="padding-top:120px">${reelHtml('Ouverture de la salle…')}</div>`;return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,election:electionView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
   if(wrap)animateCounters();
@@ -1709,8 +1723,14 @@ document.addEventListener('click',async ev=>{
   else if(act==='avpart'){avPart=id;avSub='';render()}
   else if(act==='avsub'){avSub=id;render()}
   else if(act==='nomclear'){nomPick=null;render()}
+  else if(act==='nomclose'){nomV=null;nomDet=null;render()}
+  else if(act==='nomopen'){const n=S.noms.find(x=>x.id===id);if(!n)return;
+    const f=S.films.find(x=>norm(x.title)===norm(n.title)&&(!n.year||!x.year||String(x.year)===String(n.year)));
+    if(f){film=f.id;revLimit=8;revSort='recent';editFilm=null;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();return}
+    nomV=id;nomDet=null;nomDetLoading=true;render();
+    fetchDetails({title:n.title,year:n.year,director:n.director,qid:n.qid||'',wikiTitle:n.wikiTitle||'',poster:n.poster||''}).then(d=>{if(nomV===id){nomDet=d;nomDetLoading=false;render()}}).catch(()=>{if(nomV===id){nomDet={};nomDetLoading=false;render()}})}
   else if(act==='nompub'){if(!nomPick)return;const w=curWeek(),m=nomPick,pitch=($('#nomp')?.value||'').trim().slice(0,200);
-    put('noms/'+w+'_'+S.meId,{week:w,userId:S.meId,title:m.title,year:m.year||'',director:m.director||'',genre:m.genre||'',poster:m.poster||'',qid:m.qid||'',wikiTitle:m.wikiTitle||'',tv:!!m.tv,pitch,ts:Date.now()}).then(ok=>{if(ok){nomPick=null;nomPitch='';SFX.ding();toast('Proposition enregistrée pour cette semaine')}})}
+    put('noms/'+(isDir()?w+'_d'+uid():w+'_'+S.meId),{week:w,userId:S.meId,title:m.title,year:m.year||'',director:m.director||'',genre:m.genre||'',poster:m.poster||'',qid:m.qid||'',wikiTitle:m.wikiTitle||'',tv:!!m.tv,pitch,ts:Date.now()}).then(ok=>{if(ok){nomPick=null;nomPitch='';SFX.ding();toast(isDir()?'Film ajouté à l’élection':'Proposition enregistrée pour cette semaine')}})}
   else if(act==='nomdel'){del('noms/'+id)}
   else if(act==='nomvote'){const n=S.noms.find(x=>x.id===id);if(!n)return;if(n.userId===S.meId)return toast('On ne vote pas pour sa propre proposition');if(S.noms.some(x=>x.week===n.week&&x.elected))return toast('Le film de la semaine est déjà élu');
     const mine=S.nvotes.filter(v=>v.week===n.week&&v.userId===S.meId),already=mine.some(v=>v.nomId===id);
@@ -1838,7 +1858,7 @@ document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();re
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(wrap&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();wrap.i=Math.max(0,wrap.i+(ev.key==='ArrowRight'?1:-1));render();return}
-  if(ev.key==='Escape'){if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
@@ -1894,7 +1914,11 @@ document.addEventListener('input',ev=>{
 const tipEl=document.createElement('div');tipEl.id='tip';tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
 function hideTip(){tipEl.style.display='none'}
 function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=gx(stripEmoji(txt),myG());tipEl.style.display='block';
-  const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1,r=t.getBoundingClientRect(),w=tipEl.offsetWidth*z,h=tipEl.offsetHeight*z;let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8*z;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8*z);tipEl.style.left=(x/z)+'px';tipEl.style.top=(y/z)+'px'}
+  // la bulle se cale sur le bouton : on mesure comment le navigateur convertit left/top (zoom compris) puis on corrige
+  tipEl.style.left='100px';tipEl.style.top='100px';
+  const c=tipEl.getBoundingClientRect(),kx=c.left/100||1,ky=c.top/100||1,w=c.width,h=c.height,r=t.getBoundingClientRect();
+  let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);
+  tipEl.style.left=(x/kx)+'px';tipEl.style.top=(y/ky)+'px'}
 document.addEventListener('mouseover',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusin',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusout',hideTip);document.addEventListener('scroll',hideTip,true);
