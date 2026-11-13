@@ -1157,21 +1157,32 @@ async function wdPoster(qid){
   const j=await sparql(`SELECT ?pf ?im WHERE { OPTIONAL { wd:${qid} wdt:P3383 ?pf } OPTIONAL { wd:${qid} wdt:P18 ?im } } LIMIT 1`);
   const b=j.results?.bindings?.[0];const u=b?.pf?.value||b?.im?.value;return u?u.replace(/^http:/,'https:')+'?width=400':''}
 const norm=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
-function localSearch(q){const n=norm(q);if(n.length<2)return[];
-  return CAT.filter(c=>norm(c[0]).includes(n)||norm(c[2]).includes(n)).sort((a,b)=>(norm(a[0]).startsWith(n)?0:1)-(norm(b[0]).startsWith(n)?0:1)).slice(0,5).map(([title,year,director,genre])=>({qid:'',title,year:String(year),director,genre,poster:'',sl:0,wiki:'',from:'cat'}))}
-function mergeResults(list,q){const n=norm(q),map=new Map();
+const splitYear=t=>{t=String(t||'');const m=t.match(/(?:^|\s)(18[9]\d|19\d\d|20\d\d|2100)(?=\s|$)/);const base=m?t.replace(m[1],' ').replace(/\s+/g,' ').trim():t.trim();return base.length>=2?[base,m?m[1]:'']:[t.trim(),'']};
+function localSearch(q){const [qb,qy]=splitYear(q),n=norm(qb);if(n.length<2)return[];
+  return CAT.filter(c=>norm(c[0]).includes(n)||norm(c[2]).includes(n)).sort((a,b)=>(qy&&String(a[1])===qy?0:1)-(qy&&String(b[1])===qy?0:1)||(norm(a[0]).startsWith(n)?0:1)-(norm(b[0]).startsWith(n)?0:1)).slice(0,5).map(([title,year,director,genre])=>({qid:'',title,year:String(year),director,genre,poster:'',sl:0,wiki:'',from:'cat'}))}
+function mergeResults(list,q){const [qb,qy]=splitYear(q),n=norm(qb),map=new Map();
   list.forEach(x=>{const k=norm(x.title)+'|'+(x.year||'');const o=map.get(k);
     if(!o)map.set(k,{...x});else{if(!o.qid&&x.qid)o.qid=x.qid;if(!o.poster&&x.poster)o.poster=x.poster;if(!o.director&&x.director)o.director=x.director;if(!o.wiki&&x.wiki)o.wiki=x.wiki;o.sl=Math.max(o.sl||0,x.sl||0)}});
   const arr=[...map.values()],dated=new Set(arr.filter(x=>x.year).map(x=>norm(x.title)));
   const rank=x=>{const t=norm(x.title);return t===n?0:t.startsWith(n)?1:t.includes(n)?2:3};
-  return arr.filter(x=>x.year||!dated.has(norm(x.title))).sort((a,b)=>rank(a)-rank(b)||(b.sl||0)-(a.sl||0)).slice(0,10)}
+  const cy=new Date().getFullYear(),eff=x=>(x.sl||0)+(+x.year>=cy-1?60:0);
+  return arr.filter(x=>x.year||!dated.has(norm(x.title))).sort((a,b)=>(qy&&String(a.year)===qy?0:1)-(qy&&String(b.year)===qy?0:1)||rank(a)-rank(b)||eff(b)-eff(a)).slice(0,14)}
 async function wikiThumbs(items){
   const todo=items.filter(x=>!x.poster&&x.wiki);if(!todo.length)return;
   try{const j=await wdGet('https://fr.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=400&redirects=1&format=json&origin=*&titles='+encodeURIComponent(todo.map(x=>x.wiki).join('|')),10000);
     const img=new Map(),al=new Map();Object.values(j.query?.pages||{}).forEach(p=>p.thumbnail&&img.set(p.title,p.thumbnail.source));
     [...(j.query?.normalized||[]),...(j.query?.redirects||[])].forEach(r=>al.set(r.from,r.to));
     todo.forEach(x=>{let n=x.wiki;n=al.get(n)||n;n=al.get(n)||n;const u=img.get(n);if(u)x.poster=u})}catch{}}
-async function wdSearch(text){
+async function tmdbSearch(text,qyear){
+  const k=tmdbKey();let tm=[];
+  const TG={28:'Action',12:'Aventure',16:'Animation',35:'Comédie',80:'Policier',99:'Documentaire',18:'Drame',878:'Science-fiction',53:'Thriller',10765:'Science-fiction',10759:'Action',9648:'Policier'};
+  const tg=ids=>{const g=(ids||[]).map(i=>TG[i]).find(x=>x&&GENRES.includes(x));return g||''};
+  const tmq=async(kind,yr)=>{try{const j=await wdGet(`https://api.themoviedb.org/3/search/${kind}?api_key=${k}&language=fr-FR&include_adult=false&query=${encodeURIComponent(text)}${yr?(kind==='tv'?'&first_air_date_year=':'&year=')+yr:''}`,9000);
+      return(j.results||[]).slice(0,10).map(m=>{const d=kind==='tv'?m.first_air_date:m.release_date;return{qid:'',title:kind==='tv'?m.name:m.title,year:(d||'').slice(0,4),director:'',genre:tg(m.genre_ids),poster:m.poster_path?'https://image.tmdb.org/t/p/w185'+m.poster_path:'',sl:Math.min(40,Math.round((m.popularity||0)/5)),wiki:'',from:'tmdb',serie:kind==='tv'}})}catch{return[]}};
+  if(k){tm=(await Promise.all([tmq('movie',qyear),tmq('tv',qyear)])).flat();if(qyear&&!tm.length)tm=(await Promise.all([tmq('movie',''),tmq('tv','')])).flat()}
+  return tm}
+async function wdSearch(text0){
+  const [text,qyear]=splitYear(text0);const tmP=tmdbSearch(text,qyear);
   const A='https://www.wikidata.org/w/api.php?origin=*&format=json&',W='https://fr.wikipedia.org/w/api.php?origin=*&format=json&';
   const ent=l=>A+'action=wbsearchentities&type=item&limit=50&language='+l+'&uselang='+l+'&search='+encodeURIComponent(text);
   const cir=c=>A+'action=query&list=search&srlimit=15&srsearch='+encodeURIComponent('haswbstatement:P31='+c+' '+text);
@@ -1181,16 +1192,14 @@ async function wdSearch(text){
   const fromWk=rs.slice(4,6).flatMap(r=>Object.values(r?.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0)).map(p=>p.pageprops?.wikibase_item));
   const fromEnt=rs.slice(6).flatMap(r=>(r?.search||[]).map(x=>x.id));
   const ids=[...new Set([...fromWk,...fromCir,...fromEnt])].filter(x=>/^Q\d+$/.test(x||'')).slice(0,150);
-  if(!ids.length)return[];
+  if(!ids.length){const r0=mergeResults(await tmP,text0);await wikiThumbs(r0);return r0}
   const q=`SELECT ?f ?fLabel ?year ?gq ?dLabel ?pf ?sl ?art ?tvf WHERE { VALUES ?f { ${ids.map(i=>'wd:'+i).join(' ')} }
     { ?f wdt:P31/wdt:P279* wd:Q11424 } UNION { ?f wdt:P31 wd:Q506240 }
     FILTER NOT EXISTS { ?f wdt:P31 wd:Q24862 } FILTER NOT EXISTS { ?f wdt:P31/wdt:P279* wd:Q5398426 }
     ?f wikibase:sitelinks ?sl . OPTIONAL { ?f wdt:P577 ?date } BIND(YEAR(?date) AS ?year) OPTIONAL { ?f wdt:P57 ?d } OPTIONAL { ?f wdt:P136 ?gq } OPTIONAL { ?f wdt:P3383 ?pf }
     OPTIONAL { ?art schema:about ?f ; schema:isPartOf <https://fr.wikipedia.org/> } BIND(EXISTS { ?f wdt:P31 wd:Q506240 } AS ?tvf) ${LBL} } LIMIT 1500`;
-  const k=tmdbKey();let tm=[];
-  if(k){try{const j=await wdGet(`https://api.themoviedb.org/3/search/movie?api_key=${k}&language=fr-FR&include_adult=false&query=${encodeURIComponent(text)}`,9000);
-    tm=(j.results||[]).slice(0,10).map(m=>({qid:'',title:m.title,year:(m.release_date||'').slice(0,4),director:'',genre:'',poster:m.poster_path?'https://image.tmdb.org/t/p/w185'+m.poster_path:'',sl:Math.min(40,Math.round((m.popularity||0)/5)),wiki:'',from:'tmdb'}))}catch{}}
-  const res=mergeResults([...wdRows(await sparql(q,15000)),...tm],text);await wikiThumbs(res);return res}
+  const rows=await sparql(q,15000).then(wdRows).catch(()=>[]);
+  const res=mergeResults([...rows,...await tmP],text0);await wikiThumbs(res);return res}
 
 /* fiche film : Wikidata + Wikipédia (+ TMDB si une clé est fournie dans config.js) */
 const tmdbKey=()=>(window.CINECLUB||{}).tmdbKey||'';
@@ -1283,7 +1292,7 @@ async function wpPool(F){
   return res.flat()}
 function sugList(r,attr,wait,v){
   setTimeout(()=>r.slice(0,8).forEach(m=>{if(!m.poster&&!thumbCache[thumbKey(m)]&&!thumbTried.has(thumbKey(m)))fillThumb(m)}),0);
-  return r.map(m0=>{const m={...m0,poster:m0.poster||thumbCache[thumbKey(m0)]||''};return`<button type="button" data-key="${e(thumbKey(m))}" ${attr}='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}${m.tv?' · Téléfilm':''}</span></span></button>`}).join('')+(wait?reelHtml('Recherche dans la base mondiale…',true):!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun film trouvé. Essayez une autre orthographe.</p>':'')+(v.length>=2&&!wait?manualBtn(v,attr):'')}
+  return r.map(m0=>{const m={...m0,poster:m0.poster||thumbCache[thumbKey(m0)]||''};return`<button type="button" data-key="${e(thumbKey(m))}" ${attr}='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}${m.tv?' · Téléfilm':m.serie?' · Série':''}</span></span></button>`}).join('')+(wait?reelHtml('Recherche dans la base mondiale…',true):!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun film trouvé. Essayez une autre orthographe.</p>':'')+(v.length>=2&&!wait?manualBtn(v,attr):'')}
 const manualBtn=(v,attr)=>`<button type="button" class="manual" ${attr}='${e(JSON.stringify({title:v.replace(/\s+/g,' ').trim(),year:'',director:'',genre:'',poster:'',qid:'',manual:true}))}'><span class="ph">＋</span><span><b>Ajouter « ${e(v.trim())} »</b><br><span class="dim" style="font-size:12px">Ce film n’est pas dans la liste ? Ajoutez-le tel quel.</span></span></button>`;
 async function addIdea(m){
   const key=norm(m.title)+'|'+(m.year||'');
@@ -1409,8 +1418,14 @@ function electionView(){
    ${won?`<div class="banner"><span><b>Film élu cette semaine : ${e(won.title)}</b>, proposé par ${won.mine?'vous':e(first(won.userId))}. Une nouvelle élection s’ouvre la semaine prochaine.</span></div>`:''}
    <div class="animgrid" style="align-items:start"><div style="display:grid;gap:12px;min-width:0">${noms.length?noms.map(card).join(''):`<div class="pn empty"><h3>Aucune proposition pour le moment</h3><p class="dim">${dir?'Les propositions de l’équipe apparaîtront ici.':'Soyez la première personne à proposer un film pour l’affiche.'}</p></div>`}</div>
    <div style="display:grid;gap:12px;min-width:0">${form}${past.length?`<div class="pn"><h3>Derniers élus</h3>${past.map(n=>`<div class="row" style="gap:8px;margin-top:8px"><span class="dim" style="font-size:12px;min-width:92px">Semaine ${weekLabel(n.week).replace('du ','').split(' au ')[0]}</span><span><b>${e(n.title)}</b> <span class="dim">par ${e(first(n.userId))}</span></span></div>`).join('')}</div>`:''}</div></div></div>`}
-function electionTeaser(){if(!S.meId)return'';const w=curWeek();if(weekNoms(w).some(n=>n.elected))return'';const n=weekNoms(w).length;if(isDir()&&!n)return'';
-  return`<div class="banner"><span><b>Élection de la semaine.</b> ${n?`${n} proposition${n>1?'s':''} en lice. `:''}${isDir()?'Choisissez le film de la semaine parmi les propositions.':'Proposez un film pour l’affiche et votez pour vos préférés.'}</span><button class="btn" data-act="nav" data-id="election">${isDir()?'Voir les propositions':'Participer'}</button></div>`}
+function electionTeaser(){if(!S.meId)return'';const w=curWeek(),all=weekNoms(w);if(all.some(n=>n.elected))return'';const dir=isDir(),n=all.length;
+  if(dir&&!n)return'';
+  const bn=(txt,btn)=>`<div class="banner"><span>${txt}</span><button class="btn" data-act="nav" data-id="election">${btn}</button></div>`;
+  if(dir)return bn(`<b>Élection de la semaine.</b> ${n} proposition${n>1?'s':''} en lice. Choisissez le film de la semaine parmi les propositions.`,'Voir les propositions');
+  const mine=all.find(x=>x.userId===S.meId),others=all.filter(x=>x.userId!==S.meId),voted=S.nvotes.some(v=>v.week===w&&v.userId===S.meId);
+  if(!mine)return bn(`<b>Élection de la semaine.</b> ${n?`${n} proposition${n>1?'s':''} en lice. `:''}Proposez un film pour l’affiche et votez pour vos préférés.`,'Participer');
+  if(others.length&&!voted)return bn(`<b>Votre proposition est enregistrée.</b> Il vous reste à voter pour votre préférée parmi ${others.length>1?'les '+others.length+' autres propositions':'l’autre proposition'}.`,'Voter');
+  return''}
 function rouletteView(){
   if(!R.pool.length&&!R.result&&!R.loading&&!R.tried){R.tried=true;setTimeout(buildPool,0)}
   const rs=R.result;
@@ -1868,7 +1883,7 @@ document.addEventListener('input',ev=>{
   if(ev.target.id==='ef_poster'){const v=$('#efpv'),u=ev.target.value.trim();if(v){v.hidden=!u;if(u)v.src=u}}
   if(ev.target.id==='ft'&&window._fpAuto){window._fpAuto=false;const a=$('#fp'),q2=$('#fq');if(a)a.value='';if(q2)q2.value='';previewPoster()}
   if(ev.target.id==='ft'){clearTimeout(acT);const v=ev.target.value.trim(),z=$('#sug');if(!z)return;
-    const show=(r0,wait)=>{const r=r0.map(m=>({...m,poster:m.poster||thumbCache[thumbKey(m)]||''}));setTimeout(()=>r.slice(0,8).forEach(m=>{if(!m.poster&&!thumbTried.has(thumbKey(m)))fillThumb(m)}),0);z.innerHTML=r.map(m=>`<button type="button" data-key="${e(thumbKey(m))}" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}${m.tv?' · Téléfilm':''}</span></span></button>`).join('')+(wait?reelHtml('Recherche dans la base mondiale…',true):!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat dans la base.</p>':'')+(v.length>=2&&!wait?manualBtn(v,'data-s'):'')};
+    const show=(r0,wait)=>{const r=r0.map(m=>({...m,poster:m.poster||thumbCache[thumbKey(m)]||''}));setTimeout(()=>r.slice(0,8).forEach(m=>{if(!m.poster&&!thumbTried.has(thumbKey(m)))fillThumb(m)}),0);z.innerHTML=r.map(m=>`<button type="button" data-key="${e(thumbKey(m))}" data-s='${e(JSON.stringify(m))}'>${m.poster?`<img src="${e(m.poster)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'ph',textContent:'🎞️'}))">`:'<span class="ph">🎞️</span>'}<span><b>${e(m.title)}</b> <span class="dim">${e(m.year)}${m.director?' · '+e(m.director):''}</span><br><span class="dim" style="font-size:12px">${e(m.genre||'')}${m.tv?' · Téléfilm':m.serie?' · Série':''}</span></span></button>`).join('')+(wait?reelHtml('Recherche dans la base mondiale…',true):!r.length&&v.length>=3?'<p class="dim" style="font-size:13px">Aucun résultat dans la base.</p>':'')+(v.length>=2&&!wait?manualBtn(v,'data-s'):'')};
     if(v.length<2){z.innerHTML='';return}
     show(localSearch(v),v.length>=3);if(v.length<3)return;
     acT=setTimeout(async()=>{try{const r=await wdSearch(v);if($('#ft')?.value.trim()!==v)return;{const mr=mergeResults([...localSearch(v),...r],v);show(mr,false);const t0=mr[0];if(t0&&norm(t0.title)===norm(v)){if(t0.qid&&!$('#fq').value)$('#fq').value=t0.qid;if(t0.poster)setFormPoster(t0.poster,true);else wikiPoster(t0.title,t0.year).then(u=>setFormPoster(u,true))}}}catch{if($('#ft')?.value.trim()===v)show(localSearch(v),false)}},350)}
