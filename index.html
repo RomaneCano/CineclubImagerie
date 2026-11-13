@@ -260,6 +260,8 @@ html{--z:1}@media(min-width:1700px){html{zoom:1.2;--z:1.2}main{max-width:1280px}
 .sheet>.x{position:sticky;top:-40px;right:auto;display:grid;place-items:center;width:36px;height:36px;margin:-46px -10px 10px auto;border-radius:50%;background:#0f0e14ee;border:1px solid var(--line);z-index:8;font-size:18px}
 .sheet>.fnav{position:sticky;top:-40px;left:auto;margin:-44px 0 8px -6px;height:36px;z-index:8;align-items:center;width:max-content}.sheet>.fnav button{background:#0f0e14ee;border-radius:999px}
 details.more>summary{cursor:pointer;color:var(--mut);font-size:14px;padding:6px 0;list-style:none}details.more>summary::-webkit-details-marker{display:none}details.more>summary::before{content:'＋ '}details.more[open]>summary::before{content:'− '}details.more>summary:hover{color:var(--tx)}
+.trgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px}.trc{padding:0;border:0;background:none;border-radius:10px;overflow:hidden;position:relative;display:block;transition:transform .15s,box-shadow .15s}.trc:hover,.trc:focus-visible{transform:translateY(-3px);box-shadow:0 0 0 2px var(--acc),0 10px 24px #0008}
+.trc img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;background:var(--panel2)}.trph{display:grid;place-items:center;text-align:center;aspect-ratio:2/3;padding:8px;font-size:13px;font-weight:600;border-radius:10px;background:linear-gradient(160deg,#2b2d6e,#7a1f5c);color:#fff}
 </style>
 </head>
 <body>
@@ -1451,7 +1453,8 @@ function rFilters(){const f=R.f,n=rFilterCount(),wd=R.src==='wd';
   return`<div class="row" style="margin-bottom:10px;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="rfopen">${icon('sliders')} Filtres${n?` (${n})`:''}</button>${n?'<button class="chip" data-act="rreset">Réinitialiser</button>':''}</div>
   ${R.fopen?`<div class="pn" style="margin-bottom:16px;padding:0"><div class="tabs" style="padding:0 12px;margin:0">${tabs.map(([k,l,c])=>`<button class="tab ${R.ftab===k?'on':''}" data-act="rftab" data-id="${k}">${l}${c?` <span class="cnt">${c}</span>`:''}</button>`).join('')}</div><div style="padding:14px 16px">${panel}${wd?'':'<p class="dim" style="font-size:12px;margin-top:8px">Avec « Classiques » ou « Mes idées », acteurs, durée et popularité sont ignorés.</p>'}</div></div>`:''}`}
 
-function electionView(){
+function electionView(){return electionBase()+trendingBlock('gwrap')}
+function electionBase(){
   const w=curWeek(),dir=isDir(),DID=S.cfg.directorId,noms=weekNoms(w).map(n=>({...n,v:nomVotes(n.id).length,mine:n.userId===S.meId,iv:nomVotes(n.id).some(x=>x.userId===S.meId)})).sort((a,b)=>(b.elected?1:0)-(a.elected?1:0)||b.v-a.v||a.ts-b.ts);
   const won=null,mn=dir?null:noms.find(n=>n.mine),past=[...new Set(S.noms.map(n=>n.week))].filter(x=>x<w).map(weekWinner).filter(Boolean).sort((a,b)=>b.week-a.week).slice(0,6),aff=w>0?weekWinner(w-1):null,left=Math.max(0,Math.ceil((weekStart(w+1)-Date.now())/DAY));
   const lead=won?0:Math.max(0,...noms.map(n=>n.v)),tied=lead>0?noms.filter(n=>n.v===lead):[];
@@ -1474,6 +1477,31 @@ function electionView(){
    ${aff?`<div class="banner" style="cursor:pointer" data-act="nomopen" data-id="${aff.id}" data-tip="Voir la description"><span><b>À l’affiche cette semaine : ${e(aff.title)}</b>, élu avec ${nomVotes(aff.id).length} voix (proposé par ${aff.userId===S.meId?'vous':e(first(aff.userId))}).</span></div>`:''}
    <div class="animgrid" style="align-items:start"><div style="display:grid;gap:12px;min-width:0">${closer}${noms.length?noms.map(card).join(''):`<div class="pn empty"><h3>Aucun film en lice pour le moment</h3><p class="dim">${dir?'Ajoutez vos films, l’équipe pourra voter.':'Soyez la première personne à proposer un film pour l’affiche.'}</p></div>`}</div>
    <div style="display:grid;gap:12px;min-width:0">${form}${past.length?`<div class="pn"><h3>Derniers élus</h3>${past.map(n=>`<div class="row" style="gap:8px;margin-top:8px;cursor:pointer" data-act="nomopen" data-id="${n.id}" data-tip="Voir la description"><span class="dim" style="font-size:12px;min-width:92px">Semaine ${weekLabel(n.week).replace('du ','').split(' au ')[0]}</span><span><b>${e(n.title)}</b> <span class="dim">par ${e(first(n.userId))}</span></span></div>`).join('')}</div>`:''}</div></div></div>`}
+const TMDB_GENRES={28:'Action',12:'Aventure',16:'Animation',35:'Comédie',80:'Policier',99:'Documentaire',18:'Drame',878:'Science-fiction',53:'Thriller',9648:'Policier'};
+let TR={items:null,loading:false,page:0,src:''},trendV=null,trDet=null,trLoading=false;
+async function loadTrending(){if(TR.items||TR.loading)return;TR.loading=true;
+  const cached=lsGet('trend',6*3600e3);if(cached&&cached.length){TR.items=cached;TR.loading=false;return render()}
+  try{if(!tmdbKey())throw 0;const j=await wdGet('https://api.themoviedb.org/3/trending/movie/week?language=fr-FR',9000);
+    TR.items=(j.results||[]).filter(m=>m.poster_path&&m.title).slice(0,24).map(m=>({title:m.title,year:(m.release_date||'').slice(0,4),genre:(m.genre_ids||[]).map(i=>TMDB_GENRES[i]).find(x=>x&&GENRES.includes(x))||'',poster:'https://image.tmdb.org/t/p/w342'+m.poster_path,overview:m.overview||'',from:'tmdb'}));
+    if(TR.items.length<6)throw 0;lsSet('trend',TR.items)}
+  catch{TR.src='cat';TR.items=shuffle(CAT.map(([title,year,director,genre])=>({title,year:String(year),director,genre,poster:'',from:'cat'}))).slice(0,24);
+    await Promise.all(TR.items.slice(0,12).map(async it=>{try{it.poster=await wikiPoster(it.title,it.year)}catch{}}))}
+  TR.loading=false;render()}
+function trendingBlock(wrap){if(!S.meId)return'';if(!TR.items&&!TR.loading)setTimeout(loadTrending,0);
+  const head=`<div class="row" style="align-items:baseline;flex-wrap:wrap;gap:10px;margin-bottom:10px"><h3 style="margin:0">Populaires cette semaine</h3><span class="dim" style="font-size:13px">${TR.src==='cat'?'Une sélection de films pour vous donner des idées':'Les films du moment, pour vous donner des idées'}</span>${TR.items?'<button class="chip" data-act="trmore" style="margin-left:auto">Autres idées</button>':''}</div>`;
+  const inner=!TR.items?`<div class="pn">${head}${reelHtml('Chargement des films du moment…',true)}</div>`:(()=>{const n=12,len=TR.items.length,start=(TR.page*n)%len,idx=Array.from({length:Math.min(n,len)},(_,i)=>(start+i)%len);
+    return`${head}<div class="trgrid">${idx.map(i=>{const m=TR.items[i];return`<button class="trc" data-act="tropen" data-id="${i}" data-tip="${e(m.title+(m.year?' ('+m.year+')':''))}" aria-label="${e(m.title)}">${m.poster?`<img src="${e(m.poster)}" alt="${e(m.title)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'trph',textContent:this.alt}))">`:`<span class="trph">${e(m.title)}</span>`}</button>`}).join('')}</div>`})();
+  return`<div ${wrap?`class="${wrap}" style="max-width:1040px;margin-top:22px"`:'style="margin-top:22px"'}>${inner}</div>`}
+function trendModal(){const m=TR.items&&TR.items[trendV];if(!m)return'';const d=trDet||{},pst=d.poster||m.poster||'',meta=[d.year||m.year,d.director||m.director,m.genre].filter(Boolean).map(e).join(' · '),syn=d.synopsis||m.overview||'';
+  return`<div class="modal" data-act="trclose"><div class="sheet" data-stop style="width:min(640px,100%)" role="dialog" aria-label="${e(m.title)}"><button class="x" data-act="trclose" aria-label="Fermer">✕</button>
+   <div class="row" style="gap:18px;align-items:flex-start;flex-wrap:nowrap"><div style="width:130px;flex:none">${poster({title:m.title,year:d.year||m.year,director:d.director||m.director,poster:pst})}</div><div style="min-width:0;flex:1">
+    <h2 style="margin:0">${e(m.title)}</h2><div class="dim" style="margin-top:4px">${meta}</div>
+    <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${d.runtime?`<span class="badge">${icon('clock')} ${hm(d.runtime)}</span>`:''}${d.country?`<span class="badge">${icon('globe')} ${e(d.country)}</span>`:''}</div>
+    ${trLoading?`<div style="margin-top:12px">${reelHtml('Recherche de la description…',true)}</div>`:''}
+    ${d.cast&&d.cast.length?`<p class="dim" style="margin-top:10px;font-size:14px">Avec ${d.cast.slice(0,6).map(e).join(', ')}</p>`:''}
+    ${syn?`<p style="margin-top:10px;line-height:1.55;color:#dcd9e6">${e(syn)}</p>`:(!trLoading?'<p class="dim" style="margin-top:10px">Aucune description trouvée pour ce film.</p>':'')}
+    <div class="row" style="gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn" data-act="trnom" data-tip="Il sera soumis au vote de l’équipe pour passer à l’affiche">Le mettre en lice</button><button class="chip" data-act="trprop" data-tip="Ouvre le formulaire de proposition, déjà rempli">Le proposer à l’équipe</button><button class="chip" data-act="tridea" data-tip="Le garde pour plus tard dans vos idées">Garder en idée</button></div>
+   </div></div></div></div>`}
 function nomModal(){const n=S.noms.find(x=>x.id===nomV);if(!n)return'';const d=nomDet||{},pst=d.poster||n.poster||'',first=(nameOf(n.userId)||'').split(' ')[0]||'Un collègue',v=nomVotes(n.id).length;
   const meta=[d.year||n.year,d.director||n.director,n.genre].filter(Boolean).map(e).join(' · ');
   return`<div class="modal" data-act="nomclose"><div class="sheet" data-stop style="width:min(640px,100%)" role="dialog" aria-label="${e(n.title)}"><button class="x" data-act="nomclose" aria-label="Fermer">✕</button>
@@ -1493,7 +1521,8 @@ function electionTeaser(){if(!S.meId)return'';const w=curWeek(),all=weekNoms(w);
   if(!mine)return bn(`<b>Élection de la semaine.</b> ${n?`${n} film${n>1?'s':''} en lice. `:''}Proposez un film pour l’affiche et votez pour vos préférés.`,'Participer');
   if(others.length&&!voted)return bn(`<b>Votre proposition est enregistrée.</b> Il vous reste à voter pour votre préférée parmi ${others.length>1?'les '+others.length+' autres films':'l’autre film'}.`,'Voter');
   return''}
-function rouletteView(){
+function rouletteView(){return rouletteBase()+trendingBlock()}
+function rouletteBase(){
   if(!R.pool.length&&!R.result&&!R.loading&&!R.tried){R.tried=true;setTimeout(buildPool,0)}
   const rs=R.result;
   return`<h2 style="margin-bottom:4px">La roulette 🎡</h2><p class="dim" style="margin-bottom:16px">En panne d’inspiration ? Choisissez vos critères si vous voulez, puis laissez le hasard décider.</p>
@@ -1714,11 +1743,11 @@ let lastMk='';
 function render(){
   if((adding&&$('#addf'))||(editFilm&&$('#editf'))||(chForm&&$('#chf'))){return}
   hideTip();const a=$('#app'),fid=document.activeElement?.id,focusQ=fid==='q'||fid==='dq';
-  const mk=[film,adding,rModal,nomV,memV,tour&&tour.i,podium&&1,chForm&&1].join('|'),keepScroll=mk===lastMk?(document.querySelector('.modal .sheet')?.scrollTop||0):0;
+  const mk=[film,adding,rModal,nomV,trendV,memV,tour&&tour.i,podium&&1,chForm&&1].join('|'),keepScroll=mk===lastMk?(document.querySelector('.modal .sheet')?.scrollTop||0):0;
   if(!S.ready){a.innerHTML=`<div class="empty dim" style="padding-top:120px">${reelHtml('Ouverture de la salle…')}</div>`;return}
   if(!S.db){a.innerHTML=S.setup?setupScreen():authScreen();return}
   const body={home,dash,team:teamView,profile,wrapped,roulette:rouletteView,election:electionView,guide,badges:badgesView,palmares,animer}[view]();
-  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(memV?memberModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
+  a.innerHTML=`<div class="top">${header()}${seanceBanner()}</div>`+`<main>${body}</main>`+(film?filmModal():'')+(adding?addModal():'')+(tour?tourModal():'')+(rModal?rouletteModal():'')+(nomV?nomModal():'')+(trendV!=null?trendModal():'')+(memV?memberModal():'')+(podium?podiumModal():'')+(chForm?chFormModal():'')+(wrap?wrapModal():'');
   lastMk=mk;if(keepScroll){const sh=document.querySelector('.modal .sheet');if(sh)sh.scrollTop=keepScroll}
   if(focusQ){const i=$('#'+fid);if(i){i.focus();i.setSelectionRange(99,99)}}
   if(view==='roulette')drawWheel();
@@ -1783,6 +1812,15 @@ document.addEventListener('click',async ev=>{
   else if(act==='goavatar'){view='profile';pTab='avatar';film=null;menuOpen=false;render()}
   else if(act==='avpart'){avPart=id;avSub='';render()}
   else if(act==='avsub'){avSub=id;render()}
+  else if(act==='trmore'){TR.page++;render()}
+  else if(act==='trclose'){trendV=null;trDet=null;render()}
+  else if(act==='tropen'){const m=TR.items&&TR.items[+id];if(!m)return;trendV=+id;trDet=null;trLoading=true;render();
+    fetchDetails({title:m.title,year:m.year,director:m.director||'',qid:'',wikiTitle:'',poster:m.poster||''}).then(d=>{if(trendV===+id){trDet=d;trLoading=false;render()}}).catch(()=>{if(trendV===+id){trDet={};trLoading=false;render()}})}
+  else if(act==='tridea'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{};trendV=null;trDet=null;render();addIdea({title:m.title,year:d.year||m.year,director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||''})}
+  else if(act==='trprop'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{};prefill={title:m.title,year:d.year||m.year,director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||''};trendV=null;trDet=null;adding=true;addNote=0;posterUrl='';render();$('#ft')?.focus()}
+  else if(act==='trnom'){const m=TR.items&&TR.items[trendV];if(!m)return;const d=trDet||{},w=curWeek(),dir=isDir(),ex=!dir&&S.noms.find(n=>n.week===w&&n.userId===S.meId);
+    if(ex&&t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='Remplacer mon film en lice ?';return}
+    put('noms/'+(dir?w+'_d'+uid():w+'_'+S.meId),{week:w,userId:S.meId,title:m.title,year:d.year||m.year||'',director:d.director||m.director||'',genre:m.genre||'',poster:m.poster||d.poster||'',qid:d.qid||'',pitch:'',ts:Date.now()}).then(ok=>{if(ok){trendV=null;trDet=null;SFX.ding();toast('Film mis en lice pour cette semaine');render()}})}
   else if(act==='viewmember'){memV=id;render()}
   else if(act==='memclose'){memV=null;render()}
   else if(act==='lvclose'){document.querySelector('.lvlup')?.remove()}
@@ -1928,7 +1966,7 @@ document.addEventListener('change',ev=>{if(ev.target.id==='gif'){keepDrafts();re
 document.addEventListener('keydown',ev=>{
   const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
   if(wrap&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();wrap.i=Math.max(0,wrap.i+(ev.key==='ArrowRight'?1:-1));render();return}
-  if(ev.key==='Escape'){if(memV){memV=null;render();return}if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
+  if(ev.key==='Escape'){if(trendV!=null){trendV=null;trDet=null;render();return}if(memV){memV=null;render();return}if(nomV){nomV=null;nomDet=null;render();return}if(wrap){wrap=null;render();return}if(chForm){chForm=null;render();return}if(podium){try{localStorage.setItem('cineclub-podium-'+podium.key,'1')}catch{}podium=null;render();return}if(tour){finishTour();return}menuOpen=false;rModal=false;editFilm=null;film=null;adding=false;dTxt=dShot=null;prefill=null;render()}
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
