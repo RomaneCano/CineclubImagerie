@@ -62,22 +62,35 @@ for each row execute function public.handle_new_user();
 create policy profiles_read on public.profiles for select to authenticated using (true);
 create policy docs_read on public.docs for select to authenticated using (true);
 
--- Écriture : Hervé écrit partout, chaque membre écrit uniquement ses propres lignes
--- (notes, votes, liste à voir, likes, avatar), identifiées par un identifiant qui se termine par son id.
+-- Écriture : Hervé écrit partout. Chaque membre écrit ses propres lignes (notes, votes, liste à voir, likes, avatar),
+-- identifiées par un identifiant qui se termine par son id, et peut proposer des films (qu'il peut ensuite modifier ou retirer).
+drop policy if exists docs_insert on public.docs;
+drop policy if exists docs_update on public.docs;
+drop policy if exists docs_delete on public.docs;
 create policy docs_insert on public.docs for insert to authenticated with check (
-  public.is_director() or (
-    coll in ('ratings','dvotes','watch','likes','members')
-    and right(id, 36) = auth.uid()::text
-    and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+  public.is_director()
+  or (coll in ('ratings','dvotes','watch','likes','members')
+      and right(id, 36) = auth.uid()::text
+      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+  or (coll = 'films' and owner = auth.uid()
+      and coalesce(data->>'by','') = auth.uid()::text
+      and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_update on public.docs for update to authenticated using (
-  public.is_director() or (coll in ('ratings','dvotes','watch','likes','members') and right(id, 36) = auth.uid()::text)
+  public.is_director()
+  or (coll in ('ratings','dvotes','watch','likes','members') and right(id, 36) = auth.uid()::text)
+  or (coll = 'films' and owner = auth.uid())
 ) with check (
-  public.is_director() or (
-    coll in ('ratings','dvotes','watch','likes','members')
-    and right(id, 36) = auth.uid()::text
-    and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+  public.is_director()
+  or (coll in ('ratings','dvotes','watch','likes','members')
+      and right(id, 36) = auth.uid()::text
+      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+  or (coll = 'films' and owner = auth.uid()
+      and coalesce(data->>'by','') = auth.uid()::text
+      and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_delete on public.docs for delete to authenticated using (
-  public.is_director() or (coll in ('ratings','dvotes','watch','likes','members') and right(id, 36) = auth.uid()::text)
+  public.is_director()
+  or (coll in ('ratings','dvotes','watch','likes','members') and right(id, 36) = auth.uid()::text)
+  or (coll = 'films' and owner = auth.uid())
 );

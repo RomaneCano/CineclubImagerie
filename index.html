@@ -824,7 +824,7 @@ function home(){
   if(filter==='all')h+=duelBlock()+chalCards();
   if(up.filter(f=>f!==feat).length&&filter==='all')h+=`<div class="sect"><h3>Prochainement</h3><span class="dim">annoncés par Hervé, bientôt notables</span></div><div class="grid" style="margin-bottom:10px">${up.filter(f=>f!==feat).map(card).join('')}</div>`;
   h+=filmsSection(liveF,genres);
-  if(isDir())h+=`<button class="btn fab" data-act="add">＋ Proposer un film</button>`;
+  if(S.meId)h+=`<button class="btn fab" data-act="add">＋ Proposer un film</button>`;
   return h}
 function filmModal(){
   const f=S.films.find(x=>x.id===film);if(!f)return'';
@@ -839,11 +839,12 @@ function filmModal(){
   const isLiveF=S.live&&S.live.filmId===f.id;
   return`<div class="modal" data-act="close"><div class="sheet" data-stop role="dialog" aria-label="${e(f.title)}"><button class="x" data-act="close" aria-label="Fermer" data-tip="Fermer (Échap)">✕</button><div class="fnav"><button class="chip" data-act="fprev" data-tip="Film précédent (touche ←)" aria-label="Film précédent">←</button><button class="chip" data-act="fnext" data-tip="Film suivant (touche →)" aria-label="Film suivant">→</button></div>
    <div class="cols" style="grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px">${poster(f)}<div class="wrap"><h2 style="font-size:32px">${e(f.title)}</h2><div class="meta">${[f.year,f.director,genreLabel(f)].filter(Boolean).map(e).join(' · ')}</div>
-    <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${f.where?`<span class="badge">📍 ${e(f.where)}</span>`:''}${f.seanceAt?`<span class="badge" style="border-color:var(--ok);color:var(--ok)">📅 Séance : ${e(seanceFull(f.seanceAt))}${f.seancePlace?' · '+e(f.seancePlace):''}</span>`:''}${tvLabel(f)?`<span class="badge" style="border-color:var(--acc);color:var(--acc)">${e(tvLabel(f))}</span>`:''}${up?'<span class="badge">Bientôt à l’affiche</span>':''}</div>
+    <div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${f.by&&f.by!==S.cfg.directorId?`<span class="badge">Proposé par ${e(nameOf(f.by))}</span>`:''}${f.where?`<span class="badge">📍 ${e(f.where)}</span>`:''}${f.seanceAt?`<span class="badge" style="border-color:var(--ok);color:var(--ok)">📅 Séance : ${e(seanceFull(f.seanceAt))}${f.seancePlace?' · '+e(f.seancePlace):''}</span>`:''}${tvLabel(f)?`<span class="badge" style="border-color:var(--acc);color:var(--acc)">${e(tvLabel(f))}</span>`:''}${up?'<span class="badge">Bientôt à l’affiche</span>':''}</div>
     ${f.pitch?`<div class="pitch">« ${e(f.pitch)} »</div>`:''}
     ${(()=>{const meta=[f.runtime?`<span class="badge">🕒 ${hm(f.runtime)}</span>`:'',f.country?`<span class="badge">🌍 ${e(f.country)}</span>`:'',f.tmdb&&f.tmdb.votes&&(isDir()||(mine&&!lo))?`<span class="badge">★ ${String(f.tmdb.rating.toFixed(1)).replace('.',',')} sur 10 · ${f.tmdb.votes} votes publics</span>`:''].filter(Boolean).join('');
      return `${meta?`<div class="row" style="flex-wrap:wrap;gap:6px;margin-top:8px">${meta}</div>`:''}${f.cast&&f.cast.length?`<p class="dim" style="margin-top:10px;font-size:14px">Avec ${f.cast.map(e).join(', ')}</p>`:''}${f.synopsis?`<p style="margin:10px 0;color:#dcd9e6;line-height:1.55">${e(f.synopsis)}</p>`:''}${f.synopsis||f.wiki?`<p class="dim" style="font-size:12px">Sources : ${f.wiki?`<a href="${e(f.wiki)}" target="_blank" rel="noopener" style="color:var(--acc)">Wikipédia</a> (CC BY-SA), `:''}Wikidata${f.tmdb?', TMDB':''}.</p>`:''}`})()}
-    ${f.ask?`<div class="pn" style="padding:12px 14px;margin-bottom:12px"><span class="dim" style="font-size:12px">UNE QUESTION D’HERVÉ</span><div>${e(f.ask)}</div></div>`:''}
+    ${!isDir()&&f.by===S.meId?`<div class="actbar"><div class="al">Ma proposition</div><div class="abg"><button class="abtn" data-act="editfilm" data-id="${f.id}"><span class="ai">✏️</span>Modifier la fiche</button><button class="abtn danger" data-act="del" data-id="${f.id}" data-tip="Retire votre film (possible tant que personne d’autre ne l’a noté)"><span class="ai">🗑️</span>Retirer</button></div></div>${editFilm===f.id?editForm(f):''}`:''}
+    ${f.ask?`<div class="pn" style="padding:12px 14px;margin-bottom:12px"><span class="dim" style="font-size:12px">${f.by&&f.by!==S.cfg.directorId?'UNE QUESTION DE '+e(nameOf(f.by).split(' ')[0]).toUpperCase():'UNE QUESTION D’HERVÉ'}</span><div>${e(f.ask)}</div></div>`:''}
     ${up?'':`<div class="row" style="flex-wrap:wrap;gap:20px"><div><div class="dim" style="font-size:12px">ÉQUIPE</div>${hideTeam?`<b style="font-size:20px">🔒</b> <span class="dim">${team(f.id).length} avis</span>`:`<b class="serif" style="font-size:26px">${fmt(t)}</b> <span class="dim">sur 5 · ${team(f.id).length} avis</span>`}</div>
      <div><div class="dim" style="font-size:12px">HERVÉ</div>${reveal?(dh?`<b class="serif" style="font-size:26px">${fmt(dh.stars)}</b>`:`<span class="dim">${isDir()?'Pas encore noté : cliquez sur les étoiles':'Pas encore noté'}</span>`):`<b style="font-size:20px" data-tip="La note d’Hervé se révèle quand vous avez noté">🔒</b>`}</div></div>`}
     ${isDir()?`${up?'':`<div class="row" style="margin-top:14px;flex-wrap:wrap"><span class="dim">Ma note</span>${stars(dh?.stars||0,'quick:'+f.id)}</div>`}
@@ -875,7 +876,7 @@ function filmModal(){
   </div></div>`}
 function addModal(){const p=prefill||{};
   return`<div class="modal" data-act="close"><div class="sheet" data-stop style="width:min(620px,100%)" role="dialog" aria-label="Proposer un film"><button class="x" data-act="close" aria-label="Fermer">✕</button>
-   <h2>Proposer un film</h2><p class="dim">Un titre, un mot pour l’équipe. Entrée pour publier.</p>
+   <h2>Proposer un film</h2><p class="dim">${isDir()?'Un titre, un mot pour l’équipe. Entrée pour publier.':'Un film que vous aimeriez partager ? Un titre, un mot pour l’équipe, et c’est publié.'}</p>
    <form id="addf" style="display:grid;gap:12px;margin-top:16px">
     <div class="field"><label for="ft">Titre</label><input type="hidden" name="qid" id="fq" value="${e(p.qid||'')}"><input name="title" id="ft" required autocomplete="off" autofocus value="${e(p.title||'')}"><span class="dim" style="font-size:12px">Tapez le titre : des propositions avec affiche apparaissent, un clic remplit les champs.</span></div>
     <div id="sug" class="sug"></div>
@@ -883,11 +884,11 @@ function addModal(){const p=prefill||{};
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:90px"><label for="fy">Année</label><input name="year" id="fy" type="number" min="1890" max="2100" value="${e(p.year||'')}"></div><div class="field" style="flex:2;min-width:150px"><label for="fd">Réalisation</label><input name="director" id="fd" value="${e(p.director||'')}"></div><div class="field" style="flex:1.4;min-width:130px"><label for="fg">Genre</label><input name="genre" id="fg" list="gl" value="${e(p.genre||'Drame')}"><datalist id="gl">${GENRES.map(g=>`<option>${g}</option>`).join('')}</datalist></div></div>
     <div class="row" style="flex-wrap:wrap"><div class="field" style="flex:1;min-width:170px"><label for="fw">Où le voir</label><input name="where" id="fw" placeholder="Netflix, Prime, cinéma, DVD…"></div></div>
     <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:170px"><label for="ftv">Chaîne de diffusion (si télé)</label><input name="tvch" id="ftv" list="tvl" placeholder="Arte, France 2, Canal+…"><datalist id="tvl">${TVCH.map(c=>`<option>${c}</option>`).join('')}</datalist></div><div class="field" style="flex:1;min-width:200px"><label for="ftvd">Date et heure de diffusion</label><input name="tvat" id="ftvd" type="datetime-local"></div></div>
-    <div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:200px"><label for="fsa">Date et heure de la séance d’équipe</label><input name="seat" id="fsa" type="datetime-local"></div><div class="field" style="flex:1;min-width:170px"><label for="fsp">Lieu ou lien (salle, Teams…)</label><input name="seplace" id="fsp" placeholder="Salle Lumière, lien Teams…"></div></div>
+    ${isDir()?`<div class="row" style="flex-wrap:wrap;gap:12px"><div class="field" style="flex:1;min-width:200px"><label for="fsa">Date et heure de la séance d’équipe</label><input name="seat" id="fsa" type="datetime-local"></div><div class="field" style="flex:1;min-width:170px"><label for="fsp">Lieu ou lien (salle, Teams…)</label><input name="seplace" id="fsp" placeholder="Salle Lumière, lien Teams…"></div></div>`:''}
     <div class="field"><label for="fask">Une question pour l’équipe (optionnel)</label><input name="ask" id="fask" placeholder="Et vous, que pensez-vous de la fin ?"></div>
     <div class="field"><label for="fp">Affiche (remplie automatiquement, modifiable)</label><div class="row"><input id="fp" name="posterurl" type="url" placeholder="https://…" value="${e(p.poster||'')}" style="flex:1"><img id="fpv" class="fpv" alt="Aperçu de l’affiche" ${p.poster?`src="${e(p.poster)}"`:'hidden'}></div></div>
     <div class="row" style="flex-wrap:wrap"><span class="dim">Ma note</span>${stars(addNote,'addnote')}</div>
-    <div class="row" style="flex-wrap:wrap;gap:16px"><label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label><label class="row dim" style="gap:6px"><input type="checkbox" name="tvfilm" id="ftvf" style="width:auto" ${p.tv?'checked':''}> Téléfilm</label></div>
+    <div class="row" style="flex-wrap:wrap;gap:16px">${isDir()?`<label class="row dim" style="gap:6px"><input type="checkbox" name="feat" checked style="width:auto"> Film de la semaine</label><label class="row dim" style="gap:6px"><input type="checkbox" name="up" style="width:auto"> Annoncer seulement, sans ouvrir les notes</label>`:''}<label class="row dim" style="gap:6px"><input type="checkbox" name="tvfilm" id="ftvf" style="width:auto" ${p.tv?'checked':''}> Téléfilm</label></div>
     <button class="btn" style="justify-self:end">Publier pour l’équipe</button></form></div></div>`}
 function remindText(){const f=S.films.filter(x=>x.status!=='upcoming').find(x=>x.featured)||[...S.films].sort((a,b)=>b.added-a.added)[0];
   return f?`Bonjour à toute l’équipe ! Le film de la semaine est « ${f.title} » (${f.year||'?'}). ${f.seanceAt?'La séance a lieu '+seanceFull(f.seanceAt)+(f.seancePlace?' ('+f.seancePlace+')':'')+'. ':''}Votre avis en deux minutes sur le Ciné-Club Imagerie : une note, un mot, et la note d’Hervé se révèle. Il reste ${S.films.filter(x=>x.status!=='upcoming').length?cons().filter(m=>!rOf(f.id,m.id)).length:0} avis à recueillir.`:'Aucun film proposé pour le moment.'}
@@ -1198,7 +1199,7 @@ async function fetchDetails(f){
   if(!patch.poster&&!f.poster){const u=await wpP;if(u)patch.poster=u}
   patch.enriched=Date.now();return patch}
 async function enrichFilm(id,force){
-  const f=S.films.find(x=>x.id===id);if(!f||!isDir())return;if(!force&&(f.enriched||triedEnrich.has(id)))return;triedEnrich.add(id);
+  const f=S.films.find(x=>x.id===id);if(!f||!(isDir()||f.by===S.meId))return;if(!force&&(f.enriched||triedEnrich.has(id)))return;triedEnrich.add(id);
   const p=await fetchDetails(f);
   // ne pas écraser ce qu'Hervé a saisi lui-même
   if(f.poster&&!force)delete p.poster;if(f.director&&!force)delete p.director;if(f.year&&!force)delete p.year;
@@ -1678,7 +1679,7 @@ document.addEventListener('click',async ev=>{
   else if(act==='rmore'){revLimit+=8;render()}
   else if(act==='rsort'){revSort=id;revLimit=8;render()}
   else if(act==='smode'){seasonMode=id;render()}
-  else if(act==='open'){revLimit=8;revSort='recent';editFilm=null;film=id;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();if(isDir())enrichFilm(id)}
+  else if(act==='open'){revLimit=8;revSort='recent';editFilm=null;film=id;dTxt=dShot=dGif=null;gifOpen=false;bet=0;render();enrichFilm(id)}
   else if(act==='refreshinfo'){toast('Recherche des infos…');enrichFilm(id,true).then(()=>toast('Infos mises à jour'))}
   else if(act==='add'){adding=true;addNote=0;posterUrl='';prefill=null;render();$('#ft')?.focus()}
   else if(act==='logout'){sb.auth.signOut()}
@@ -1691,7 +1692,8 @@ document.addEventListener('click',async ev=>{
   else if(act==='reveal')upd('config/live',{state:'revealed'})
   else if(act==='endlive')del('config/live')
   else if(act==='del'){if(t.dataset.sure!=='1'){t.dataset.sure='1';t.textContent='Confirmer la suppression';return}
-    S.ratings.filter(r=>r.filmId===id).forEach(r=>del('ratings/'+r.id));del('films/'+id);if(liveFilm()===id)del('config/live');film=null;render()}
+    {const ff=S.films.find(x=>x.id===id);if(!isDir()){if(!ff||ff.by!==S.meId)return;if(S.ratings.some(r=>r.filmId===id&&r.userId!==S.meId))return toast('Des collègues ont déjà noté ce film : demandez à Hervé de le retirer.')}}
+    S.ratings.filter(r=>r.filmId===id&&(isDir()||r.userId===S.meId)).forEach(r=>del('ratings/'+r.id));del('films/'+id);if(liveFilm()===id)del('config/live');film=null;render()}
   else if(act==='like'){const r=S.ratings.find(x=>x.id===id);if(!r)return;if(r.userId===S.meId)return toast('On ne se like pas soi-même 😉');SFX.pop();const k='likes/'+id+'_'+S.meId;(r.likes||[]).includes(S.meId)?del(k):put(k,{ratingId:id,userId:S.meId})}
   else if(act==='tag'){const r=rOf(film,S.meId);if(!r)return toast('Notez d’abord le film');SFX.pop();const tg=r.tags||[];dTxt=$('#txt')?.value??dTxt;dShot=$('#shot')?.value??dShot;upd('ratings/'+r.id,{tags:tg.includes(id)?tg.filter(x=>x!==id):[...tg,id]})}
   else if(act==='publish'){const r=rOf(id,S.meId);if(!r)return toast('Notez d’abord le film');const text=$('#txt').value.trim(),shot=$('#shot').value.trim(),raw=($('#gif')?.value||'').trim(),gif=gifUrl(raw);if(raw&&!gif)return toast('Adresse du GIF invalide : elle doit commencer par https://');dTxt=dShot=dGif=null;gifOpen=false;upd('ratings/'+r.id,{text,shot,gif}).then(ok=>ok&&(SFX.ding(),toast(text||shot||gif?'Avis publié ✔ +XP':'Enregistré')))}
@@ -1748,16 +1750,16 @@ document.addEventListener('keydown',ev=>{
   else if(film&&!typing&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){ev.preventDefault();filmStep(ev.key==='ArrowRight'?1:-1)}
   else if(ev.key==='Enter'&&document.activeElement?.dataset?.act==='open'&&document.activeElement.dataset.id){film=document.activeElement.dataset.id;render();if(isDir())enrichFilm(film)}
   else if(!typing&&S.db){if(ev.key==='/'){ev.preventDefault();if(!$('#q')){view='home';film=null;render()}$('#q')?.focus()}
-    else if((ev.key==='n'||ev.key==='N')&&isDir()){ev.preventDefault();adding=true;addNote=0;posterUrl='';prefill=null;render();$('#ft')?.focus()}}
+    else if((ev.key==='n'||ev.key==='N')&&!!S.meId){ev.preventDefault();adding=true;addNote=0;posterUrl='';prefill=null;render();$('#ft')?.focus()}}
 });
 document.addEventListener('submit',async ev=>{
   ev.preventDefault();const f=ev.target,d=Object.fromEntries(new FormData(f));
   if(f.id==='authf')return doAuth(d);
   if(f.id==='recf')return doRecovery(d);
-  if(f.id==='addf'){const id='f'+uid(),up=!!d.up;
-    if(d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
+  if(f.id==='addf'){const dirU=isDir(),id='f'+uid(),up=dirU&&!!d.up;
+    if(dirU&&d.feat)S.films.filter(x=>x.featured).forEach(x=>upd('films/'+x.id,{featured:false}));
     let poster=(d.posterurl||'').trim();if(!poster){toast('Recherche de l’affiche…');poster=await Promise.race([wikiPoster(d.title.trim(),d.year),new Promise(r=>setTimeout(()=>r(''),3500))])||''}
-    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,seanceAt:d.seat?new Date(d.seat).getTime():0,seancePlace:(d.seplace||'').trim(),ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:!!d.feat,status:up?'upcoming':'live',added:Date.now()})];
+    const ops=[put('films/'+id,{title:d.title.trim(),year:d.year||'',director:(d.director||'').trim(),genre:(d.genre||'Drame').trim(),pitch:(d.pitch||'').trim(),where:(d.where||'').trim(),tvCh:(d.tvch||'').trim(),tvAt:d.tvat?new Date(d.tvat).getTime():0,seanceAt:dirU&&d.seat?new Date(d.seat).getTime():0,seancePlace:dirU?(d.seplace||'').trim():'',ask:(d.ask||'').trim(),poster,qid:d.qid||'',kind:d.tvfilm?'tv':'',featured:dirU&&!!d.feat,status:up?'upcoming':'live',by:S.meId,added:Date.now()})];
     if(addNote&&!up)ops.push(put('ratings/'+rid(id,S.meId),base(id,{stars:addNote})));
     const fromIdea=prefill&&prefill.from==='idea'?prefill.id:null;if(fromIdea)ops.push(del('ideas/'+fromIdea));
     adding=false;prefill=null;render();Promise.all(ops).then(()=>{SFX.win();toast(up?'Film annoncé dans Prochainement 🗓️':'Film publié pour l’équipe 🎬');enrichFilm(id)})}
