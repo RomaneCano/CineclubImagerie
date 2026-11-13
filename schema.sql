@@ -60,13 +60,13 @@ for each row execute function public.handle_new_user();
 
 -- Lecture : tout membre connecté. Les visiteurs anonymes ne voient rien.
 create policy profiles_read on public.profiles for select to authenticated using (true);
--- Le carnet personnel ('diary') n'est lisible que par son auteur, y compris pour Hervé.
-create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text);
+-- Le carnet personnel ('diary') n'est lisible que par son auteur (même pas Hervé), sauf les revues qu'il choisit de partager.
+create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
 
 -- Écriture : Hervé écrit partout. Chaque membre écrit ses propres lignes (notes, votes, liste à voir, likes, avatar),
 -- identifiées par un identifiant qui se termine par son id, et peut proposer des films (qu'il peut ensuite modifier ou retirer).
 drop policy if exists docs_read on public.docs;
-create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text);
+create policy docs_read on public.docs for select to authenticated using (coll <> 'diary' or right(id, 36) = auth.uid()::text or coalesce(data->>'shared','false') = 'true');
 drop policy if exists docs_insert on public.docs;
 drop policy if exists docs_update on public.docs;
 drop policy if exists docs_delete on public.docs;
