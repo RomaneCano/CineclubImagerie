@@ -674,7 +674,7 @@ function animer(){
     const fd=ts=>new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
     const row=c=>{const [a,b]=chRange(c),sc=chStatus(c)==='sched';return`<div class="chr"><span class="tem">${e(c.emoji||'⛳')}</span><div style="min-width:0"><b>${e(c.title)}</b><div class="dim" style="font-size:12px">${e(chalLabel(c))}<br>${chWhen(c)}</div>${c.badge?`<span class="badge" style="margin-top:4px" data-tip="Badge lié à ce défi">${e(c.badge.emoji||'🏅')} ${e(c.badge.name)}</span>`:''}</div><div class="chb"><span class="dim" style="font-size:12px">${cons().filter(x=>chalDone(c,x.id)).length}/${cons().length}</span><button class="chip" data-act="chedit" data-id="${c.id}" data-tip="Modifier ce défi" aria-label="Modifier">✏️</button><button class="chip" data-act="chdup" data-id="${c.id}" data-tip="Dupliquer pour créer un nouveau défi en changeant les paramètres" aria-label="Dupliquer">⧉</button><button class="chip dgr" data-act="chaldel" data-id="${c.id}" data-tip="${sc?'Annuler ce défi programmé':'Retirer ce défi'}" aria-label="Retirer">✕</button></div></div>`};
     body=`<div class="animgrid"><div class="pn"><div class="row" style="margin-bottom:10px;flex-wrap:wrap;gap:8px"><h3 style="flex:1">Lancer un défi</h3><button class="btn" data-act="chnew" data-tip="Créer un défi sur mesure : règle, dates, badge">＋ Créer un défi</button></div>
-      <div class="dim" style="font-size:13px;margin:2px 0 6px">Le défi se termine :</div><div class="subtabs" style="margin-bottom:12px">${[['month','Fin du mois'],['7','Dans 1 semaine'],['14','Dans 2 semaines']].map(([k,l])=>`<button class="stab ${chDur===k?'on':''}" data-act="chdur" data-id="${k}">${l}<small>${fdl(chEnd(k))}</small></button>`).join('')}</div>
+      <div class="dim" style="font-size:13px;margin:2px 0 6px">Le défi se termine :</div><div class="subtabs" style="margin-bottom:12px">${[['month','Fin du mois'],['7','Dans 1 semaine'],['14','Dans 2 semaines'],['c','Durée libre']].map(([k,l])=>`<button class="stab ${chDur===k?'on':''}" data-act="chdur" data-id="${k}">${l}<small ${k==='c'?'id="chdl"':''}>${fdl(chEnd(k))}</small></button>`).join('')}</div>${chDur==='c'?`<div class="row" style="gap:8px;align-items:center;margin:-4px 0 12px"><label for="chdays" class="dim" style="font-size:13px">Nombre de jours</label><input id="chdays" type="number" min="1" max="365" value="${chDays}" style="width:90px"><span class="dim" style="font-size:13px">à partir d’aujourd’hui</span></div>`:''}
       <div class="tiles2">${CHAL_TPL.map((t,i)=>`<div class="tile2"><button class="tmain" data-act="chaltpl" data-id="${i}" data-tip="${e('Lancer maintenant : '+chalLabel({type:t[2],value:t[3],target:t[4]})+' (badge : '+t[5]+')')}"><span class="tem">${t[0]}</span><b>${t[1]}</b></button><button class="tmore" data-act="chtpl" data-id="${i}" data-tip="Personnaliser, programmer ou changer le badge" aria-label="Personnaliser">⋯</button></div>`).join('')}</div>
       </div>
      <div class="pn"><div class="row" style="gap:6px;margin-bottom:8px;flex-wrap:wrap">${Object.entries(names).map(([k,l])=>`<button class="stab ${chList===k?'on':''}" data-act="chlist" data-id="${k}">${l} (${st[k].length})</button>`).join('')}</div>
@@ -1331,9 +1331,9 @@ function icsSeance(f){const st=new Date(f.seanceAt),en=new Date(f.seanceAt+((f.r
 
 
 /* défis : création, doublons, annulation */
-let animTab='chal',chList='active',chDur='month',chForm=null;
+let animTab='chal',chList='active',chDur='month',chDays=10,chForm=null;
 const fdl=ts=>new Date(ts).toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
-const chEnd=k=>{const s0=dayStart(Date.now());return k==='7'?s0+7*DAY-1:k==='14'?s0+14*DAY-1:monthEnd(s0)};
+const chEnd=k=>{const s0=dayStart(Date.now());return k==='7'?s0+7*DAY-1:k==='14'?s0+14*DAY-1:k==='c'?s0+Math.max(1,chDays)*DAY-1:monthEnd(s0)};
 function chWhen(c){const [a,b]=chRange(c),st=chStatus(c),n=Math.max(1,Math.ceil((b-Date.now())/DAY));
   return st==='sched'?`Commence le ${fdl(a)} et se termine le ${fdl(b)}`:st==='active'?`Se termine le ${fdl(b)} : il reste ${n} jour${n>1?'s':''}`:`Terminé le ${fdl(b)}`}
 function toastAction(text,label,fn){const n=document.createElement('div');n.className='toast';n.style.cssText+=';display:flex;gap:12px;align-items:center';const sp=document.createElement('span');sp.textContent=text;const b=document.createElement('button');b.textContent=label;b.style.cssText='background:#1a1500;color:#ffcc00;border-radius:99px;padding:4px 14px;font-weight:700';b.onclick=()=>{n.remove();fn()};n.append(sp,b);document.body.append(n);setTimeout(()=>n.remove(),9000)}
@@ -1350,7 +1350,7 @@ async function launchChallenge(c){
   if(S.chals.some(x=>x.id===id))return toast('Ce défi existe déjà.');
   const doc={...c};if(!doc.badge)delete doc.badge;
   if(await put('challenges/'+id,doc)){SFX.ding();toastAction(c.start>Date.now()+3600e3?'Défi programmé 📅':'Défi lancé ⛳','Annuler',()=>del('challenges/'+id))}}
-function chFromTpl(t,start){const s0=dayStart(start||Date.now()),end=chDur==='7'?s0+7*DAY-1:chDur==='14'?s0+14*DAY-1:monthEnd(s0);
+function chFromTpl(t,start){const s0=dayStart(start||Date.now()),end=chDur==='7'?s0+7*DAY-1:chDur==='14'?s0+14*DAY-1:chDur==='c'?s0+Math.max(1,chDays)*DAY-1:monthEnd(s0);
   return{title:t[1],emoji:t[0],type:t[2],value:t[3],target:t[4],start:s0,end,badge:t[5]?{name:t[5],emoji:t[0]}:null}}
 async function removeChallenge(id){const c=S.chals.find(x=>x.id===id);if(!c)return;const doc={...c};delete doc.id;
   if(await del('challenges/'+id))toastAction(chStatus(c)==='sched'?'Lancement annulé':'Défi retiré','Annuler',()=>put('challenges/'+id,doc))}
@@ -1693,6 +1693,7 @@ document.addEventListener('submit',async ev=>{
 document.addEventListener('input',ev=>{
   if(ev.target.id==='q'){q=ev.target.value;homeLimit=24;render()}
   if(ev.target.id==='dq'){dQ=ev.target.value;dLimit=15;render()}
+  if(ev.target.id==='chdays'){const n=Math.min(365,Math.max(1,parseInt(ev.target.value,10)||1));chDays=n;const l=$('#chdl');if(l)l.textContent=fdl(chEnd('c'));return}
   if(ev.target.id==='idt'){clearTimeout(idT);const v=ev.target.value.trim(),z=$('#isug');if(!z)return;
     const show=(r,wait)=>{R.isug=r;z.innerHTML=sugList(r,'data-is',wait,v)};
     if(v.length<2){R.isug=[];z.innerHTML='';return}
