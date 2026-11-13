@@ -69,28 +69,30 @@ drop policy if exists docs_update on public.docs;
 drop policy if exists docs_delete on public.docs;
 create policy docs_insert on public.docs for insert to authenticated with check (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas')
+  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes')
       and right(id, 36) = auth.uid()::text
-      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text
+      and coalesce(data->>'elected','false') <> 'true')
   or (coll = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
       and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_update on public.docs for update to authenticated using (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas') and right(id, 36) = auth.uid()::text)
+  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes') and right(id, 36) = auth.uid()::text)
   or (coll = 'films' and owner = auth.uid())
 ) with check (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas')
+  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes')
       and right(id, 36) = auth.uid()::text
-      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text)
+      and coalesce(data->>'userId', auth.uid()::text) = auth.uid()::text
+      and coalesce(data->>'elected','false') <> 'true')
   or (coll = 'films' and owner = auth.uid()
       and coalesce(data->>'by','') = auth.uid()::text
       and coalesce(data->>'featured','false') <> 'true')
 );
 create policy docs_delete on public.docs for delete to authenticated using (
   public.is_director()
-  or (coll in ('ratings','dvotes','watch','likes','members','ideas') and right(id, 36) = auth.uid()::text)
+  or (coll in ('ratings','dvotes','watch','likes','members','ideas','noms','nvotes') and right(id, 36) = auth.uid()::text)
   or (coll = 'films' and owner = auth.uid())
 );
