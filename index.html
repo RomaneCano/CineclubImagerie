@@ -256,6 +256,9 @@ nav button .ic{margin-right:5px;vertical-align:-.22em}nav button:not(.on) .ic{op
 .lvbox h2{font-size:clamp(28px,6vw,46px);margin:0 0 8px;text-shadow:0 4px 30px #000a}.lvbox p{opacity:.85;margin:0 0 18px}
 @keyframes lvFade{from{opacity:0}to{opacity:1}}@keyframes lvOut{to{opacity:0;transform:scale(1.04)}}@keyframes lvSpin{to{transform:rotate(360deg)}}@keyframes lvPop{0%{transform:scale(.3) translateY(40px);opacity:0}100%{transform:none;opacity:1}}@keyframes lvGlow{to{transform:scale(1.07);box-shadow:0 0 0 16px #ffcc0022,0 0 120px #ffcc00cc}}
 @media(prefers-reduced-motion:reduce){.lvlup,.lvrays,.lvbox,.lvico{animation:none!important}}
+/* boutons de la fenêtre : toujours visibles, même quand on fait défiler la fiche */
+.sheet>.x{position:sticky;top:-40px;right:auto;display:grid;place-items:center;width:36px;height:36px;margin:-46px -10px 10px auto;border-radius:50%;background:#0f0e14ee;border:1px solid var(--line);z-index:8;font-size:18px}
+.sheet>.fnav{position:sticky;top:-40px;left:auto;margin:-44px 0 8px -6px;height:36px;z-index:8;align-items:center;width:max-content}.sheet>.fnav button{background:#0f0e14ee;border-radius:999px}
 </style>
 </head>
 <body>
