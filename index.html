@@ -1879,7 +1879,7 @@ document.addEventListener('input',ev=>{
 const tipEl=document.createElement('div');tipEl.id='tip';tipEl.setAttribute('role','tooltip');document.body.append(tipEl);
 function hideTip(){tipEl.style.display='none'}
 function showTip(t){const txt=t.dataset.tip;if(!txt||(menuOpen&&t.dataset.act==='menu'))return hideTip();tipEl.textContent=gx(stripEmoji(txt),myG());tipEl.style.display='block';
-  const r=t.getBoundingClientRect(),w=tipEl.offsetWidth,h=tipEl.offsetHeight;let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);tipEl.style.left=x+'px';tipEl.style.top=y+'px'}
+  const z=parseFloat(getComputedStyle(document.documentElement).zoom)||1,r=t.getBoundingClientRect(),w=tipEl.offsetWidth*z,h=tipEl.offsetHeight*z;let x=Math.min(Math.max(8,r.left+r.width/2-w/2),innerWidth-w-8),y=r.bottom+8*z;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8*z);tipEl.style.left=(x/z)+'px';tipEl.style.top=(y/z)+'px'}
 document.addEventListener('mouseover',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusin',ev=>{const t=ev.target.closest?.('[data-tip]');t?showTip(t):hideTip()});
 document.addEventListener('focusout',hideTip);document.addEventListener('scroll',hideTip,true);
