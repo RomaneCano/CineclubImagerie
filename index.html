@@ -1458,7 +1458,7 @@ function rFilters(){const f=R.f,n=rFilterCount(),wd=R.src==='wd';
   return`<div class="row" style="margin-bottom:10px;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="rfopen">${icon('sliders')} Filtres${n?` (${n})`:''}</button>${n?'<button class="chip" data-act="rreset">Réinitialiser</button>':''}</div>
   ${R.fopen?`<div class="pn" style="margin-bottom:16px;padding:0"><div class="tabs" style="padding:0 12px;margin:0">${tabs.map(([k,l,c])=>`<button class="tab ${R.ftab===k?'on':''}" data-act="rftab" data-id="${k}">${l}${c?` <span class="cnt">${c}</span>`:''}</button>`).join('')}</div><div style="padding:14px 16px">${panel}${wd?'':'<p class="dim" style="font-size:12px;margin-top:8px">Avec « Classiques » ou « Mes idées », acteurs, durée et popularité sont ignorés.</p>'}</div></div>`:''}`}
 
-function electionView(){return electionBase().replace('<div class="animgrid"',trendingStrip()+'<div class="animgrid"')}
+function electionView(){return electionBase().replace('<div class="elgrid"',trendingStrip()+'<div class="elgrid"')}
 function electionBase(){
   const w=curWeek(),dir=isDir(),DID=S.cfg.directorId,noms=weekNoms(w).map(n=>({...n,v:nomVotes(n.id).length,mine:n.userId===S.meId,iv:nomVotes(n.id).some(x=>x.userId===S.meId)})).sort((a,b)=>(b.elected?1:0)-(a.elected?1:0)||b.v-a.v||a.ts-b.ts);
   const won=null,mn=dir?null:noms.find(n=>n.mine),past=[...new Set(S.noms.map(n=>n.week))].filter(x=>x<w).map(weekWinner).filter(Boolean).sort((a,b)=>b.week-a.week).slice(0,6),aff=w>0?weekWinner(w-1):null,left=Math.max(0,Math.ceil((weekStart(w+1)-Date.now())/DAY));
