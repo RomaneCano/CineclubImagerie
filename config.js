@@ -8,5 +8,5 @@ window.CINECLUB = {
   tmdbKey: "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJjOGFkNmM3Y2E2NDVmNjU1MGY0ZTlmZjE3MzgwMzRjMyIsIm5iZiI6MTc0ODI0MzAwMC40NDEsInN1YiI6IjY4MzQxMjM4ZjAyM2FhNWNmZmViMzBlZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.YmJJxVXyFwY7q1KSYdQ9nfEFPMDJ5lPfhuCUvuIOoMw",
   // Optionnel : clé API GIPHY (gratuite, developers.giphy.com) pour chercher des GIF dans un avis.
   // Sans clé, on peut quand même coller l'adresse d'un GIF.
-  giphyKey: ""
+  giphyKey: "c8kayremj6tfhaF0lFxEKqEuT3It4Zze"
 };
